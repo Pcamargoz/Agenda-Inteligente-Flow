@@ -8876,46 +8876,76 @@ function renderCcItem(it, card){
   /* Item pode ser encerrado se não estiver em estado terminal já */
   const canEncerrar = !['concluido','cancelado','reagendado','atendido'].includes(it.status);
 
-  /* MODO PÓS-CONFIRMAÇÃO: treinamento de cronograma já confirmado mostra apenas
-     toggle "Realizado / Não realizado" + check visual, e botão "Gerar OS".
-     Esconde controles redundantes (select de status, botões de editar/excluir). */
+  /* MODO PÓS-CONFIRMAÇÃO: treinamento que já foi confirmado com o cliente.
+     Mostra APENAS o toggle Realizado/Não realizado e — após Realizado — o botão Gerar OS.
+     Detecção robusta: qualquer treinamento que não esteja em estado inicial.
+     - Tem flag explícita `fromConfirmedSchedule`, OU
+     - Está vinculado a um schedule confirmado, OU
+     - Status já avançou para em-andamento/atendido/concluido,
+     OU já foi marcado com realizationStatus. */
   const raw = it.raw || it;
-  const isConfirmedTraining = it.kind === 'treinamento'
-    && (raw.fromConfirmedSchedule || (raw.scheduleId && (SCHEDULES.find(s=>s.id===raw.scheduleId)?.status === 'confirmado')));
+  const linkedSch = raw.scheduleId ? SCHEDULES.find(s => s.id === raw.scheduleId) : null;
+  const isConfirmedTraining = it.kind === 'treinamento' && (
+       raw.fromConfirmedSchedule === true
+    || (linkedSch && linkedSch.status === 'confirmado')
+    || ['em-andamento','atendido','concluido'].includes(it.status)
+    || ['realizado','nao-realizado'].includes(raw.realizationStatus)
+  );
   if (isConfirmedTraining){
-    const realized = raw.realizationStatus === 'realizado' || raw.status === 'atendido' || raw.status === 'concluido';
-    const notRealized = raw.realizationStatus === 'nao-realizado' || raw.status === 'cancelado';
+    const realized = raw.realizationStatus === 'realizado'
+                  || it.status === 'atendido'
+                  || it.status === 'concluido';
+    const notRealized = raw.realizationStatus === 'nao-realizado'
+                     || it.status === 'cancelado';
+    const decided = realized || notRealized;
     const hasOS = (typeof ORDERS_SERVICE !== 'undefined') && ORDERS_SERVICE.some(o => o.itemId === it.id);
+
     return `
       <div class="cc-item treinamento confirmed-training ${realized?'realized':''} ${notRealized?'not-realized':''}">
-        <div class="cc-item-icon">${realized?'✓':'✦'}</div>
+        <div class="cc-item-icon">${realized?'✓':notRealized?'✕':'✦'}</div>
         <div class="cc-item-info">
           <b>${it.title}</b>
-          <span>${c?c.name:'sem consultor'} · ${realized?'Realizado':notRealized?'Não realizado':'Em andamento'}${hasOS?' · OS gerada':''}</span>
+          <span>${c?c.name:'sem consultor'} · ${realized?'Realizado':notRealized?'Não realizado':'Em andamento — aguardando confirmação de realização'}${hasOS?' · OS gerada':''}</span>
         </div>
         <div class="cc-item-when">${whenHTML}</div>
+        ${realized ? `
+          <div class="train-decided" style="font-family:var(--font-mono);font-size:10.5px;color:var(--forest);letter-spacing:.06em;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--forest-bg);border:1px solid var(--forest);border-radius:2px;font-weight:700">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.6"><path d="M5 12l5 5L20 7"/></svg>
+            REALIZADO
+          </div>
+        ` : notRealized ? `
+          <div class="train-decided" style="font-family:var(--font-mono);font-size:10.5px;color:var(--burgundy);letter-spacing:.06em;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--burgundy-bg);border:1px solid var(--burgundy);border-radius:2px;font-weight:700">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.6"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            NÃO REALIZADO
+          </div>
+        ` : `
         <div class="train-toggle" role="group" aria-label="Status do treinamento">
-          <button type="button" class="tt-opt ok ${realized?'active':''}"
+          <button type="button" class="tt-opt ok"
                   onclick="ccSetTrainingRealization('${it._src}','${it.id}','realizado')"
                   title="Marcar como realizado">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg>
             Realizado
           </button>
-          <button type="button" class="tt-opt no ${notRealized?'active':''}"
+          <button type="button" class="tt-opt no"
                   onclick="ccSetTrainingRealization('${it._src}','${it.id}','nao-realizado')"
                   title="Marcar como NÃO realizado">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
             Não realizado
           </button>
         </div>
+        `}
         <div class="cc-item-actions">
           ${realized && !hasOS ? `
           <button title="Gerar OS deste treinamento" class="primary" onclick="openOSModal('${it._src}','${it.id}')">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
           </button>` : ''}
           ${hasOS ? `
-          <button title="Abrir OS" onclick="(function(){var o=ORDERS_SERVICE.find(x=>x.itemId==='${it.id}');if(o)openOSModal('${it._src}','${it.id}',o.id);})()">
+          <button title="Abrir OS gerada" onclick="ccOpenOSForItem('${it._src}','${it.id}')">
             <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>` : ''}
+          ${decided ? `
+          <button title="Reabrir (voltar para não decidido)" onclick="ccSetTrainingRealization('${it._src}','${it.id}','reset')">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
           </button>` : ''}
         </div>
       </div>
@@ -8978,10 +9008,27 @@ window.ccSetTrainingRealization = (src, id, value) => {
     target.canceledReason = target.canceledReason || 'Marcado como não realizado no card';
     if (typeof pushHistory === 'function') pushHistory(target, 'marcado como NÃO realizado', `${before} → cancelado`);
     toast('warn','Treinamento não realizado','Item movido para cancelado.');
+  } else if (value === 'reset'){
+    const before = target.status;
+    target.realizationStatus = 'pendente';
+    target.realizedAt = null;
+    target.notRealizedAt = null;
+    target.canceledReason = null;
+    target.status = 'em-andamento';
+    if (typeof pushHistory === 'function') pushHistory(target, 'realização reaberta', `${before} → em-andamento`);
+    toast('info','Treinamento reaberto','Volte a decidir entre Realizado/Não realizado.');
   }
   persist();
   renderClientCardModal();
   renderClientKanban();
+};
+
+/* Abre a OS vinculada a um item do card (treinamento já realizado). */
+window.ccOpenOSForItem = (src, id) => {
+  if (typeof ORDERS_SERVICE === 'undefined') return;
+  const os = ORDERS_SERVICE.find(o => o.itemId === id);
+  if (!os){ toast('warn','OS não encontrada','Nenhuma OS vinculada a este item.'); return; }
+  openOSModal(src, id, os.id);
 };
 
 /* Abre o modal de reagendamento a partir de um item do card.

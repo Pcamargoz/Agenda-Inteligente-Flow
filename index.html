@@ -444,7 +444,7 @@
   }
   /* Badge "horas livres" no canto inferior da célula do calendário */
   .cal-day .free-hours{
-    position:absolute;bottom:6px;right:8px;
+    position:absolute;bottom:14px;right:8px;
     font-family:var(--font-mono);font-size:9px;font-weight:600;
     letter-spacing:.05em;color:var(--forest);
     background:rgba(74,125,93,.10);padding:2px 6px;border-radius:8px;
@@ -453,6 +453,28 @@
   }
   .cal-day .free-hours.busy{color:var(--amber-2);background:rgba(200,117,51,.12);border-color:rgba(200,117,51,.3)}
   .cal-day .free-hours.full{color:var(--burgundy);background:rgba(138,38,56,.10);border-color:rgba(138,38,56,.25)}
+  /* Mini-barra de capacidade dia: ocupado + provisionado + livre */
+  .cal-day .cap-bar{
+    position:absolute;left:8px;right:8px;bottom:6px;height:4px;
+    background:rgba(20,23,31,.06);border-radius:2px;overflow:hidden;
+    display:flex;pointer-events:auto;
+  }
+  .cal-day .cap-bar .cap-busy{background:var(--forest);height:100%;display:block}
+  .cal-day .cap-bar .cap-prov{
+    background:repeating-linear-gradient(90deg,var(--amber-2),var(--amber-2) 3px,rgba(200,117,51,.45) 3px,rgba(200,117,51,.45) 6px);
+    height:100%;display:block;
+  }
+  /* Legenda flutuante de capacidade na agenda (header) */
+  .cap-legend{
+    display:inline-flex;gap:14px;align-items:center;
+    font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;
+    background:var(--paper-2);padding:6px 12px;border:1px solid var(--line-2);border-radius:2px;
+  }
+  .cap-legend .cl-item{display:inline-flex;align-items:center;gap:5px}
+  .cap-legend .cl-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .cap-legend .cl-dot.busy{background:var(--forest)}
+  .cap-legend .cl-dot.prov{background:repeating-linear-gradient(90deg,var(--amber-2),var(--amber-2) 3px,rgba(200,117,51,.45) 3px,rgba(200,117,51,.45) 6px)}
+  .cap-legend .cl-dot.free{background:rgba(20,23,31,.08);border:1px solid var(--line-2)}
   .day-num{font-family:var(--font-display);font-size:17px;font-weight:500;letter-spacing:-.02em;line-height:1}
   .day-num sup{font-family:var(--font-mono);font-size:9px;color:var(--ink-3);margin-left:4px;font-weight:400;letter-spacing:.06em}
   .cal-day.weekend .day-num{color:var(--champagne)}
@@ -1571,6 +1593,56 @@
     border-left-color:var(--indigo-2)!important;
   }
   .cc-item.reagendado .cc-item-info b::before{content:"↻ ";font-weight:700;color:var(--indigo-2)}
+
+  /* Treinamento pós-confirmação — só toggle Realizado/Não realizado */
+  .cc-item.confirmed-training{
+    grid-template-columns:auto 1fr auto auto auto;
+    background:linear-gradient(180deg,var(--paper) 0%,var(--forest-bg) 220%);
+  }
+  .cc-item.confirmed-training.realized{
+    background:linear-gradient(180deg,var(--forest-bg) 0%,var(--paper) 100%);
+    border-left-color:var(--forest)!important;
+  }
+  .cc-item.confirmed-training.realized .cc-item-icon{
+    background:var(--forest);color:var(--paper);border-color:var(--forest);
+    font-weight:700;
+  }
+  .cc-item.confirmed-training.realized .cc-item-info b{color:var(--forest)}
+  .cc-item.confirmed-training.realized .cc-item-info b::after{
+    content:" ✓";color:var(--forest);font-weight:700;
+  }
+  .cc-item.confirmed-training.not-realized{
+    background:repeating-linear-gradient(135deg,var(--burgundy-bg),var(--burgundy-bg) 8px,rgba(138,38,56,.06) 8px,rgba(138,38,56,.06) 16px);
+    border-left-color:var(--burgundy)!important;opacity:.85;
+  }
+  .cc-item.confirmed-training.not-realized .cc-item-info b{text-decoration:line-through;color:var(--burgundy)}
+
+  .train-toggle{
+    display:inline-flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden;
+    background:var(--paper);
+  }
+  .train-toggle .tt-opt{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:6px 11px;font-size:11px;font-weight:600;letter-spacing:.04em;
+    color:var(--ink-3);background:var(--paper);
+    border:none;border-right:1px solid var(--line-2);cursor:pointer;
+    transition:all .15s ease;
+  }
+  .train-toggle .tt-opt:last-child{border-right:none}
+  .train-toggle .tt-opt:hover{background:var(--paper-2);color:var(--ink)}
+  .train-toggle .tt-opt svg{stroke:currentColor;fill:none}
+  .train-toggle .tt-opt.ok.active{
+    background:var(--forest);color:var(--paper);
+  }
+  .train-toggle .tt-opt.no.active{
+    background:var(--burgundy);color:var(--paper);
+  }
+  .cc-item.confirmed-training .cc-item-actions button.primary{
+    background:var(--forest);color:var(--paper);border-color:var(--forest);
+  }
+  .cc-item.confirmed-training .cc-item-actions button.primary:hover{
+    background:var(--forest-2);
+  }
   .cc-item-icon{
     width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
     background:var(--paper-2);font-size:13px;border:1px solid var(--line-2);
@@ -2078,6 +2150,11 @@
           <button class="active" data-cal="month">Mês</button>
           <button data-cal="week">Semana</button>
           <button data-cal="day">Dia</button>
+        </div>
+        <div class="cap-legend" title="Capacidade diária baseada na jornada do consultor (Cadastros)">
+          <span class="cl-item"><span class="cl-dot busy"></span> Ocupado</span>
+          <span class="cl-item"><span class="cl-dot prov"></span> Provisionado</span>
+          <span class="cl-item"><span class="cl-dot free"></span> Livre</span>
         </div>
         <div class="toolbar-spacer"></div>
         <div class="filter-bar">
@@ -3074,6 +3151,50 @@ const eventsOverlap = (a,b) => {
 const findConflicts = (ev, ignoreId=null) =>
   EVENTS.filter(o => o.id !== ignoreId && o.consultantId === ev.consultantId && eventsOverlap(o, ev) && o.status !== 'cancelado');
 
+/* Capacidade diária do consultor (em minutos) — descontando almoço.
+   Defaults: 08:00–17:00 / 60min de almoço = 8h. */
+function consultantDailyCapacityMin(c){
+  if (!c) return 8*60;
+  const ws = c.workStart || '08:00';
+  const we = c.workEnd   || '17:00';
+  const lm = (typeof c.lunchMin === 'number') ? c.lunchMin : 60;
+  return Math.max(0, timeToMin(we) - timeToMin(ws) - lm);
+}
+window.consultantDailyCapacityMin = consultantDailyCapacityMin;
+
+/* Horas livres restantes para um consultor num dia ISO específico, considerando jornada.
+   Retorna: { capacityMin, busyMin, freeMin, provisionedMin, ocupadosCount, provisionadosCount }
+   Eventos cancelados/reagendados não contam.
+   - "Ocupados": confirmado/em-andamento/atendido/concluido
+   - "Provisionados": provisorio/pendente/criado */
+function consultantDayLoad(consultantId, isoDate){
+  const c = consultantById(consultantId);
+  const capacity = consultantDailyCapacityMin(c);
+  let busy = 0, provisioned = 0, ocupCount = 0, provCount = 0;
+  EVENTS.forEach(e => {
+    if (e.consultantId !== consultantId) return;
+    if (e.date !== isoDate) return;
+    if (e.status === 'cancelado' || e.status === 'reagendado') return;
+    const dur = Math.max(0, timeToMin(e.timeEnd) - timeToMin(e.timeStart));
+    if (['confirmado','em-andamento','atendido','concluido'].includes(e.status)){
+      busy += dur; ocupCount++;
+    } else {
+      provisioned += dur; provCount++;
+    }
+  });
+  const used = busy + provisioned;
+  return {
+    capacityMin: capacity,
+    busyMin: busy,
+    provisionedMin: provisioned,
+    freeMin: Math.max(0, capacity - used),
+    ocupadosCount: ocupCount,
+    provisionadosCount: provCount,
+    overflowMin: Math.max(0, used - capacity),
+  };
+}
+window.consultantDayLoad = consultantDayLoad;
+
 function isConsultantFreeOn(consultant, isoDate){
   const d = parseISO(isoDate);
   const dow = d.getDay();
@@ -3471,30 +3592,40 @@ function renderMonthGrid(){
     if (hasP) cell.classList.add('has-provisorio');
     if (hasConflict) cell.classList.add('has-conflict');
 
-    /* Calcula horas livres: assume janela de trabalho 08–18 (10h) menos a soma dos eventos não-cancelados.
-       Se houver filtro de consultor, mostra livres apenas dele; senão, do consultor com mais carga. */
-    const WORK_MINUTES = 10 * 60;
-    const activeEvs = dayEvs.filter(e => e.status !== 'cancelado' && e.status !== 'reagendado');
-    let busyMin = 0;
+    /* Capacidade e horas livres baseadas na JORNADA REAL do consultor (entrada/saída/almoço).
+       Sem filtro de consultor: agrega pelo consultor com maior carga (visão de gargalo).
+       Com filtro: usa o consultor filtrado. */
+    let load = null;
     if (state.filters.consultant && state.filters.consultant !== 'all'){
-      activeEvs.filter(e => e.consultantId === state.filters.consultant)
-               .forEach(e => { busyMin += Math.max(0, timeToMin(e.timeEnd) - timeToMin(e.timeStart)); });
+      load = consultantDayLoad(state.filters.consultant, iso);
+    } else if (CONSULTANTS.length){
+      /* pega o de maior carga (mais ocupado) para mostrar como "pior caso" do dia */
+      const allLoads = CONSULTANTS.map(c => ({ c, l: consultantDayLoad(c.id, iso) }));
+      allLoads.sort((a,b) => (b.l.busyMin + b.l.provisionedMin) - (a.l.busyMin + a.l.provisionedMin));
+      load = allLoads[0].l;
     } else {
-      /* sem filtro de consultor: mostra ocupação agregada por consultor com mais carga */
-      const byCons = {};
-      activeEvs.forEach(e => {
-        const m = Math.max(0, timeToMin(e.timeEnd) - timeToMin(e.timeStart));
-        byCons[e.consultantId] = (byCons[e.consultantId]||0) + m;
-      });
-      busyMin = Math.max(0, ...Object.values(byCons), 0);
+      load = { capacityMin: 8*60, busyMin: 0, provisionedMin: 0, freeMin: 8*60, overflowMin: 0 };
     }
-    const freeMin = Math.max(0, WORK_MINUTES - busyMin);
+    const capMin = load.capacityMin;
+    const usedMin = load.busyMin + load.provisionedMin;
+    const freeMin = load.freeMin;
     const freeH = Math.floor(freeMin/60);
     const freeMrem = freeMin % 60;
-    const freeLabel = freeMin <= 0 ? 'cheio' : `${freeH}h${freeMrem?`${pad(freeMrem)}`:''} livre`;
-    const freeCls = freeMin <= 0 ? 'full' : (busyMin >= WORK_MINUTES*0.6 ? 'busy' : '');
+    const capH = Math.floor(capMin/60);
+    const capMrem = capMin % 60;
+    const freeLabel = freeMin <= 0 ? 'cheio' : `${freeH}h${freeMrem?` ${pad(freeMrem)}m`:''} / ${capH}h${capMrem?` ${pad(capMrem)}m`:''}`;
+    const freeCls = freeMin <= 0 ? 'full' : (usedMin >= capMin*0.6 ? 'busy' : '');
 
-    cell.innerHTML = `<div class="day-num">${pad(d)}<sup>${dowLowerPT(dow)}</sup></div><div class="day-events"></div>${dow!==0&&dow!==6?`<span class="free-hours ${freeCls}" title="Horas livres no dia (janela 08h–18h)">${freeLabel}</span>`:''}`;
+    /* Mini-barra de ocupação: confirmado (verde) + provisionado (âmbar) + livre (paper). */
+    const pctBusy = capMin ? Math.min(100, Math.round(load.busyMin / capMin * 100)) : 0;
+    const pctProv = capMin ? Math.min(100 - pctBusy, Math.round(load.provisionedMin / capMin * 100)) : 0;
+    const capBarHTML = (dow !== 0 && dow !== 6)
+      ? `<div class="cap-bar" title="Ocupado: ${pad(Math.floor(load.busyMin/60))}h${load.busyMin%60?' '+pad(load.busyMin%60)+'m':''} · Provisionado: ${pad(Math.floor(load.provisionedMin/60))}h${load.provisionedMin%60?' '+pad(load.provisionedMin%60)+'m':''} · Capacidade: ${capH}h${capMrem?' '+pad(capMrem)+'m':''}">
+          <span class="cap-busy" style="width:${pctBusy}%"></span>
+          <span class="cap-prov" style="width:${pctProv}%"></span>
+        </div>` : '';
+
+    cell.innerHTML = `<div class="day-num">${pad(d)}<sup>${dowLowerPT(dow)}</sup></div><div class="day-events"></div>${dow!==0&&dow!==6?`<span class="free-hours ${freeCls}" title="Livre / Capacidade total — baseado na jornada do consultor">${freeLabel}</span>`:''}${capBarHTML}`;
     const wrap = cell.querySelector('.day-events');
     const max = 3;
     dayEvs.slice(0,max).forEach(e => {
@@ -4851,12 +4982,16 @@ function renderCadConsultores(){
     </div>
     <div class="table-wrap">
       <table class="atelier">
-        <thead><tr><th>Consultor</th><th>Especialidade</th><th>Dias livres</th><th>Períodos</th><th>Bloqueios</th><th>Contato</th><th></th></tr></thead>
+        <thead><tr><th>Consultor</th><th>Especialidade</th><th>Jornada</th><th>Dias livres</th><th>Períodos</th><th>Bloqueios</th><th>Contato</th><th></th></tr></thead>
         <tbody>
-        ${CONSULTANTS.map(c => `
+        ${CONSULTANTS.map(c => {
+          const capMin = consultantDailyCapacityMin(c);
+          const capH = Math.floor(capMin/60), capM = capMin%60;
+          return `
           <tr>
             <td><div style="display:flex;gap:10px;align-items:center"><div class="avatar ${c.cls}">${c.initials}</div><div><b>${c.name}</b><br><span style="font-size:10.5px;color:var(--ink-3)">${c.role}</span></div></div></td>
             <td>${c.specialty}</td>
+            <td><span style="font-family:var(--font-mono);font-size:11px">${c.workStart||'08:00'}–${c.workEnd||'17:00'}</span><br><span style="font-size:10px;color:var(--ink-3);font-family:var(--font-mono)">${capH}h${capM?` ${pad(capM)}m`:''}/dia · almoço ${c.lunchMin!=null?c.lunchMin:60}min</span></td>
             <td>${c.freeDays.map(d => `<span class="pill confirmado" style="font-size:9px">${dowShortPT(d)}</span>`).join(' ')}</td>
             <td>${c.freePeriods.map(p => `<span class="pill provisorio" style="font-size:9px">${(periodById(p)||{}).label||p}</span>`).join(' ')}</td>
             <td>${c.blockedDates.length} dia(s)</td>
@@ -4865,7 +5000,8 @@ function renderCadConsultores(){
               <button title="Editar" onclick="openConsultantModal('${c.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
               <button title="Ver agenda" onclick="openAgendaModal('${c.id}')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="1"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button>
             </td>
-          </tr>`).join('')}
+          </tr>`;
+        }).join('')}
         </tbody>
       </table>
     </div>
@@ -4898,6 +5034,26 @@ function openConsultantModal(consultantId=null){
       </div>
     </div>
     <div class="modal-section">
+      <div class="modal-section-title">Jornada de <em>trabalho</em></div>
+      <div class="field-grid cols-3">
+        <div class="field">
+          <label>Entrada</label>
+          <input type="time" id="cdWorkStart" value="${c&&c.workStart?c.workStart:'08:00'}" />
+        </div>
+        <div class="field">
+          <label>Saída</label>
+          <input type="time" id="cdWorkEnd" value="${c&&c.workEnd?c.workEnd:'17:00'}" />
+        </div>
+        <div class="field">
+          <label>Almoço (minutos)</label>
+          <input type="number" min="0" max="240" step="15" id="cdLunchMin" value="${c&&c.lunchMin!=null?c.lunchMin:60}" />
+        </div>
+      </div>
+      <div id="cdCapacityPreview" style="margin-top:10px;background:var(--forest-bg);border-left:3px solid var(--forest);padding:8px 12px;font-size:11.5px;color:var(--ink-2);font-family:var(--font-mono);letter-spacing:.04em">
+        Capacidade diária calculada: <b id="cdCapValue" style="color:var(--forest);font-family:var(--font-display);font-size:14px">—</b>
+      </div>
+    </div>
+    <div class="modal-section">
       <div class="modal-section-title">Disponibilidade — dias da semana livres</div>
       <div class="day-toggle-grid" id="cdDays">
         ${dn.map((d,i) => `<button type="button" class="day-toggle ${c && c.freeDays.includes(i)?'active':''}" data-day="${i}">${d}</button>`).join('')}
@@ -4921,6 +5077,23 @@ function openConsultantModal(consultantId=null){
   `;
   document.querySelectorAll('#cdDays .day-toggle').forEach(b => b.onclick = () => b.classList.toggle('active'));
   document.querySelectorAll('#cdPeriods .period-toggle').forEach(b => b.onclick = () => b.classList.toggle('active'));
+
+  /* Live preview da capacidade diária */
+  const refreshCap = () => {
+    const ws = document.getElementById('cdWorkStart').value || '08:00';
+    const we = document.getElementById('cdWorkEnd').value   || '17:00';
+    const lm = parseInt(document.getElementById('cdLunchMin').value||'0', 10) || 0;
+    const total = Math.max(0, timeToMin(we) - timeToMin(ws) - lm);
+    const h = Math.floor(total/60), m = total%60;
+    document.getElementById('cdCapValue').textContent =
+      total > 0 ? `${h}h${m?` ${pad(m)}min`:''} por dia útil (${ws}–${we} · ${lm}min de almoço)` : 'jornada inválida';
+  };
+  ['cdWorkStart','cdWorkEnd','cdLunchMin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', refreshCap);
+  });
+  refreshCap();
+
   openModal('modalCadastro');
 }
 
@@ -5155,6 +5328,13 @@ function saveCadastro(){
     const days = Array.from(document.querySelectorAll('#cdDays .day-toggle.active')).map(b => parseInt(b.dataset.day));
     const periods = Array.from(document.querySelectorAll('#cdPeriods .period-toggle.active')).map(b => b.dataset.p);
     const blocked = document.getElementById('cdBlocked').value.split(',').map(s => s.trim()).filter(Boolean);
+    const workStart = document.getElementById('cdWorkStart').value || '08:00';
+    const workEnd   = document.getElementById('cdWorkEnd').value   || '17:00';
+    const lunchMin  = parseInt(document.getElementById('cdLunchMin').value||'0', 10) || 0;
+    if (timeToMin(workEnd) <= timeToMin(workStart) + lunchMin){
+      toast('error','Jornada inválida','Saída deve ser após Entrada + almoço.');
+      return;
+    }
     const data = {
       name: document.getElementById('cdName').value.trim(),
       initials: document.getElementById('cdInitials').value.trim().toUpperCase() || 'XX',
@@ -5164,6 +5344,7 @@ function saveCadastro(){
       phone: document.getElementById('cdPhone').value.trim(),
       freeDays: days, freePeriods: periods, blockedDates: blocked,
       defaultRecurrence: document.getElementById('cdDefRec').value,
+      workStart, workEnd, lunchMin,
     };
     if (!data.name){ toast('error','Nome obrigatório'); return; }
     if (id){
@@ -7602,7 +7783,8 @@ function doConfirmSchedule(scheduleId, partial){
       if (it.pendingDate && !partial){
         throw new Error('Item pendente em confirmação completa: ' + it.title);
       }
-      const status = it.pendingDate ? 'pendente' : 'confirmado';
+      /* CICLO DE VIDA: ao confirmar com o cliente → tudo já vai pra "em-andamento" (treinamento começou). */
+      const status = it.pendingDate ? 'pendente' : 'em-andamento';
       it.status = status;
 
       /* atualização do evento (se existir) */
@@ -7634,6 +7816,14 @@ function doConfirmSchedule(scheduleId, partial){
         generatedAt: nowISO(),
         generatedByUserId: CURRENT_USER?.id || null,
         history: [],
+        /* Checklist do template é preservada como tarefas do treinamento */
+        checklist: it.kind === 'treinamento' && Array.isArray(it.checklist)
+          ? it.checklist.map(c => typeof c === 'string' ? { text:c, done:false } : c)
+          : undefined,
+        /* Flag para indicar que veio de cronograma confirmado — UI usa para mostrar Realizado/Não realizado */
+        fromConfirmedSchedule: true,
+        /* Status binário do treinamento dentro do card pós-confirmação */
+        realizationStatus: it.kind === 'treinamento' ? 'pendente' : undefined,
       };
       pushHistory(rec, 'criado por confirmação do cronograma');
       newRecords.push(rec);
@@ -7653,12 +7843,22 @@ function doConfirmSchedule(scheduleId, partial){
     s.confirmedAt = nowISO();
     s.confirmedByUserId = CURRENT_USER?.id || null;
     s.partialConfirm = !!partial;
+    s.updatedAt = new Date().toISOString();
     pushHistory(s, partial ? 'confirmado parcialmente' : 'confirmado',
-      `${createdTrain} treinamentos + ${createdTask} tarefas gerados`);
+      `${createdTrain} treinamentos + ${createdTask} tarefas gerados (todos em "em-andamento")`);
+
+    /* CICLO DE VIDA: card do cliente também migra para "Em andamento" */
+    const card = (typeof CLIENT_CARDS !== 'undefined') ? CLIENT_CARDS.find(c => c.companyId === s.companyId) : null;
+    if (card){
+      const oldCardStatus = card.status;
+      card.status = 'em-andamento';
+      card.statusManual = false;
+      pushHistory(card, 'auto: cronograma confirmado', `${oldCardStatus} → em-andamento`);
+    }
 
     toast('success',
       `Cronograma confirmado${partial?' (parcial)':''}`,
-      `${createdTrain} treinamento(s) e ${createdTask} tarefa(s) criados automaticamente.`);
+      `${createdTrain} treinamento(s) e ${createdTask} tarefa(s) movidos para "Em andamento".`);
     closeModal('modalConfirmCrono');
     closeModal('modalCrono');
     renderAll();
@@ -8675,6 +8875,53 @@ function renderCcItem(it, card){
     : `<span style="color:var(--indigo-2);font-style:italic">sem data</span>`;
   /* Item pode ser encerrado se não estiver em estado terminal já */
   const canEncerrar = !['concluido','cancelado','reagendado','atendido'].includes(it.status);
+
+  /* MODO PÓS-CONFIRMAÇÃO: treinamento de cronograma já confirmado mostra apenas
+     toggle "Realizado / Não realizado" + check visual, e botão "Gerar OS".
+     Esconde controles redundantes (select de status, botões de editar/excluir). */
+  const raw = it.raw || it;
+  const isConfirmedTraining = it.kind === 'treinamento'
+    && (raw.fromConfirmedSchedule || (raw.scheduleId && (SCHEDULES.find(s=>s.id===raw.scheduleId)?.status === 'confirmado')));
+  if (isConfirmedTraining){
+    const realized = raw.realizationStatus === 'realizado' || raw.status === 'atendido' || raw.status === 'concluido';
+    const notRealized = raw.realizationStatus === 'nao-realizado' || raw.status === 'cancelado';
+    const hasOS = (typeof ORDERS_SERVICE !== 'undefined') && ORDERS_SERVICE.some(o => o.itemId === it.id);
+    return `
+      <div class="cc-item treinamento confirmed-training ${realized?'realized':''} ${notRealized?'not-realized':''}">
+        <div class="cc-item-icon">${realized?'✓':'✦'}</div>
+        <div class="cc-item-info">
+          <b>${it.title}</b>
+          <span>${c?c.name:'sem consultor'} · ${realized?'Realizado':notRealized?'Não realizado':'Em andamento'}${hasOS?' · OS gerada':''}</span>
+        </div>
+        <div class="cc-item-when">${whenHTML}</div>
+        <div class="train-toggle" role="group" aria-label="Status do treinamento">
+          <button type="button" class="tt-opt ok ${realized?'active':''}"
+                  onclick="ccSetTrainingRealization('${it._src}','${it.id}','realizado')"
+                  title="Marcar como realizado">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg>
+            Realizado
+          </button>
+          <button type="button" class="tt-opt no ${notRealized?'active':''}"
+                  onclick="ccSetTrainingRealization('${it._src}','${it.id}','nao-realizado')"
+                  title="Marcar como NÃO realizado">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            Não realizado
+          </button>
+        </div>
+        <div class="cc-item-actions">
+          ${realized && !hasOS ? `
+          <button title="Gerar OS deste treinamento" class="primary" onclick="openOSModal('${it._src}','${it.id}')">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+          </button>` : ''}
+          ${hasOS ? `
+          <button title="Abrir OS" onclick="(function(){var o=ORDERS_SERVICE.find(x=>x.itemId==='${it.id}');if(o)openOSModal('${it._src}','${it.id}',o.id);})()">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
   return `
     <div class="cc-item ${it.kind}${(it.status==='cancelado'||it.status==='reagendado')?' '+it.status:''}">
       <div class="cc-item-icon">${it.kind==='atendimento'?'●':it.kind==='treinamento'?'✦':'☰'}</div>
@@ -8704,6 +8951,38 @@ function renderCcItem(it, card){
     </div>
   `;
 }
+
+/* Marca um treinamento confirmado como Realizado ou Não realizado.
+   - Realizado → status do registro vai para "atendido" (pronto para virar OS)
+   - Não realizado → status "cancelado" + motivo
+   Em ambos os casos `realizationStatus` é gravado para a UI lembrar do toggle. */
+window.ccSetTrainingRealization = (src, id, value) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  let target = null;
+  if (src === 'record') target = RECORDS.find(r => r.id === id);
+  else if (src === 'event') target = EVENTS.find(e => e.id === id);
+  if (!target){ toast('error','Item não encontrado'); return; }
+
+  if (value === 'realizado'){
+    const before = target.status;
+    target.realizationStatus = 'realizado';
+    target.realizedAt = new Date().toISOString();
+    target.status = 'atendido';
+    if (typeof pushHistory === 'function') pushHistory(target, 'marcado como realizado', `${before} → atendido`);
+    toast('success','Treinamento realizado','Pronto para gerar a OS.');
+  } else if (value === 'nao-realizado'){
+    const before = target.status;
+    target.realizationStatus = 'nao-realizado';
+    target.notRealizedAt = new Date().toISOString();
+    target.status = 'cancelado';
+    target.canceledReason = target.canceledReason || 'Marcado como não realizado no card';
+    if (typeof pushHistory === 'function') pushHistory(target, 'marcado como NÃO realizado', `${before} → cancelado`);
+    toast('warn','Treinamento não realizado','Item movido para cancelado.');
+  }
+  persist();
+  renderClientCardModal();
+  renderClientKanban();
+};
 
 /* Abre o modal de reagendamento a partir de um item do card.
    Encontra o EVENTO vinculado (preferência) ou o item do schedule; cai para record se nada mais existir. */

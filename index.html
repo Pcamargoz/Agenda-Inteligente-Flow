@@ -19,6 +19,13 @@
     --burgundy:#8a2638; --burgundy-2:#a73347; --burgundy-bg:#f0d4d8;
     --indigo:#2f3a78; --indigo-2:#4555a3; --indigo-bg:#dbdeef;
     --slate:#525c6b; --slate-bg:#dfe1e6;
+    /* Tokens semânticos (paleta obrigatória do design system) */
+    --sem-success:    var(--forest);    --sem-success-bg: var(--forest-bg);
+    --sem-progress:   var(--indigo-2);  --sem-progress-bg:var(--indigo-bg);
+    --sem-warning:    var(--amber-2);   --sem-warning-bg: var(--amber-bg);
+    --sem-danger:     var(--burgundy);  --sem-danger-bg:  var(--burgundy-bg);
+    --sem-neutral:    var(--ink-3);     --sem-neutral-bg: var(--slate-bg);
+    --sem-info:       var(--champagne); --sem-info-bg:    var(--champagne-4);
     --line:rgba(20,23,31,.08); --line-2:rgba(20,23,31,.16); --line-3:rgba(20,23,31,.28);
     --shadow-sm:0 1px 2px rgba(20,23,31,.04),0 2px 8px rgba(20,23,31,.04);
     --shadow-md:0 4px 12px rgba(20,23,31,.06),0 12px 32px rgba(20,23,31,.08);
@@ -198,7 +205,11 @@
     font-family:var(--font-mono);white-space:nowrap;
   }
   .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-  .pill.confirmado{color:var(--forest);background:var(--forest-bg);border-color:var(--forest)}
+  .pill.confirmado{color:var(--indigo-2);background:var(--indigo-bg);border-color:var(--indigo-2)}
+  .pill.concluido{color:var(--forest);background:var(--forest-bg);border-color:var(--forest)}
+  .pill.atendido{color:var(--forest-2);background:var(--forest-bg);border-color:var(--forest-2)}
+  .pill.em-andamento{color:var(--indigo-2);background:var(--indigo-bg);border-color:var(--indigo-2);animation:pulse 2s ease-in-out infinite}
+  .pill.criado{color:var(--ink-3);background:var(--paper-3);border-color:var(--line-3)}
   .pill.provisorio,.pill.provisao{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-2)}
   .pill.cancelado{color:var(--burgundy);background:var(--burgundy-bg);border-color:var(--burgundy)}
   .pill.reagendado{color:var(--indigo-2);background:var(--indigo-bg);border-color:var(--indigo-2)}
@@ -1271,6 +1282,50 @@
 
   @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
+  /* ============ CHECKLIST INTERATIVO + PROGRESSO ============ */
+  .progress-track{
+    height:6px;background:var(--paper-2);border:1px solid var(--line);border-radius:4px;overflow:hidden;
+  }
+  .progress-track > div{height:100%;background:linear-gradient(90deg,var(--forest) 0%,var(--forest-2) 100%);transition:width .4s ease;border-radius:4px}
+  .progress-label{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;text-align:right;margin-top:4px;
+  }
+  .progress-label b{color:var(--ink);font-weight:700}
+
+  .checklist-interactive{
+    background:var(--paper-2);border:1px solid var(--line-2);border-radius:3px;padding:12px 14px;margin-top:10px;
+  }
+  .checklist-interactive-head{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;
+    font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700;
+  }
+  .checklist-interactive-head b{color:var(--ink)}
+  .checklist-step{
+    display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+    padding:7px 0;border-bottom:1px dashed var(--line);font-size:12.5px;
+    transition:all .15s ease;
+  }
+  .checklist-step:last-child{border-bottom:none}
+  .checklist-step:hover{background:var(--paper)}
+  .checklist-step .cs-check{
+    width:18px;height:18px;border:1.5px solid var(--line-3);border-radius:3px;
+    background:var(--paper);display:grid;place-items:center;cursor:pointer;transition:all .15s ease;
+    font-size:11px;color:transparent;
+  }
+  .checklist-step .cs-check:hover{border-color:var(--ink)}
+  .checklist-step.done .cs-check{background:var(--forest);border-color:var(--forest);color:var(--paper)}
+  .checklist-step.done .cs-check::after{content:"✓"}
+  .checklist-step.done .cs-text{text-decoration:line-through;color:var(--ink-4)}
+  .checklist-step .cs-text{line-height:1.4}
+  .checklist-step .cs-time{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.04em}
+
+  .checklist-bulk{display:flex;gap:6px;margin-bottom:10px}
+  .checklist-bulk button{
+    font-size:10px;padding:3px 9px;border:1px solid var(--line-2);background:var(--paper);
+    border-radius:9px;color:var(--ink-3);cursor:pointer;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+  }
+  .checklist-bulk button:hover{border-color:var(--ink);color:var(--ink)}
+
   /* ============ KANBAN DE CLIENTES ============ */
   .ckb-toolbar{
     display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;
@@ -1385,9 +1440,34 @@
   .ckb-card-foot .ccf-date{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.04em}
 
   .ckb-progress{
-    margin-top:6px;height:3px;background:var(--paper-2);border-radius:2px;overflow:hidden;
+    margin-top:6px;height:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:3px;overflow:hidden;position:relative;
   }
-  .ckb-progress > div{height:100%;background:linear-gradient(90deg,var(--forest) 0%,var(--forest-2) 100%);transition:width .3s ease}
+  .ckb-progress > div{height:100%;background:linear-gradient(90deg,var(--sem-success) 0%,var(--forest-2) 100%);transition:width .3s ease}
+  .ckb-progress.partial > div{background:linear-gradient(90deg,var(--sem-progress) 0%,var(--indigo-2) 100%)}
+  .ckb-progress.warning > div{background:linear-gradient(90deg,var(--sem-warning) 0%,var(--amber-2) 100%)}
+
+  /* Estados visuais universais */
+  .is-loading{opacity:.6;pointer-events:none;position:relative}
+  .is-loading::after{
+    content:"";position:absolute;top:50%;left:50%;width:18px;height:18px;
+    border:2px solid var(--ink-3);border-top-color:transparent;border-radius:50%;
+    animation:spin .8s linear infinite;transform:translate(-50%,-50%);
+  }
+  .is-disabled{opacity:.45;pointer-events:none;cursor:not-allowed}
+
+  /* Empty states padronizados */
+  .empty-state-rich{
+    padding:48px 24px;text-align:center;background:var(--paper);
+    border:1px dashed var(--line-2);border-radius:3px;
+  }
+  .empty-state-rich .es-icon{
+    width:56px;height:56px;border-radius:50%;background:var(--paper-2);
+    display:inline-grid;place-items:center;font-size:24px;color:var(--ink-3);
+    border:1px solid var(--line-2);margin-bottom:14px;
+  }
+  .empty-state-rich h4{font-family:var(--font-display);font-size:20px;font-weight:400;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px}
+  .empty-state-rich p{font-size:12.5px;color:var(--ink-3);max-width:380px;margin:0 auto 16px;line-height:1.55}
+  .empty-state-rich .es-actions{display:flex;gap:8px;justify-content:center}
 
   .ckb-add-card{
     background:transparent;border:1px dashed var(--line-3);padding:8px;border-radius:2px;
@@ -2281,6 +2361,10 @@
         <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6M5 6l1 14a2 2 0 002 2h8a2 2 0 002-2l1-14"/></svg>
         Excluir
       </button>
+      <button class="btn hide" id="evReagBtn" style="color:var(--indigo-2);border-color:var(--indigo-2)">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        Reagendar
+      </button>
       <div style="display:flex;gap:10px;margin-left:auto">
         <button class="btn" data-close="modalEvent">Cancelar</button>
         <button class="btn btn-primary" id="evSaveBtn">Salvar evento</button>
@@ -2370,6 +2454,26 @@
       <div style="display:flex;gap:10px;margin-left:auto">
         <button class="btn" data-close="modalRegistro">Cancelar</button>
         <button class="btn btn-primary" id="rgSaveBtn">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: REAGENDAR EVENTO ============ -->
+<div class="overlay" id="modalReagendar">
+  <div class="modal lg">
+    <div class="modal-head">
+      <div>
+        <h3>Reagendar <em>evento</em></h3>
+        <p id="reagSubtitle">CRIA NOVO EVENTO · ORIGINAL VAI PARA CANCELADO COM MOTIVO</p>
+      </div>
+      <button class="modal-close" data-close="modalReagendar">&times;</button>
+    </div>
+    <div class="modal-body" id="reagBody"></div>
+    <div class="modal-foot">
+      <button class="btn" data-close="modalReagendar">Cancelar</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button class="btn btn-primary" id="reagSubmitBtn">Confirmar reagendamento</button>
       </div>
     </div>
   </div>
@@ -2639,13 +2743,44 @@ const dowShortPT = d => ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'][d];
 const dowLowerPT = d => ['dom','seg','ter','qua','qui','sex','sáb'][d];
 
 /* ============ TABELAS AUXILIARES (editáveis) ============ */
+/* Ciclo de vida completo: criado → confirmado → em-andamento → atendido → concluido
+   Ramificações: cancelado, reagendado.
+   Paleta semântica:
+     - verde   = concluído / atendido
+     - azul    = em andamento
+     - amarelo = pendente / provisório / criado
+     - vermelho= cancelado
+     - cinza   = neutro / rascunho */
 const STATUSES = [
-  { id:'provisorio', label:'Provisório', cls:'provisorio' },
-  { id:'confirmado', label:'Confirmado', cls:'confirmado' },
-  { id:'pendente',   label:'Pendente',   cls:'pendente' },
-  { id:'reagendado', label:'Reagendado', cls:'reagendado' },
-  { id:'cancelado',  label:'Cancelado',  cls:'cancelado' },
+  { id:'criado',       label:'Criado',       cls:'criado',       sem:'neutral', order:1 },
+  { id:'provisorio',   label:'Provisório',   cls:'provisorio',   sem:'warning', order:2 },
+  { id:'confirmado',   label:'Confirmado',   cls:'confirmado',   sem:'progress',order:3 },
+  { id:'em-andamento', label:'Em andamento', cls:'em-andamento', sem:'progress',order:4 },
+  { id:'atendido',     label:'Atendido',     cls:'atendido',     sem:'success', order:5 },
+  { id:'concluido',    label:'Concluído',    cls:'concluido',    sem:'success', order:6 },
+  { id:'pendente',     label:'Pendente',     cls:'pendente',     sem:'warning', order:7 },
+  { id:'reagendado',   label:'Reagendado',   cls:'reagendado',   sem:'info',    order:8 },
+  { id:'cancelado',    label:'Cancelado',    cls:'cancelado',    sem:'danger',  order:9 },
 ];
+
+/* Transições permitidas a partir de cada status (regras de ciclo de vida) */
+const STATUS_TRANSITIONS = {
+  'criado':       ['confirmado','cancelado'],
+  'provisorio':   ['confirmado','reagendado','cancelado'],
+  'confirmado':   ['em-andamento','reagendado','cancelado'],
+  'em-andamento': ['atendido','reagendado','cancelado'],
+  'atendido':     ['concluido','reagendado'],
+  'concluido':    [],                          /* estado terminal */
+  'pendente':     ['confirmado','cancelado'],
+  'reagendado':   [],                          /* estado terminal — novo item assume a vez */
+  'cancelado':    [],                          /* estado terminal */
+};
+function canTransitionTo(fromStatus, toStatus){
+  if (fromStatus === toStatus) return true;
+  const allowed = STATUS_TRANSITIONS[fromStatus];
+  return !allowed || allowed.includes(toStatus); /* se status não estiver na tabela, permite tudo (fallback) */
+}
+window.canTransitionTo = canTransitionTo;
 const EVENT_TYPES = [
   { id:'consultoria', label:'Consultoria',       icon:'§', color:'champagne' },
   { id:'treinamento', label:'Treinamento',       icon:'✦', color:'forest' },
@@ -3513,6 +3648,12 @@ function openEventModal(eventId=null, prefDate=null, prefHour=null){
     state.evSelectedDates = [e.date];
     state.evStatus = e.status;
     document.getElementById('evDeleteBtn').classList.remove('hide');
+    /* Reagendar disponível para eventos confirmados ou em andamento */
+    const reagBtn = document.getElementById('evReagBtn');
+    if (reagBtn){
+      const allowReag = !['cancelado','reagendado','concluido'].includes(e.status);
+      reagBtn.classList.toggle('hide', !allowReag);
+    }
   } else {
     document.getElementById('evModalTitle').innerHTML = 'Novo <em>evento</em>';
     document.getElementById('evModalSub').textContent = 'AGENDAMENTO';
@@ -3532,6 +3673,8 @@ function openEventModal(eventId=null, prefDate=null, prefHour=null){
     document.getElementById('evPriority').value = 'media';
     if (prefDate) state.evSelectedDates = [prefDate];
     document.getElementById('evDeleteBtn').classList.add('hide');
+    const reagBtn2 = document.getElementById('evReagBtn');
+    if (reagBtn2) reagBtn2.classList.add('hide');
   }
   document.querySelectorAll('#evStatusPick [data-st]').forEach(b => b.classList.toggle('active', b.dataset.st===state.evStatus));
 
@@ -3737,6 +3880,15 @@ document.getElementById('evReplicateBtn').onclick = () => {
   toast('info','Horário aplicado',`${state.evSelectedDates.length} dia(s) usarão o mesmo horário.`);
 };
 document.getElementById('evSaveBtn').onclick = saveEvent;
+document.getElementById('evReagBtn').onclick = () => {
+  const eid = document.getElementById('evId').value;
+  const ev = EVENTS.find(e => e.id === eid);
+  if (!ev){ toast('error','Evento não encontrado'); return; }
+  closeModal('modalEvent');
+  setTimeout(() => {
+    if (typeof openReagendarModal === 'function') openReagendarModal(ev, 'event');
+  }, 100);
+};
 document.getElementById('evDeleteBtn').onclick = deleteEvent;
 
 window.toggleDate = toggleDate;
@@ -4202,6 +4354,27 @@ function openRegistroModal(recordId=null, defaultKind='atendimento'){
   const titleLabels = { atendimento:'Título do atendimento', treinamento:'Tema do treinamento', tarefa:'Título da tarefa' };
   const detailsLabels = { atendimento:'Detalhes do atendimento', treinamento:'Prototipagem / objetivo', tarefa:'Detalhes / passos' };
 
+  /* Carrega checklist do template original (se existir) ou do próprio record */
+  let checklistData = [];
+  if (r && Array.isArray(r.checklist)){
+    checklistData = r.checklist.map(c => typeof c === 'string' ? { text: c, done: false } : c);
+  } else if (r && r.templateId){
+    const tpl = TEMPLATES.find(t => t.id === r.templateId);
+    const item = tpl?.items?.find(i => i.id === r.templateItemId);
+    if (item?.checklist?.length){
+      checklistData = item.checklist.map(c => ({ text: c, done: false }));
+    }
+  }
+  /* Estado local do modal */
+  state.rgChecklist = checklistData;
+
+  /* Pauta automática para atendimentos (novo): puxa tarefas pendentes da empresa */
+  let autoPautaText = '';
+  if (!r && kind === 'atendimento'){
+    /* será populado depois ao selecionar empresa */
+    autoPautaText = '';
+  }
+
   let html = `
     <input type="hidden" id="rgKind" value="${kind}" />
     <div class="field-grid">
@@ -4225,12 +4398,144 @@ function openRegistroModal(recordId=null, defaultKind='atendimento'){
             <option value="baixa" ${r&&r.priority==='baixa'?'selected':''}>Baixa</option>
           </select>
         </div>
+        ${r ? `
+        <div class="field"><label>Encerrar tarefa (sem excluir)</label>
+          <button type="button" class="btn btn-sm" id="rgCloseTaskBtn" style="margin-top:5px">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Encerrar com motivo
+          </button>
+        </div>` : ''}
+      ` : ''}
+      ${kind==='treinamento' ? `
+        <div id="rgChecklistWrap"></div>
+      ` : ''}
+      ${kind==='atendimento' && !r ? `
+        <div id="rgPautaWrap" style="background:var(--indigo-bg);border:1px solid var(--indigo-2);padding:10px 12px;border-radius:2px;display:none">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo-2);font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+            <span>Pauta sugerida — tarefas pendentes do cliente</span>
+            <button type="button" id="rgApplyPautaBtn" class="btn btn-xs btn-primary" style="font-size:9.5px">Inserir na descrição</button>
+          </div>
+          <div id="rgPautaContent" style="font-size:11.5px;color:var(--ink-2);line-height:1.5"></div>
+        </div>
       ` : ''}
     </div>
   `;
   document.getElementById('rgBody').innerHTML = html;
+
+  /* Render do checklist interativo */
+  if (kind === 'treinamento'){
+    renderRgChecklist();
+  }
+
+  /* Wire da pauta automática para atendimento novo */
+  if (kind === 'atendimento' && !r){
+    const coSel = document.getElementById('rgCompany');
+    const refreshPauta = () => {
+      const cid = coSel.value;
+      if (!cid){
+        document.getElementById('rgPautaWrap').style.display = 'none';
+        return;
+      }
+      const pending = RECORDS.filter(rec => rec.kind === 'tarefa' && rec.companyId === cid && rec.status !== 'concluido' && rec.status !== 'cancelado');
+      if (!pending.length){
+        document.getElementById('rgPautaWrap').style.display = 'none';
+        return;
+      }
+      const pautaText = pending.map(t => `• ${t.title}${t.priority?` (${t.priority})`:''}`).join('\n');
+      document.getElementById('rgPautaWrap').style.display = 'block';
+      document.getElementById('rgPautaContent').innerHTML = pending.map(t =>
+        `<div style="padding:3px 0">• <b>${(t.title||'').replace(/</g,'&lt;')}</b> ${t.priority?`<span style="font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3)">[${t.priority.toUpperCase()}]</span>`:''}</div>`
+      ).join('');
+      document.getElementById('rgApplyPautaBtn').onclick = () => {
+        const desc = document.getElementById('rgDesc');
+        const existing = desc.value.trim();
+        const pauta = `Pauta sugerida (tarefas pendentes):\n${pautaText}`;
+        desc.value = existing ? `${existing}\n\n${pauta}` : pauta;
+        toast('success','Pauta inserida', `${pending.length} tarefa(s) adicionada(s) à descrição`);
+      };
+    };
+    coSel.addEventListener('change', refreshPauta);
+    refreshPauta();
+  }
+
+  /* Botão encerrar tarefa */
+  if (kind === 'tarefa' && r){
+    document.getElementById('rgCloseTaskBtn')?.addEventListener('click', () => {
+      const reason = prompt('Motivo do encerramento (será registrado no histórico):');
+      if (!reason) return;
+      r.status = 'concluido';
+      r.closedAt = nowISO();
+      r.closedReason = reason.trim();
+      r.closedByUserId = CURRENT_USER?.id || null;
+      pushHistory(r, 'encerrada', reason.trim());
+      toast('success','Tarefa encerrada', reason.trim());
+      closeModal('modalRegistro');
+      persist();
+      renderAll();
+    });
+  }
+
   openModal('modalRegistro');
 }
+
+/* Render do checklist interativo do treinamento */
+function renderRgChecklist(){
+  const wrap = document.getElementById('rgChecklistWrap');
+  if (!wrap) return;
+  const list = state.rgChecklist || [];
+  const total = list.length;
+  const done = list.filter(c => c.done).length;
+  const pct = total ? Math.round((done/total) * 100) : 0;
+
+  wrap.innerHTML = `
+    <div class="checklist-interactive">
+      <div class="checklist-interactive-head">
+        <span><b>${done}/${total}</b> etapas concluídas</span>
+        <span>${pct}%</span>
+      </div>
+      ${total ? `<div class="progress-track"><div style="width:${pct}%"></div></div>` : ''}
+      ${total ? `
+        <div class="checklist-bulk">
+          <button type="button" onclick="rgChecklistAll(true)">Marcar todos</button>
+          <button type="button" onclick="rgChecklistAll(false)">Limpar todos</button>
+          <button type="button" onclick="rgChecklistAdd()">+ Etapa</button>
+        </div>
+      ` : `
+        <div style="text-align:center;padding:14px 8px;color:var(--ink-3);font-size:11.5px;font-style:italic">
+          Sem checklist neste treinamento.
+          <button type="button" class="btn btn-xs" onclick="rgChecklistAdd()" style="margin-left:6px">+ Adicionar etapa</button>
+        </div>
+      `}
+      ${list.map((step, i) => `
+        <div class="checklist-step ${step.done?'done':''}">
+          <div class="cs-check" onclick="rgChecklistToggle(${i})"></div>
+          <div class="cs-text">${(step.text||'').replace(/</g,'&lt;')||'<i style="color:var(--ink-3)">Etapa sem descrição</i>'}</div>
+          <span class="cs-time">${step.doneAt?fmtDateTime(step.doneAt):''}</span>
+        </div>`).join('')}
+    </div>
+  `;
+}
+window.rgChecklistToggle = (i) => {
+  const step = state.rgChecklist[i];
+  if (!step) return;
+  step.done = !step.done;
+  step.doneAt = step.done ? nowISO() : null;
+  step.doneByUserId = step.done ? (CURRENT_USER?.id||null) : null;
+  renderRgChecklist();
+};
+window.rgChecklistAll = (done) => {
+  state.rgChecklist.forEach(s => {
+    s.done = done;
+    s.doneAt = done ? nowISO() : null;
+  });
+  renderRgChecklist();
+};
+window.rgChecklistAdd = () => {
+  const text = prompt('Texto da nova etapa:');
+  if (!text) return;
+  state.rgChecklist.push({ text: text.trim(), done:false });
+  renderRgChecklist();
+};
 
 function saveRegistro(){
   const kind = document.getElementById('rgKind').value;
@@ -4246,18 +4551,77 @@ function saveRegistro(){
     status: document.getElementById('rgStatus').value,
   };
   if (kind === 'tarefa') data.priority = document.getElementById('rgPriority').value;
+  if (kind === 'treinamento' && Array.isArray(state.rgChecklist)){
+    data.checklist = state.rgChecklist.slice();
+  }
   if (!data.title){ toast('error','Título obrigatório'); return; }
 
+  /* Detecta se este save está concluindo um treinamento com etapas incompletas */
+  let trainingCompletionPending = null;
+  if (kind === 'treinamento'
+      && (data.status === 'concluido' || data.status === 'atendido')
+      && Array.isArray(data.checklist) && data.checklist.length){
+    const incomplete = data.checklist.filter(s => !s.done);
+    if (incomplete.length){
+      trainingCompletionPending = incomplete;
+    }
+  }
+
+  let savedRecord = null;
   if (state.rgEditingId){
     const idx = RECORDS.findIndex(x => x.id===state.rgEditingId);
-    RECORDS[idx] = { ...RECORDS[idx], ...data };
+    /* registra mudança de status no histórico */
+    const before = RECORDS[idx];
+    if (before.status !== data.status){
+      pushHistory(before, 'status alterado', `${before.status} → ${data.status}`);
+    }
+    RECORDS[idx] = { ...before, ...data, updatedAt: nowISO() };
+    savedRecord = RECORDS[idx];
     toast('success','Registro atualizado', data.title);
   } else {
-    RECORDS.push({ id:uid('r'), ...data });
+    savedRecord = { id:uid('r'), createdAt: nowISO(), history: [], ...data };
+    pushHistory(savedRecord, 'criado');
+    RECORDS.push(savedRecord);
     toast('success','Registro criado', data.title);
   }
+
+  /* Fluxo automático: treinamento concluído com itens não-feitos → cria tarefa pendente */
+  if (trainingCompletionPending && trainingCompletionPending.length){
+    setTimeout(() => {
+      if (confirm(`Este treinamento foi concluído com ${trainingCompletionPending.length} etapa(s) não realizada(s). Deseja criar uma tarefa avulsa pendente para acompanhar essas etapas?`)){
+        const newTask = {
+          id: uid('r'),
+          kind: 'tarefa',
+          title: `Pendências — ${savedRecord.title}`,
+          consultantId: savedRecord.consultantId,
+          companyId: savedRecord.companyId,
+          date: null,
+          desc: `Etapas não realizadas no treinamento "${savedRecord.title}" (concluído em ${fmtDateTime(nowISO())}):\n\n` +
+            trainingCompletionPending.map(s => `• ${s.text}`).join('\n'),
+          details: '',
+          notes: '',
+          status: 'pendente',
+          priority: 'media',
+          createdAt: nowISO(),
+          history: [],
+          generatedFrom: savedRecord.id,
+          generatedFromKind: 'treinamento',
+        };
+        pushHistory(newTask, 'criada automaticamente', `do treinamento ${savedRecord.title}`);
+        RECORDS.push(newTask);
+        savedRecord.followUpTaskId = newTask.id;
+        toast('success','Tarefa pendente criada', `${trainingCompletionPending.length} etapa(s) para acompanhar`);
+        persist();
+        renderAll();
+      }
+    }, 300);
+  }
+
   closeModal('modalRegistro');
+  persist();
   renderRegistros();
+  /* Atualiza Kanban se aberto */
+  if (typeof renderClientKanban === 'function') renderClientKanban();
 }
 
 window.openRegistroModal = openRegistroModal;
@@ -6688,10 +7052,15 @@ function renderSchedulePill(status){
     'rascunho':           { cls:'rascunho',    label:'Rascunho' },
     'aguardando':         { cls:'aguardando',  label:'Aguardando cliente' },
     'aguardando-cliente': { cls:'aguardando',  label:'Aguardando cliente' },
+    'criado':             { cls:'criado',      label:'Criado' },
+    'provisorio':         { cls:'provisorio',  label:'Provisório' },
     'confirmado':         { cls:'confirmado',  label:'Confirmado' },
-    'andamento':          { cls:'andamento',   label:'Em andamento' },
-    'em-andamento':       { cls:'andamento',   label:'Em andamento' },
+    'andamento':          { cls:'em-andamento',label:'Em andamento' },
+    'em-andamento':       { cls:'em-andamento',label:'Em andamento' },
+    'atendido':           { cls:'atendido',    label:'Atendido' },
     'concluido':          { cls:'concluido',   label:'Concluído' },
+    'pendente':           { cls:'pendente',    label:'Pendente' },
+    'reagendado':         { cls:'reagendado',  label:'Reagendado' },
     'cancelado':          { cls:'cancelado',   label:'Cancelado' },
   };
   const m = map[status] || { cls:'provisorio', label:status || 'Provisório' };
@@ -10210,6 +10579,340 @@ if (_origSaveCadastro){
   /* Re-aplica binding no botão (saveCadastro foi reassinado) */
   const btn = document.getElementById('cdSaveBtn');
   if (btn) btn.onclick = saveCadastro;
+}
+
+/* ============================================
+   FLUXO 4 — REAGENDAMENTO de evento/item de cronograma
+   - Cria novo evento com a nova data/hora
+   - Marca o original como cancelado com motivo
+   - Envia email ao cliente automaticamente
+   ============================================ */
+state.reagCurrent = null;
+
+function openReagendarModal(eventOrItem, source){
+  /* source: 'event' (registro EVENTS) | 'scheduleItem' (item dentro de SCHEDULES.items) */
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  state.reagCurrent = { source, ref: eventOrItem };
+
+  const ref = eventOrItem;
+  const co = companyById(ref.companyId);
+  const c  = consultantById(ref.consultantId || ref.responsibleId);
+
+  document.getElementById('reagSubtitle').textContent =
+    `${(ref.title||'').toUpperCase()} · ${co?co.fantasia.toUpperCase():''} · ORIGINAL → CANCELADO`;
+
+  const consOptions = CONSULTANTS.map(x =>
+    `<option value="${x.id}" ${(ref.consultantId||ref.responsibleId)===x.id?'selected':''}>${x.name}${x.email?' — '+x.email:''}</option>`
+  ).join('');
+
+  document.getElementById('reagBody').innerHTML = `
+    <!-- Bloco do evento original -->
+    <div style="background:var(--paper-2);border:1px solid var(--line-2);padding:12px 16px;border-radius:2px;margin-bottom:18px">
+      <div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:6px">Evento original</div>
+      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center">
+        <div style="background:var(--paper);border:1px solid var(--line-2);padding:6px 12px;text-align:center">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:500;color:var(--ink);line-height:1">${ref.date?isoToBR(ref.date):'—'}</div>
+          <div style="font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-top:3px">${ref.timeStart||'?'}–${ref.timeEnd||'?'}</div>
+        </div>
+        <div>
+          <b style="font-size:14px;font-weight:600;display:block">${ref.title||'—'}</b>
+          <span style="font-size:11px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em">${co?co.fantasia:'—'} · ${c?c.name:'—'}</span>
+        </div>
+        <span class="pill ${(statusById(ref.status||'confirmado')||{}).cls||'provisorio'}" style="font-size:9.5px">${(statusById(ref.status||'confirmado')||{}).label||ref.status||'—'}</span>
+      </div>
+    </div>
+
+    <div class="modal-section" style="margin-top:0;padding-top:0;border:none">
+      <div class="modal-section-title">Nova <em>data e horário</em></div>
+      <div class="field-grid cols-3">
+        <div class="field">
+          <label>Nova data *</label>
+          <input type="date" id="reagDate" value="${ref.date||''}" />
+        </div>
+        <div class="field">
+          <label>Hora início *</label>
+          <input type="time" id="reagTimeStart" value="${ref.timeStart||'09:00'}" />
+        </div>
+        <div class="field">
+          <label>Hora término *</label>
+          <input type="time" id="reagTimeEnd" value="${ref.timeEnd||'11:00'}" />
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Consultor responsável</label>
+        <select id="reagConsultant">${consOptions}</select>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Motivo do <em>reagendamento</em> *</div>
+      <div class="field">
+        <label>Selecione um motivo (obrigatório)</label>
+        <select id="reagReasonType">
+          <option value="">— Selecione —</option>
+          <option value="conflito_horario">Conflito de horário</option>
+          <option value="solicitacao_cliente">Solicitação do cliente</option>
+          <option value="indisponibilidade_consultor">Indisponibilidade do consultor</option>
+          <option value="problema_tecnico">Problema técnico</option>
+          <option value="ajuste_escopo">Ajuste de escopo</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>Detalhes / observações</label>
+        <textarea id="reagNotes" rows="3" placeholder="Descreva o motivo do reagendamento..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Impacto e <em>notificação</em></div>
+      <div id="reagPreview" style="background:var(--paper);border:1px solid var(--line-2);padding:12px 16px;border-radius:2px;font-size:12px;line-height:1.6;color:var(--ink-2)"></div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;cursor:pointer">
+        <input type="checkbox" id="reagNotifyClient" checked style="width:16px;height:16px;cursor:pointer" />
+        <span>Enviar e-mail ao cliente <b>${co?co.fantasia:''}</b>${co&&co.contato?` (<span style="font-family:var(--font-mono);color:var(--forest)">${co.contato}</span>)`:' <span style="color:var(--burgundy)">(sem email cadastrado)</span>'}</span>
+      </label>
+    </div>
+  `;
+
+  /* Atualiza preview ao alterar os campos */
+  const refreshPreview = () => {
+    const newDate = document.getElementById('reagDate').value;
+    const newTs   = document.getElementById('reagTimeStart').value;
+    const newTe   = document.getElementById('reagTimeEnd').value;
+    const newCons = consultantById(document.getElementById('reagConsultant').value);
+    const reason  = document.getElementById('reagReasonType').value;
+
+    const sameDate = ref.date === newDate;
+    const sameTime = ref.timeStart === newTs && ref.timeEnd === newTe;
+    const sameCons = (ref.consultantId||ref.responsibleId) === (newCons?.id);
+
+    const changes = [];
+    if (!sameDate) changes.push(`Data: <b>${isoToBR(ref.date)||'—'} → ${isoToBR(newDate)||'—'}</b>`);
+    if (!sameTime) changes.push(`Horário: <b>${ref.timeStart||'—'}–${ref.timeEnd||'—'} → ${newTs}–${newTe}</b>`);
+    if (!sameCons) changes.push(`Consultor: <b>${c?c.name:'—'} → ${newCons?newCons.name:'—'}</b>`);
+
+    /* Detecta conflito do novo horário no consultor */
+    let conflictMsg = '';
+    if (newCons && newDate && newTs && newTe){
+      const conflict = EVENTS.find(e =>
+        e.id !== (ref.id) &&
+        e.consultantId === newCons.id &&
+        e.date === newDate &&
+        e.status !== 'cancelado' &&
+        timeToMin(e.timeStart) < timeToMin(newTe) &&
+        timeToMin(newTs) < timeToMin(e.timeEnd)
+      );
+      if (conflict){
+        const cco = companyById(conflict.companyId);
+        conflictMsg = `<div style="margin-top:8px;color:var(--burgundy);background:var(--burgundy-bg);padding:6px 10px;border-left:3px solid var(--burgundy);font-size:11.5px"><b>⚠ Conflito detectado:</b> ${cco?cco.fantasia:conflict.title} (${conflict.timeStart}–${conflict.timeEnd})</div>`;
+      }
+    }
+
+    document.getElementById('reagPreview').innerHTML = `
+      <div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:6px">O que vai acontecer</div>
+      <ul style="margin:0;padding-left:18px">
+        <li>O evento original será marcado como <b style="color:var(--burgundy)">CANCELADO</b> com o motivo informado</li>
+        <li>Um <b style="color:var(--forest)">novo evento</b> será criado com a nova data/horário/consultor</li>
+        <li>O novo evento terá vínculo de rastreabilidade com o original (campo <code style="font-family:var(--font-mono);font-size:10.5px;background:var(--paper-2);padding:1px 4px">reagendadoDe</code>)</li>
+        <li>${reason ? 'O motivo será registrado no histórico imutável' : '<i style="color:var(--burgundy)">Defina o motivo do reagendamento antes de confirmar</i>'}</li>
+      </ul>
+      ${changes.length ? `<div style="margin-top:10px;padding:8px 12px;background:var(--champagne-4);border-left:3px solid var(--champagne);font-size:11.5px">${changes.join('<br>')}</div>` : ''}
+      ${conflictMsg}
+    `;
+  };
+
+  ['reagDate','reagTimeStart','reagTimeEnd','reagConsultant','reagReasonType','reagNotes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el){
+      el.addEventListener('input', refreshPreview);
+      el.addEventListener('change', refreshPreview);
+    }
+  });
+  refreshPreview();
+
+  openModal('modalReagendar');
+}
+window.openReagendarModal = openReagendarModal;
+
+/* Submissão do reagendamento */
+document.getElementById('reagSubmitBtn').onclick = async () => {
+  const ctx = state.reagCurrent;
+  if (!ctx){ toast('error','Contexto perdido'); return; }
+  const newDate = document.getElementById('reagDate').value;
+  const newTs   = document.getElementById('reagTimeStart').value;
+  const newTe   = document.getElementById('reagTimeEnd').value;
+  const newConsId = document.getElementById('reagConsultant').value;
+  const reason  = document.getElementById('reagReasonType').value;
+  const notes   = document.getElementById('reagNotes').value.trim();
+  const notify  = document.getElementById('reagNotifyClient').checked;
+
+  if (!newDate || !newTs || !newTe){ toast('error','Campos obrigatórios','Defina nova data e horários.'); return; }
+  if (timeToMin(newTe) <= timeToMin(newTs)){ toast('error','Horário inválido','Término deve ser após o início.'); return; }
+  if (!reason){ toast('error','Motivo obrigatório','Selecione um motivo para o reagendamento.'); return; }
+
+  const ref = ctx.ref;
+  const reasonLabels = {
+    'conflito_horario':'Conflito de horário',
+    'solicitacao_cliente':'Solicitação do cliente',
+    'indisponibilidade_consultor':'Indisponibilidade do consultor',
+    'problema_tecnico':'Problema técnico',
+    'ajuste_escopo':'Ajuste de escopo',
+    'outro':'Outro',
+  };
+  const reasonText = reasonLabels[reason] || reason;
+  const fullReason = `${reasonText}${notes?` — ${notes}`:''}`;
+
+  if (ctx.source === 'event'){
+    /* Cancela original */
+    const original = EVENTS.find(e => e.id === ref.id);
+    if (!original){ toast('error','Evento não encontrado'); return; }
+    original.status = 'cancelado';
+    original.canceledReason = fullReason;
+    original.canceledAt = nowISO();
+    original.canceledByUserId = CURRENT_USER?.id || null;
+
+    /* Cria novo evento */
+    const novo = Object.assign({}, original, {
+      id: uid('e'),
+      consultantId: newConsId || original.consultantId,
+      date: newDate,
+      timeStart: newTs,
+      timeEnd: newTe,
+      status: 'confirmado',
+      reagendadoDe: original.id,
+      reagendadoEm: nowISO(),
+      reagendadoByUserId: CURRENT_USER?.id || null,
+      reagendadoMotivo: fullReason,
+      canceledReason: null,
+      canceledAt: null,
+      canceledByUserId: null,
+    });
+    EVENTS.push(novo);
+
+    /* Marca o original como reagendado depois (estado terminal final), preservando o cancelamento de fato */
+    original.status = 'reagendado';
+    original.reagendadoPara = novo.id;
+    persist();
+    toast('success','Reagendado com sucesso', `Novo evento em ${isoToBR(newDate)} ${newTs}`);
+  } else if (ctx.source === 'scheduleItem'){
+    const sched = SCHEDULES.find(s => (s.items||[]).some(i => i.id === ref.id));
+    if (!sched){ toast('error','Cronograma não encontrado'); return; }
+    const item = sched.items.find(i => i.id === ref.id);
+    item.status = 'reagendado';
+    item.canceledReason = fullReason;
+    item.canceledAt = nowISO();
+    /* Cria item novo no mesmo cronograma */
+    const novoItem = Object.assign({}, item, {
+      id: uid('it'),
+      date: newDate,
+      timeStart: newTs,
+      timeEnd: newTe,
+      responsibleId: newConsId || item.responsibleId,
+      status: 'confirmado',
+      reagendadoDe: item.id,
+      reagendadoEm: nowISO(),
+      reagendadoMotivo: fullReason,
+      canceledReason: null,
+      canceledAt: null,
+    });
+    sched.items.push(novoItem);
+    sched.itemIds.push(novoItem.id);
+
+    /* atualiza ou cria evento correspondente */
+    if (item.eventId){
+      const ev = EVENTS.find(e => e.id === item.eventId);
+      if (ev){ ev.status = 'reagendado'; ev.canceledReason = fullReason; }
+    }
+    if (newDate && newTs && newTe){
+      const ev = {
+        id: uid('e'),
+        consultantId: novoItem.responsibleId,
+        companyId: sched.companyId,
+        date: newDate, timeStart: newTs, timeEnd: newTe,
+        typeId: item.kind === 'treinamento' ? 'treinamento' : 'tarefa',
+        title: item.title,
+        period:'manha', recurrence:'none', status:'confirmado',
+        desc: item.desc||'', details:'', notes:'',
+        priority: item.priority||'media',
+        seriesId: sched.id, templateId: item.templateId, scheduleId: sched.id, itemId: novoItem.id,
+        reagendadoDe: item.eventId || null,
+      };
+      EVENTS.push(ev);
+      novoItem.eventId = ev.id;
+      sched.eventIds.push(ev.id);
+    }
+    pushHistory(sched, 'item reagendado', `${item.title} · ${fullReason}`);
+    persist();
+    toast('success','Item reagendado', `${item.title} → ${isoToBR(newDate)}`);
+  }
+
+  /* Notificação ao cliente */
+  if (notify){
+    const co = companyById(ref.companyId);
+    if (co && co.contato){
+      const newCons = consultantById(newConsId);
+      const subject = `Reagendamento de ${ref.title||'evento'} — ${co.fantasia}`;
+      const html = buildReagendamentoEmail(ref, { newDate, newTs, newTe, newCons, reasonText, notes }, co);
+      const text = `Olá ${co.responsavel||co.fantasia},\n\nO evento "${ref.title}" foi reagendado para:\n\nNova data: ${isoToBR(newDate)}\nNovo horário: ${newTs}–${newTe}\n${newCons?`Consultor: ${newCons.name}\n`:''}Motivo: ${reasonText}${notes?`\nObs: ${notes}`:''}\n\n— Faktory Flow Agenda`;
+      await sendNotificationEmail({
+        to: co.contato,
+        subject, html, text,
+        kind: 'event-rescheduled',
+        relatedId: ref.id,
+        relatedType: ctx.source,
+        recipientName: co.responsavel || co.fantasia,
+      }).then(r => {
+        if (r.ok) toast('success','Cliente notificado', co.contato);
+      });
+    } else if (notify){
+      toast('warn','Sem email do cliente','Reagendamento salvo mas email não foi enviado (empresa sem contato).');
+    }
+  }
+
+  state.reagCurrent = null;
+  closeModal('modalReagendar');
+  renderAll();
+};
+
+function buildReagendamentoEmail(original, change, co){
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;color:#14171f">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4">
+      <tr><td style="padding:24px 30px;border-bottom:1px solid #ddd5c4;background:linear-gradient(180deg,#ebe5d8 0%,#fff 100%)">
+        <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px">Faktory Flow Agenda</div>
+        <h1 style="font-size:24px;font-weight:400;letter-spacing:-.025em;margin:0">Reagendamento <em style="font-style:italic;color:#4555a3">notificado</em></h1>
+      </td></tr>
+      <tr><td style="padding:22px 30px;font-size:14px;line-height:1.6">
+        Olá <b>${esc(co.responsavel||co.fantasia)}</b>,<br><br>
+        Informamos que o evento abaixo foi <b style="color:#4555a3">reagendado</b> em nosso sistema.
+      </td></tr>
+      <tr><td style="padding:0 30px 14px">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4efe6;border:1px solid #ddd5c4">
+          <tr><td style="padding:14px 16px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#8a2638;font-weight:700;margin-bottom:6px">De (cancelado)</div>
+            <div style="font-size:14px;font-weight:600;text-decoration:line-through;color:#6b7184">${esc(original.title)} — ${original.date?isoToBR(original.date):'—'} ${original.timeStart||''}–${original.timeEnd||''}</div>
+          </td></tr>
+          <tr><td style="padding:14px 16px;border-top:1px solid #ddd5c4">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#2d5f3f;font-weight:700;margin-bottom:6px">Para (nova data)</div>
+            <div style="font-size:18px;font-weight:600;color:#14171f">${esc(original.title)}</div>
+            <div style="margin-top:6px;font-family:monospace;font-size:13px">${isoToBR(change.newDate)} · ${change.newTs}–${change.newTe}</div>
+            ${change.newCons?`<div style="margin-top:4px;font-size:12px;color:#4a4f5e">Consultor: <b>${esc(change.newCons.name)}</b></div>`:''}
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td style="padding:0 30px 22px">
+        <div style="background:#fcecee;border:1px solid #8a2638;border-left:3px solid #8a2638;padding:12px 14px;font-size:12.5px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#8a2638;font-weight:700;margin-bottom:4px">Motivo</div>
+          ${esc(change.reasonText)}${change.notes?`<br><br><i>${esc(change.notes)}</i>`:''}
+        </div>
+      </td></tr>
+      <tr><td style="padding:14px;background:#14171f;color:#d0c6b1;text-align:center;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda · notificação automática</td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
 }
 
 /* ============================================

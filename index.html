@@ -1701,7 +1701,10 @@
       <div><span class="dot"></span><b>Sistema online</b></div>
       <div style="margin-top:4px">v2.0 — Faktory Flow</div>
       <div style="margin-top:4px">Salvo <b id="syncTime">agora</b></div>
-      <button onclick="resetAllData()" style="margin-top:10px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#a73347';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
+      <button onclick="runIntegrityCheck()" style="margin-top:10px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#d4a574';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
+        Verificar integridade
+      </button>
+      <button onclick="resetAllData()" style="margin-top:6px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#a73347';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
         Limpar tudo
       </button>
     </div>
@@ -2292,6 +2295,26 @@
   </div>
 </div>
 
+<!-- ============ MODAL: NOVO CARD DE CLIENTE (substitui prompt nativo) ============ -->
+<div class="overlay" id="modalNewCard">
+  <div class="modal lg">
+    <div class="modal-head">
+      <div>
+        <h3>Novo card de <em>cliente</em></h3>
+        <p>SELECIONE A EMPRESA</p>
+      </div>
+      <button class="modal-close" data-close="modalNewCard">&times;</button>
+    </div>
+    <div class="modal-body" id="ncBody"></div>
+    <div class="modal-foot">
+      <button class="btn" data-close="modalNewCard">Cancelar</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button class="btn" id="ncOpenCadastroBtn">+ Cadastrar nova empresa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ============ MODAL: ORDEM DE SERVIÇO ============ -->
 <div class="overlay" id="modalOS">
   <div class="modal lg">
@@ -2339,6 +2362,7 @@
       <div class="cc-tab" data-cct="atendimento">Atendimentos <span class="cc-tab-count" id="cctAtend">0</span></div>
       <div class="cc-tab" data-cct="treinamento">Treinamentos <span class="cc-tab-count" id="cctTrain">0</span></div>
       <div class="cc-tab" data-cct="tarefa">Tarefas <span class="cc-tab-count" id="cctTask">0</span></div>
+      <div class="cc-tab" data-cct="cronogramas">Cronogramas <span class="cc-tab-count" id="cctSched">0</span></div>
     </div>
     <div class="modal-body" id="ccBody" style="max-height:60vh;overflow-y:auto;padding:0"></div>
     <div class="modal-foot">
@@ -2576,10 +2600,124 @@ function resetAllData(){
   localStorage.removeItem(STORAGE_KEY);
   CONSULTANTS = []; COMPANIES = []; EVENT_CATALOG = [];
   EVENTS = []; SCHEDULES = []; RECORDS = [];
+  if (typeof TEMPLATES        !== 'undefined') TEMPLATES = [];
+  if (typeof DASH_VIEWS       !== 'undefined') DASH_VIEWS = [];
+  if (typeof CLIENT_CARDS     !== 'undefined') CLIENT_CARDS = [];
+  if (typeof ORDERS_SERVICE   !== 'undefined') ORDERS_SERVICE = [];
   toast('success','Tudo apagado','O sistema voltou ao estado inicial.');
   renderAll();
 }
 window.resetAllData = resetAllData;
+
+/* ============================================
+   VALIDADOR DE INTEGRIDADE — detecta e limpa órfãos
+   ============================================ */
+function validateDataIntegrity(autoFix = false){
+  const report = {
+    orphanCards:     [],
+    orphanSchedules: [],
+    orphanEvents:    [],
+    orphanRecords:   [],
+    orphanOrders:    [],
+    duplicateCards:  [],
+    orphanItems:     [],
+    fixedCount: 0,
+  };
+
+  const companyIds = new Set(COMPANIES.map(c => c.id));
+  const consultantIds = new Set(CONSULTANTS.map(c => c.id));
+
+  /* Cards apontando para empresa inexistente */
+  (typeof CLIENT_CARDS !== 'undefined' ? CLIENT_CARDS : []).forEach(c => {
+    if (!companyIds.has(c.companyId)) report.orphanCards.push(c);
+  });
+
+  /* Schedules apontando para empresa inexistente */
+  SCHEDULES.forEach(s => {
+    if (!companyIds.has(s.companyId)) report.orphanSchedules.push(s);
+  });
+
+  /* Eventos sem empresa válida (quando companyId existir) */
+  EVENTS.forEach(e => {
+    if (e.companyId && !companyIds.has(e.companyId)) report.orphanEvents.push(e);
+  });
+
+  /* Registros sem empresa válida */
+  RECORDS.forEach(r => {
+    if (r.companyId && !companyIds.has(r.companyId)) report.orphanRecords.push(r);
+  });
+
+  /* OS sem empresa válida */
+  (typeof ORDERS_SERVICE !== 'undefined' ? ORDERS_SERVICE : []).forEach(o => {
+    if (o.companyId && !companyIds.has(o.companyId)) report.orphanOrders.push(o);
+  });
+
+  /* Cards duplicados (>1 ativo para a mesma empresa) */
+  if (typeof CLIENT_CARDS !== 'undefined'){
+    const byCompany = {};
+    CLIENT_CARDS.filter(c => !c.archived).forEach(c => {
+      (byCompany[c.companyId] = byCompany[c.companyId] || []).push(c);
+    });
+    Object.entries(byCompany).forEach(([cid, arr]) => {
+      if (arr.length > 1) report.duplicateCards.push({ companyId: cid, cards: arr });
+    });
+  }
+
+  /* Itens de schedule sem schedule pai (shouldn't happen, mas vale checar) */
+  /* — coberto implicitamente pelos orphanSchedules — */
+
+  const total = report.orphanCards.length + report.orphanSchedules.length + report.orphanEvents.length + report.orphanRecords.length + report.orphanOrders.length + report.duplicateCards.length;
+
+  if (autoFix && total > 0){
+    /* Remove órfãos */
+    if (typeof CLIENT_CARDS !== 'undefined'){
+      const orphanCardIds = new Set(report.orphanCards.map(c => c.id));
+      CLIENT_CARDS = CLIENT_CARDS.filter(c => !orphanCardIds.has(c.id));
+    }
+    const orphanSchIds = new Set(report.orphanSchedules.map(s => s.id));
+    SCHEDULES = SCHEDULES.filter(s => !orphanSchIds.has(s.id));
+    const orphanEvIds = new Set(report.orphanEvents.map(e => e.id));
+    EVENTS = EVENTS.filter(e => !orphanEvIds.has(e.id));
+    const orphanRecIds = new Set(report.orphanRecords.map(r => r.id));
+    RECORDS = RECORDS.filter(r => !orphanRecIds.has(r.id));
+    if (typeof ORDERS_SERVICE !== 'undefined'){
+      const orphanOsIds = new Set(report.orphanOrders.map(o => o.id));
+      ORDERS_SERVICE = ORDERS_SERVICE.filter(o => !orphanOsIds.has(o.id));
+    }
+    /* Resolve duplicatas: mantém o mais antigo, arquiva os outros */
+    report.duplicateCards.forEach(d => {
+      const sorted = d.cards.sort((a,b) => (a.createdAt||'').localeCompare(b.createdAt||''));
+      sorted.slice(1).forEach(c => { c.archived = true; });
+    });
+    report.fixedCount = total;
+  }
+
+  return report;
+}
+window.validateDataIntegrity = validateDataIntegrity;
+
+window.runIntegrityCheck = () => {
+  const report = validateDataIntegrity(false);
+  const total = report.orphanCards.length + report.orphanSchedules.length + report.orphanEvents.length + report.orphanRecords.length + report.orphanOrders.length + report.duplicateCards.length;
+  if (!total){
+    toast('success','Base íntegra','Nenhuma inconsistência encontrada. Tudo certo.');
+    return;
+  }
+  const msg = `Encontradas ${total} inconsistência(s):\n\n` +
+    (report.orphanCards.length     ? `• ${report.orphanCards.length} card(s) sem empresa\n` : '') +
+    (report.orphanSchedules.length ? `• ${report.orphanSchedules.length} cronograma(s) sem empresa\n` : '') +
+    (report.orphanEvents.length    ? `• ${report.orphanEvents.length} evento(s) órfãos\n` : '') +
+    (report.orphanRecords.length   ? `• ${report.orphanRecords.length} registro(s) órfãos\n` : '') +
+    (report.orphanOrders.length    ? `• ${report.orphanOrders.length} OS órfãs\n` : '') +
+    (report.duplicateCards.length  ? `• ${report.duplicateCards.length} empresa(s) com cards duplicados ativos\n` : '') +
+    `\nLimpar agora? (arquiva duplicatas, remove órfãos)`;
+  if (confirm(msg)){
+    const r = validateDataIntegrity(true);
+    toast('success', `${r.fixedCount} inconsistência(s) corrigida(s)`, 'Base reorganizada com sucesso.');
+    persist();
+    renderAll();
+  }
+};
 
 /* ============ STATE ============ */
 let state = {
@@ -3491,12 +3629,30 @@ window.openAgendaModal = openAgendaModal;
 function renderCronogramas(){
   const co = document.getElementById('croCompany');
   const cs = document.getElementById('croConsultant');
-  if (!co.options.length){
+
+  /* FIX: sempre repopula (antes só populava na 1a vez → empresas novas não apareciam).
+     Preserva seleção atual sempre que possível. */
+  const prevCo = co.value;
+  const prevCs = cs.value;
+  if (COMPANIES.length){
     co.innerHTML = COMPANIES.map(c => `<option value="${c.id}">${c.fantasia} · ${c.projeto||'—'}</option>`).join('');
-    cs.innerHTML = CONSULTANTS.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    document.getElementById('croFrom').value = fmtDate(state.viewYear, state.viewMonth, 1);
+    co.value = COMPANIES.some(c => c.id === prevCo) ? prevCo : COMPANIES[0].id;
+  } else {
+    co.innerHTML = '<option value="">— Nenhuma empresa cadastrada —</option>';
+  }
+  if (CONSULTANTS.length){
+    cs.innerHTML = CONSULTANTS.map(c => `<option value="${c.id}">${c.name}${c.email?` — ${c.email}`:''}</option>`).join('');
+    cs.value = CONSULTANTS.some(c => c.id === prevCs) ? prevCs : CONSULTANTS[0].id;
+  } else {
+    cs.innerHTML = '<option value="">— Nenhum consultor cadastrado —</option>';
+  }
+  /* Datas só preenche se ainda estiverem vazias */
+  const fromEl = document.getElementById('croFrom');
+  const toEl = document.getElementById('croTo');
+  if (!fromEl.value) fromEl.value = fmtDate(state.viewYear, state.viewMonth, 1);
+  if (!toEl.value){
     const dim = new Date(state.viewYear, state.viewMonth+1, 0).getDate();
-    document.getElementById('croTo').value = fmtDate(state.viewYear, state.viewMonth, dim);
+    toEl.value = fmtDate(state.viewYear, state.viewMonth, dim);
   }
 
   // lista de cronogramas salvos
@@ -4283,10 +4439,52 @@ window.openConsultantModal = openConsultantModal;
 window.openCompanyModal = openCompanyModal;
 window.openEventCatalogModal = openEventCatalogModal;
 window.deleteEntity = (kind, id) => {
-  if (!confirm('Excluir este cadastro?')) return;
-  if (kind === 'company'){ COMPANIES = COMPANIES.filter(x=>x.id!==id); toast('success','Empresa excluída'); }
-  if (kind === 'catalog'){ EVENT_CATALOG = EVENT_CATALOG.filter(x=>x.id!==id); toast('success','Modelo excluído'); }
-  if (kind === 'consultant'){ CONSULTANTS = CONSULTANTS.filter(x=>x.id!==id); toast('success','Consultor excluído'); }
+  if (kind === 'company'){
+    /* FIX: cascata explícita — preview do que será apagado, depois confirma */
+    const co = companyById(id);
+    if (!co){ toast('error','Empresa não encontrada'); return; }
+    const deps = (typeof getCompanyDependencies === 'function') ? getCompanyDependencies(id) : { cards:[], schedules:[], events:[], records:[], orders:[] };
+    const totalDeps = deps.cards.length + deps.schedules.length + deps.events.length + deps.records.length + deps.orders.length;
+    const msg = totalDeps
+      ? `Excluir "${co.fantasia}" também removerá:\n\n` +
+        `• ${deps.cards.length} card(s) Kanban\n` +
+        `• ${deps.schedules.length} cronograma(s)\n` +
+        `• ${deps.events.length} evento(s) da agenda\n` +
+        `• ${deps.records.length} registro(s) de atend./treino/tarefa\n` +
+        `• ${deps.orders.length} ordem(ns) de serviço\n\n` +
+        `Esta ação é definitiva. Confirma?`
+      : `Excluir "${co.fantasia}"? Esta ação é definitiva.`;
+    if (!confirm(msg)) return;
+
+    /* Cascata atômica: remove TODOS os registros dependentes para evitar órfãos */
+    const cardIds = deps.cards.map(c => c.id);
+    const schIds = deps.schedules.map(s => s.id);
+    CLIENT_CARDS    = CLIENT_CARDS.filter(c => !cardIds.includes(c.id));
+    SCHEDULES       = SCHEDULES.filter(s => !schIds.includes(s.id));
+    EVENTS          = EVENTS.filter(e => e.companyId !== id);
+    RECORDS         = RECORDS.filter(r => r.companyId !== id);
+    ORDERS_SERVICE  = ORDERS_SERVICE.filter(o => o.companyId !== id);
+    COMPANIES       = COMPANIES.filter(x => x.id !== id);
+
+    toast('success', `Empresa excluída`, `${co.fantasia} · ${totalDeps} registro(s) relacionado(s) removido(s)`);
+  }
+  if (kind === 'catalog'){
+    if (!confirm('Excluir este modelo de evento?')) return;
+    EVENT_CATALOG = EVENT_CATALOG.filter(x=>x.id!==id);
+    toast('success','Modelo excluído');
+  }
+  if (kind === 'consultant'){
+    /* Consultor: bloqueia exclusão se estiver vinculado a registros ativos */
+    const linkedEv = EVENTS.filter(e => e.consultantId === id && e.status !== 'cancelado').length;
+    const linkedRec = RECORDS.filter(r => r.consultantId === id).length;
+    if (linkedEv + linkedRec > 0){
+      if (!confirm(`Este consultor está vinculado a ${linkedEv} evento(s) e ${linkedRec} registro(s). Excluindo, eles ficarão sem consultor responsável. Continuar?`)) return;
+      EVENTS.forEach(e => { if (e.consultantId === id) e.consultantId = null; });
+      RECORDS.forEach(r => { if (r.consultantId === id) r.consultantId = null; });
+    } else if (!confirm('Excluir este consultor?')) return;
+    CONSULTANTS = CONSULTANTS.filter(x=>x.id!==id);
+    toast('success','Consultor excluído', linkedEv+linkedRec ? `${linkedEv+linkedRec} registro(s) ficaram sem responsável`:'');
+  }
   renderAll();
 };
 
@@ -7187,7 +7385,14 @@ function clientCardByCompany(companyId){
 function ensureClientCard(companyId, opts = {}){
   if (!companyId) return null;
   let card = clientCardByCompany(companyId);
-  if (card) return card;
+  if (card){
+    /* FIX: se o card existe mas está arquivado, REATIVA em vez de devolver invisível */
+    if (card.archived){
+      card.archived = false;
+      pushHistory(card, 'reativado', opts.detail || 'reativado ao receber novo conteúdo');
+    }
+    return card;
+  }
   card = {
     id: uid('cc'),
     companyId,
@@ -7201,6 +7406,17 @@ function ensureClientCard(companyId, opts = {}){
   pushHistory(card, 'criado', opts.detail || '');
   CLIENT_CARDS.push(card);
   return card;
+}
+
+/* Helper: encontra todos os registros vinculados a uma empresa (para preview de cascata) */
+function getCompanyDependencies(companyId){
+  return {
+    cards:     CLIENT_CARDS.filter(c => c.companyId === companyId),
+    schedules: SCHEDULES.filter(s => s.companyId === companyId),
+    events:    EVENTS.filter(e => e.companyId === companyId),
+    records:   RECORDS.filter(r => r.companyId === companyId),
+    orders:    ORDERS_SERVICE.filter(o => o.companyId === companyId),
+  };
 }
 
 /* Itens do card = todos os records + events vinculados àquele cliente */
@@ -7453,26 +7669,129 @@ function attachKanbanDnD(){
 
 /* ---------- Modal: criar novo card sem cronograma ---------- */
 function openCkbNewCardModal(){
-  if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  if (!COMPANIES.length){
-    toast('warn','Nenhuma empresa cadastrada','Crie em Cadastros → Empresas.');
-    return;
-  }
-  const opts = COMPANIES.map(c => `${c.id}|${c.fantasia}`).join('\n');
-  const choice = prompt(`Selecione o cliente (digite o ID):\n\n${opts}`);
-  if (!choice) return;
-  const id = choice.split('|')[0].trim();
-  const co = companyById(id);
-  if (!co){ toast('error','Cliente não encontrado'); return; }
-  if (clientCardByCompany(id)){
-    toast('warn','Já existe', `${co.fantasia} já tem um card. Clique nele para abrir.`);
-    return;
-  }
-  const card = ensureClientCard(id, { status:'nao-iniciada', detail:'criado manualmente' });
-  toast('success','Card criado', co.fantasia);
-  renderClientKanban();
-  setTimeout(() => openClientCardModal(card.id), 100);
+  if (!canEdit()){ toast('warn','Sem permissão para criar cards'); return; }
+  renderNewCardModal();
+  openModal('modalNewCard');
 }
+
+function renderNewCardModal(){
+  const body = document.getElementById('ncBody');
+  if (!COMPANIES.length){
+    body.innerHTML = `
+      <div class="empty-state" style="padding:34px 18px">
+        <h4>Nenhuma empresa cadastrada</h4>
+        <p>Para criar um card, primeiro cadastre uma empresa em <b>Cadastros → Empresas</b>.</p>
+      </div>`;
+    document.getElementById('ncOpenCadastroBtn').onclick = () => {
+      closeModal('modalNewCard');
+      switchView('cadastros');
+      state.cadTab = 'empresas';
+      renderCadastros();
+      setTimeout(() => { if (typeof openCompanyModal === 'function') openCompanyModal(); }, 200);
+    };
+    return;
+  }
+
+  /* Classifica empresas em 3 grupos: sem card, com card arquivado, com card ativo */
+  const groups = { available: [], archived: [], active: [] };
+  COMPANIES.forEach(co => {
+    const card = clientCardByCompany(co.id);
+    if (!card)              groups.available.push({ co });
+    else if (card.archived) groups.archived.push({ co, card });
+    else                    groups.active.push({ co, card });
+  });
+
+  const renderCompanyRow = (co, action) => {
+    const c = consultantById(co.consultantId);
+    return `
+      <div class="hub-item ${action.cls}" style="cursor:pointer" onclick="${action.handler}">
+        <div class="hub-item-status">${action.icon}</div>
+        <div class="hub-item-info">
+          <b>${co.fantasia}</b>
+          <div class="hii-meta">${co.razao || ''}${co.cnpj?` · CNPJ ${co.cnpj}`:''}${c?` · Consultor: ${c.name}`:''}</div>
+        </div>
+        <div class="hub-item-when">
+          ${co.projeto?`<span class="ckm-product">${co.projeto}</span>`:'<span style="color:var(--ink-3);font-style:italic">sem projeto</span>'}
+        </div>
+        <div class="hub-item-actions">
+          <button title="${action.title}">${action.btnLabel}</button>
+        </div>
+        <div></div>
+      </div>`;
+  };
+
+  let html = '';
+
+  if (groups.available.length){
+    html += `<div class="modal-section-title" style="margin-top:0">Disponíveis · ${groups.available.length}</div>`;
+    html += groups.available.map(({co}) => renderCompanyRow(co, {
+      cls: 'configured',
+      icon: '+',
+      title: 'Criar card para esta empresa',
+      btnLabel: 'Criar',
+      handler: `ncCreateCard('${co.id}')`,
+    })).join('');
+  }
+
+  if (groups.archived.length){
+    html += `<div class="modal-section-title" style="margin-top:18px">Arquivados — reativáveis · ${groups.archived.length}</div>`;
+    html += groups.archived.map(({co, card}) => renderCompanyRow(co, {
+      cls: 'await',
+      icon: '↺',
+      title: 'Reativar card arquivado',
+      btnLabel: 'Reativar',
+      handler: `ncReactivateCard('${card.id}')`,
+    })).join('');
+  }
+
+  if (groups.active.length){
+    html += `<div class="modal-section-title" style="margin-top:18px">Já existem cards ativos · ${groups.active.length}</div>`;
+    html += groups.active.map(({co, card}) => renderCompanyRow(co, {
+      cls: '',
+      icon: '✓',
+      title: 'Abrir card existente',
+      btnLabel: 'Abrir',
+      handler: `closeModal('modalNewCard');setTimeout(()=>openClientCardModal('${card.id}'),100)`,
+    })).join('');
+  }
+
+  if (!html){
+    html = `<div class="empty-state" style="padding:30px"><h4>Tudo já tem card</h4><p>Todas as empresas cadastradas já possuem um card ativo.</p></div>`;
+  }
+
+  body.innerHTML = html;
+
+  document.getElementById('ncOpenCadastroBtn').onclick = () => {
+    closeModal('modalNewCard');
+    switchView('cadastros');
+    state.cadTab = 'empresas';
+    renderCadastros();
+    setTimeout(() => { if (typeof openCompanyModal === 'function') openCompanyModal(); }, 200);
+  };
+}
+
+window.ncCreateCard = (companyId) => {
+  const co = companyById(companyId);
+  if (!co){ toast('error','Empresa não encontrada'); return; }
+  const card = ensureClientCard(companyId, { status:'nao-iniciada', detail:'criado manualmente via Kanban' });
+  toast('success','Card criado', co.fantasia);
+  closeModal('modalNewCard');
+  renderClientKanban();
+  persist();
+  setTimeout(() => openClientCardModal(card.id), 100);
+};
+
+window.ncReactivateCard = (cardId) => {
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card) return;
+  card.archived = false;
+  pushHistory(card, 'reativado', 'reativado manualmente via Kanban');
+  toast('success','Card reativado', companyById(card.companyId)?.fantasia);
+  closeModal('modalNewCard');
+  renderClientKanban();
+  persist();
+  setTimeout(() => openClientCardModal(cardId), 100);
+};
 
 /* ---------- Modal: detalhe do card ---------- */
 function openClientCardModal(cardId){
@@ -7503,11 +7822,21 @@ function renderClientCardModal(){
     <div class="avatar xl ${cs?cs.cls:'c1'}">${cs?cs.initials:co.fantasia.slice(0,2).toUpperCase()}</div>
     <div>
       <h3>${co.fantasia}</h3>
-      <p>${co.razao || ''} · ${co.cnpj || ''}</p>
-      <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em">
+      <p>${co.razao || ''}${co.cnpj?` · CNPJ ${co.cnpj}`:''}</p>
+      <div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3);letter-spacing:.02em;align-items:center">
         ${co.projeto?`<span class="ckm-product">${co.projeto}</span>`:''}
-        ${cs?`<span>Consultor: <b style="color:var(--ink);font-weight:600">${cs.name}</b></span>`:''}
-        <span>Criado em ${fmtDateTime(card.createdAt)}</span>
+        ${cs ? `
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--forest-bg);border:1px solid var(--forest);border-radius:14px;padding:4px 10px">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" style="color:var(--forest)"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <b style="color:var(--ink);font-weight:600">${cs.name}</b>
+            ${cs.email?`<span style="color:var(--forest);font-family:var(--font-mono);font-size:10.5px">${cs.email}</span>`:'<span style="color:var(--burgundy);font-family:var(--font-mono);font-size:10px;font-style:italic">sem email</span>'}
+          </span>` : '<span style="color:var(--burgundy);font-style:italic">⚠ sem consultor atribuído</span>'}
+        ${co.contato?`
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--champagne-4);border:1px solid var(--champagne);border-radius:14px;padding:4px 10px">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" style="color:var(--champagne)"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--champagne)">${co.contato}</span>
+          </span>`:''}
+        <span style="font-family:var(--font-mono);font-size:10.5px">Criado em ${fmtDateTime(card.createdAt)}</span>
       </div>
     </div>
     <div>
@@ -7526,10 +7855,16 @@ function renderClientCardModal(){
     <div class="cc-stat"><b>${pad(items.length - done - pending)}</b><span>Outros</span></div>
   `;
 
+  /* Cronogramas vinculados ao cliente */
+  const companySchedules = SCHEDULES.filter(s => s.companyId === card.companyId)
+    .sort((a,b) => (b.createdAtISO||'').localeCompare(a.createdAtISO||''));
+
   document.getElementById('cctAll').textContent = items.length;
   document.getElementById('cctAtend').textContent = tAtend;
   document.getElementById('cctTrain').textContent = tTrain;
   document.getElementById('cctTask').textContent = tTask;
+  const cctSchedEl = document.getElementById('cctSched');
+  if (cctSchedEl) cctSchedEl.textContent = companySchedules.length;
 
   document.querySelectorAll('#ccTabs .cc-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.cct === state.ccTab);
@@ -7554,7 +7889,48 @@ function renderClientCardModal(){
       </div>`;
   };
 
+  /* Seção dedicada de Cronogramas */
+  const renderSchedulesSection = () => {
+    if (state.ccTab !== 'all' && state.ccTab !== 'cronogramas') return '';
+    return `
+      <div class="cc-section">
+        <div class="cc-section-head">
+          <h4><span style="display:inline-block;width:22px;height:22px;background:var(--champagne-4);color:var(--champagne);border-radius:50%;text-align:center;line-height:22px;margin-right:8px;font-size:11px">§</span> Cronogramas <em>· ${companySchedules.length}</em></h4>
+          <button class="btn btn-xs btn-primary" onclick="ccCreateNewSchedule('${card.companyId}')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo cronograma
+          </button>
+        </div>
+        ${companySchedules.length ? companySchedules.map(s => {
+          const c = consultantById(s.consultantId);
+          const itemsCount = (s.items||[]).length || EVENTS.filter(e => e.seriesId === s.id || (s.eventIds||[]).includes(e.id)).length;
+          const pendCount = (s.items||[]).filter(i => i.pendingDate).length;
+          return `
+            <div class="cc-item" style="border-left:3px solid var(--champagne);grid-template-columns:auto 1fr auto auto auto">
+              <div class="cc-item-icon" style="background:var(--champagne-4);color:var(--champagne);border-color:var(--champagne)">§</div>
+              <div class="cc-item-info">
+                <b>${isoToBR(s.from)} → ${isoToBR(s.to)} · ${itemsCount} item(ns)${pendCount?` · <span style="color:var(--amber)">${pendCount} pendente(s)</span>`:''}</b>
+                <span>${c?c.name:'sem consultor'}${s.confirmedAt?` · confirmado em ${fmtDateTime(s.confirmedAt)}`:''}</span>
+              </div>
+              <div class="cc-item-when" style="min-width:auto">
+                ${renderSchedulePill(s.status)}
+              </div>
+              <div></div>
+              <div class="cc-item-actions">
+                <button title="Abrir cronograma" onclick="closeModal('modalClientCard');setTimeout(()=>openScheduleModalV2('${s.id}'),100)">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                ${(s.status === 'rascunho' || s.status === 'aguardando' || s.status === 'aguardando-cliente') ? `
+                  <button title="Continuar edição" onclick="closeModal('modalClientCard');goEditDraft('${s.id}')">
+                    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>` : ''}
+              </div>
+            </div>`;
+        }).join('') : `<div class="cc-add-bar"><span>Nenhum cronograma ainda</span><button class="btn btn-xs" onclick="ccCreateNewSchedule('${card.companyId}')">Criar primeiro cronograma</button></div>`}
+      </div>`;
+  };
+
   document.getElementById('ccBody').innerHTML = `
+    ${renderSchedulesSection()}
     ${renderSection('atendimento','Atendimentos','●')}
     ${renderSection('treinamento','Treinamentos','✦')}
     ${renderSection('tarefa','Tarefas','☰')}
@@ -7562,10 +7938,36 @@ function renderClientCardModal(){
 
   /* Footer */
   document.getElementById('ccArchiveBtn').onclick = () => {
-    if (!confirm('Arquivar este card? Ele some do Kanban mas os registros internos são mantidos.')) return;
-    card.archived = true;
-    pushHistory(card, 'arquivado');
-    toast('success','Card arquivado', co.fantasia);
+    /* Oferece 2 ações: arquivar (reversível) OU excluir definitivo (cascata) */
+    const choice = prompt(
+      `O que fazer com o card de ${co.fantasia}?\n\n` +
+      `Digite uma das opções:\n` +
+      `  arquivar   — esconde do Kanban, registros mantidos, reversível\n` +
+      `  excluir    — apaga card + seus cronogramas, eventos, registros e OS vinculados (DEFINITIVO)\n` +
+      `  cancelar   — não fazer nada`,
+      'arquivar'
+    );
+    const action = (choice||'').trim().toLowerCase();
+    if (!action || action === 'cancelar') return;
+
+    if (action === 'arquivar'){
+      card.archived = true;
+      pushHistory(card, 'arquivado');
+      toast('success','Card arquivado', `${co.fantasia} — pode ser reativado em "Novo card"`);
+    } else if (action === 'excluir'){
+      const deps = getCompanyDependencies(card.companyId);
+      if (!confirm(`Exclusão definitiva — remove:\n• Este card\n• ${deps.schedules.length} cronograma(s)\n• ${deps.events.length} evento(s)\n• ${deps.records.length} registro(s)\n• ${deps.orders.length} OS\n\nA EMPRESA "${co.fantasia}" PERMANECE cadastrada.\nConfirma?`)) return;
+      const schIds = deps.schedules.map(s => s.id);
+      CLIENT_CARDS    = CLIENT_CARDS.filter(c => c.id !== card.id);
+      SCHEDULES       = SCHEDULES.filter(s => !schIds.includes(s.id));
+      EVENTS          = EVENTS.filter(e => e.companyId !== card.companyId);
+      RECORDS         = RECORDS.filter(r => r.companyId !== card.companyId);
+      ORDERS_SERVICE  = ORDERS_SERVICE.filter(o => o.companyId !== card.companyId);
+      toast('success','Card e registros excluídos', `${co.fantasia} — empresa permanece cadastrada e pode receber novo card`);
+    } else {
+      toast('warn','Opção inválida','Use: arquivar, excluir ou cancelar');
+      return;
+    }
     closeModal('modalClientCard');
     renderClientKanban();
     persist();
@@ -7624,6 +8026,42 @@ window.updateCardStatus = (cardId, val) => {
   toast('success','Status atualizado', CKB_COLS.find(k=>k.id===val).label);
   renderClientKanban();
   persist();
+};
+
+/* Cria novo cronograma já pré-preenchido com a empresa e consultor padrão do card */
+window.ccCreateNewSchedule = (companyId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const co = companyById(companyId);
+  if (!co){ toast('error','Empresa não encontrada'); return; }
+  if (!CONSULTANTS.length){
+    toast('warn','Sem consultores','Cadastre um consultor antes de criar cronograma.');
+    return;
+  }
+  closeModal('modalClientCard');
+  switchView('cronogramas');
+  /* Pré-preenche o builder com empresa e consultor */
+  setTimeout(() => {
+    const coSel = document.getElementById('croCompany');
+    const csSel = document.getElementById('croConsultant');
+    if (coSel) coSel.value = companyId;
+    if (csSel) csSel.value = co.consultantId || CONSULTANTS[0].id;
+    /* Datas: do mês corrente */
+    const fromEl = document.getElementById('croFrom');
+    const toEl = document.getElementById('croTo');
+    if (fromEl) fromEl.value = fmtDate(state.viewYear, state.viewMonth, 1);
+    if (toEl){
+      const dim = new Date(state.viewYear, state.viewMonth+1, 0).getDate();
+      toEl.value = fmtDate(state.viewYear, state.viewMonth, dim);
+    }
+    /* Reset do builder */
+    state.croTplItems = [];
+    state.croTplSelected = [];
+    state.croPreview = [];
+    state.croDraftScheduleId = null;
+    if (typeof renderCroHub === 'function') renderCroHub();
+    toast('info','Novo cronograma', `Pré-preenchido para ${co.fantasia}. Use "Usar templates" ou "Sugerir dias livres".`);
+    document.querySelector('#view-cronogramas .crono-builder')?.scrollIntoView({behavior:'smooth'});
+  }, 200);
 };
 
 window.ccAddItem = (kind, companyId) => {
@@ -8663,6 +9101,19 @@ document.querySelectorAll('#viewSwitch button').forEach(b => b.onclick = () => {
 /* ============ CARREGA DADOS SALVOS E INICIA ============ */
 const _loaded = loadPersisted();
 _bootDone = true;
+
+/* Validação silenciosa: detecta órfãos no boot. Se houver, avisa o usuário (não corrige automático) */
+try {
+  const report = validateDataIntegrity(false);
+  const total = report.orphanCards.length + report.orphanSchedules.length + report.orphanEvents.length + report.orphanRecords.length + report.orphanOrders.length + report.duplicateCards.length;
+  if (total > 0){
+    setTimeout(() => {
+      toast('warn', `${total} inconsistência(s) na base`,
+        'Use "Verificar integridade" no menu lateral para revisar e limpar.');
+    }, 1500);
+  }
+} catch(e){ /* fail-safe — não bloqueia o boot */ }
+
 switchView('agenda');
 if (_loaded) toast('success','Dados carregados','Suas alterações anteriores foram restauradas.');
 else toast('info','Bem-vindo','Comece criando consultores em Cadastros.');

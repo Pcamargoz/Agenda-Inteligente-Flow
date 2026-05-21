@@ -79,7 +79,7 @@ export default async function handler(req, res) {
   try {
     // Body parsing (Vercel já parseia JSON quando Content-Type: application/json)
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    const { to, subject, html, text, replyTo, osId } = body;
+    const { to, subject, html, text, replyTo, osId, attachments, kind, relatedId } = body;
 
     // Validações
     if (!to)      return res.status(400).json({ error: 'Campo obrigatório: to' });
@@ -87,6 +87,14 @@ export default async function handler(req, res) {
     if (!isValidEmail(to)) return res.status(400).json({ error: 'E-mail destinatário inválido' });
     if (replyTo && !isValidEmail(replyTo)) return res.status(400).json({ error: 'replyTo inválido' });
     if (!html && !text) return res.status(400).json({ error: 'Forneça html ou text' });
+    if (attachments && !Array.isArray(attachments)) {
+      return res.status(400).json({ error: 'attachments deve ser um array' });
+    }
+    // Tamanho máximo do payload (proteção contra anexos enormes)
+    const totalSize = JSON.stringify(body).length;
+    if (totalSize > 9 * 1024 * 1024) {
+      return res.status(413).json({ error: 'Payload muito grande (limite ~9MB)' });
+    }
 
     // Env vars SMTP
     const {
@@ -135,6 +143,17 @@ export default async function handler(req, res) {
     const fromEmail = SMTP_FROM || SMTP_USER;
     const fromName = SMTP_FROM_NAME || 'Faktory Flow Agenda';
 
+    // Mapeia anexos para o formato do nodemailer
+    let mailAttachments;
+    if (attachments && attachments.length) {
+      mailAttachments = attachments.map(att => ({
+        filename: att.filename || 'arquivo.bin',
+        content: att.content,
+        encoding: att.encoding || 'base64',
+        contentType: att.contentType || undefined,
+      }));
+    }
+
     const mailOptions = {
       from: `"${fromName.replace(/"/g, '')}" <${fromEmail}>`,
       to,
@@ -143,8 +162,11 @@ export default async function handler(req, res) {
       html: html || `<pre style="font-family:sans-serif;white-space:pre-wrap">${(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')}</pre>`,
       replyTo: replyTo || undefined,
       bcc: SMTP_BCC || undefined,
+      attachments: mailAttachments,
       headers: {
         'X-Faktory-Flow-OS': osId || 'unknown',
+        'X-Faktory-Flow-Kind': kind || 'generic',
+        'X-Faktory-Flow-RelatedId': relatedId || '',
         'X-Mailer': 'Faktory Flow Agenda v2',
       },
     };

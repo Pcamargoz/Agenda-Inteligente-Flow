@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- html2pdf.js: gera PDFs no browser a partir de HTML (bundle inclui jsPDF + html2canvas) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   :root{
     --ink:#14171f; --ink-2:#2a2e3a; --ink-3:#4a4f5e; --ink-4:#6b7184;
@@ -1642,6 +1644,80 @@
   .reg-view-switch button.active{background:var(--ink);color:var(--paper)}
   .reg-view-switch button svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7}
 
+  /* ============ MODAL: NOTIFICAÇÃO ============ */
+  .nf-summary{
+    background:linear-gradient(135deg,var(--champagne-4) 0%,var(--paper) 100%);
+    border:1px solid var(--champagne);padding:14px 16px;border-radius:2px;margin-bottom:14px;
+    display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;
+  }
+  .nf-summary .nf-icon{
+    width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:18px;
+    background:var(--paper);border:1px solid var(--champagne);color:var(--champagne);
+  }
+  .nf-summary b{font-family:var(--font-display);font-size:15px;font-weight:500;letter-spacing:-.01em;display:block}
+  .nf-summary span{font-size:11.5px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em;display:block;margin-top:3px}
+  .nf-summary b em{font-style:italic;color:var(--champagne);font-weight:400}
+
+  .nf-recipient{
+    background:var(--paper-2);border:1px solid var(--line-2);padding:12px 14px;border-radius:2px;
+    display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  }
+  .nf-recipient .avatar{width:36px;height:36px;font-size:12px}
+  .nf-recipient b{display:block;font-size:13px;font-weight:600}
+  .nf-recipient span{font-size:11px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em}
+  .nf-recipient .nf-email-tag{
+    font-family:var(--font-mono);font-size:11px;color:var(--forest);background:var(--forest-bg);
+    border:1px solid var(--forest);padding:4px 10px;border-radius:11px;font-weight:600;
+  }
+  .nf-recipient .nf-email-tag.missing{color:var(--burgundy);background:var(--burgundy-bg);border-color:var(--burgundy);font-style:italic}
+
+  .nf-preview{
+    margin-top:12px;background:var(--paper);border:1px solid var(--line);border-radius:2px;padding:12px 14px;font-size:12px;color:var(--ink-2);line-height:1.5;
+  }
+  .nf-preview .nf-preview-head{
+    font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:6px;
+  }
+
+  /* ============ LOG DE NOTIFICAÇÕES ============ */
+  .nl-row{
+    display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;
+    padding:11px 14px;border-bottom:1px solid var(--line);
+  }
+  .nl-row:last-child{border-bottom:none}
+  .nl-row:hover{background:var(--paper-2)}
+  .nl-row .nl-icon{
+    width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;
+    background:var(--paper-2);border:1px solid var(--line-2);
+  }
+  .nl-row.sucesso .nl-icon{background:var(--forest-bg);color:var(--forest);border-color:var(--forest)}
+  .nl-row.falha .nl-icon{background:var(--burgundy-bg);color:var(--burgundy);border-color:var(--burgundy)}
+  .nl-row b{display:block;font-size:12.5px;font-weight:600}
+  .nl-row span{font-size:10.5px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em}
+  .nl-row .nl-time{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);text-align:right}
+  .nl-row .nl-time b{display:block;color:var(--ink);font-family:var(--font-mono);font-size:11.5px;font-weight:600}
+  .nl-row .nl-pill{
+    font-family:var(--font-mono);font-size:9.5px;padding:3px 9px;border-radius:9px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;
+  }
+  .nl-row.sucesso .nl-pill{background:var(--forest-bg);color:var(--forest);border:1px solid var(--forest)}
+  .nl-row.falha .nl-pill{background:var(--burgundy-bg);color:var(--burgundy);border:1px solid var(--burgundy)}
+
+  .nl-empty{padding:40px 20px;text-align:center;color:var(--ink-3);font-style:italic}
+
+  /* sidebar log button */
+  .sb-log-btn{
+    margin-top:6px;width:100%;padding:7px 10px;background:transparent;
+    border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+    cursor:pointer;border-radius:2px;transition:all .18s ease;
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+  }
+  .sb-log-btn:hover{border-color:var(--champagne-2);color:#fff}
+  .sb-log-btn .sb-log-count{
+    font-family:var(--font-mono);font-size:9.5px;background:rgba(244,239,230,.1);
+    color:var(--paper);padding:1px 6px;border-radius:8px;letter-spacing:.04em;
+  }
+
   /* ============ USER BADGE (top) ============ */
   .user-chip{
     display:inline-flex;align-items:center;gap:8px;padding:6px 12px;
@@ -1701,7 +1777,11 @@
       <div><span class="dot"></span><b>Sistema online</b></div>
       <div style="margin-top:4px">v2.0 — Faktory Flow</div>
       <div style="margin-top:4px">Salvo <b id="syncTime">agora</b></div>
-      <button onclick="runIntegrityCheck()" style="margin-top:10px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#d4a574';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
+      <button class="sb-log-btn" onclick="openNotifLogModal()">
+        <span>Log de notificações</span>
+        <span class="sb-log-count" id="sbNotifCount">0</span>
+      </button>
+      <button onclick="runIntegrityCheck()" style="margin-top:6px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#d4a574';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
         Verificar integridade
       </button>
       <button onclick="resetAllData()" style="margin-top:6px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#a73347';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
@@ -2290,6 +2370,47 @@
       <div style="display:flex;gap:10px;margin-left:auto">
         <button class="btn" data-close="modalRegistro">Cancelar</button>
         <button class="btn btn-primary" id="rgSaveBtn">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: CONFIRMAÇÃO DE NOTIFICAÇÃO POR EMAIL ============ -->
+<div class="overlay" id="modalNotifyConfirm">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="nfTitle">Notificar por <em>e-mail</em></h3>
+        <p id="nfSub">CONFIRMAÇÃO DE ENVIO</p>
+      </div>
+      <button class="modal-close" data-close="modalNotifyConfirm">&times;</button>
+    </div>
+    <div class="modal-body" id="nfBody"></div>
+    <div class="modal-foot">
+      <button class="btn" id="nfCancelBtn" data-close="modalNotifyConfirm">Cancelar</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button class="btn btn-primary" id="nfConfirmBtn">Confirmar envio</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: LOG DE NOTIFICAÇÕES ============ -->
+<div class="overlay" id="modalNotifLog">
+  <div class="modal lg">
+    <div class="modal-head">
+      <div>
+        <h3>Log de <em>notificações</em></h3>
+        <p>HISTÓRICO DE ENVIOS POR E-MAIL</p>
+      </div>
+      <button class="modal-close" data-close="modalNotifLog">&times;</button>
+    </div>
+    <div class="modal-body" id="nlBody" style="max-height:64vh;overflow-y:auto"></div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="nlClearBtn">Limpar log</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button class="btn" data-close="modalNotifLog">Fechar</button>
+        <button class="btn" id="nlExportBtn">Exportar CSV</button>
       </div>
     </div>
   </div>
@@ -9097,6 +9218,701 @@ document.querySelectorAll('#viewSwitch button').forEach(b => b.onclick = () => {
   state.calView = b.dataset.cal;
   renderAgenda();
 });
+
+/* ============================================
+   NOTIFICAÇÕES AUTOMÁTICAS POR EMAIL (SMTP serverless)
+   - Fluxo 1: criação de treinamento → modal "notificar consultor?"
+   - Fluxo 2: envio de cronograma → modal "enviar PDF para cliente?"
+   - Log de envios persistido em localStorage
+   ============================================ */
+
+let NOTIFICATIONS_LOG = [];
+
+/* Persistência */
+const _persistV5 = persist;
+persist = function(){
+  _persistV5();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw){
+      const d = JSON.parse(raw);
+      d.NOTIFICATIONS_LOG = NOTIFICATIONS_LOG;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+    }
+  } catch(e){}
+};
+const _loadV5 = loadPersisted;
+loadPersisted = function(){
+  const ok = _loadV5();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw){
+      const d = JSON.parse(raw);
+      if (Array.isArray(d.NOTIFICATIONS_LOG)) NOTIFICATIONS_LOG = d.NOTIFICATIONS_LOG;
+    }
+  } catch(e){}
+  return ok;
+};
+
+/* ---------- Registro de log ---------- */
+function logNotification(entry){
+  const log = {
+    id: uid('nlog'),
+    at: nowISO(),
+    kind: entry.kind || 'generic',          // 'training-created' | 'schedule-approval' | ...
+    to: entry.to || '',
+    recipientName: entry.recipientName || '',
+    subject: entry.subject || '',
+    status: entry.status,                   // 'sucesso' | 'falha'
+    error: entry.error || null,
+    relatedId: entry.relatedId || null,     // id do record/schedule/card relacionado
+    relatedType: entry.relatedType || null, // 'record' | 'schedule' | 'card'
+    messageId: entry.messageId || null,
+    userId: CURRENT_USER?.id || null,
+    userName: CURRENT_USER?.name || null,
+  };
+  NOTIFICATIONS_LOG.unshift(log); /* mais recente primeiro */
+  /* Limita histórico para evitar bloat */
+  if (NOTIFICATIONS_LOG.length > 500) NOTIFICATIONS_LOG = NOTIFICATIONS_LOG.slice(0, 500);
+  persist();
+  updateSidebarNotifCount();
+  return log;
+}
+
+function updateSidebarNotifCount(){
+  const el = document.getElementById('sbNotifCount');
+  if (el) el.textContent = NOTIFICATIONS_LOG.length;
+}
+
+/* ---------- Modal de confirmação genérico ---------- */
+let _nfPendingAction = null;
+function showNotifyConfirm({ title, subtitle, summaryIcon, summaryTitle, summarySub, recipient, preview, confirmLabel, onConfirm }){
+  document.getElementById('nfTitle').innerHTML = title || 'Notificar por <em>e-mail</em>';
+  document.getElementById('nfSub').textContent = subtitle || 'CONFIRMAÇÃO DE ENVIO';
+  document.getElementById('nfConfirmBtn').textContent = confirmLabel || 'Confirmar envio';
+
+  const hasEmail = !!(recipient?.email);
+  const recipientCls = recipient?.avatarCls || 'c1';
+  const recipientInitials = recipient?.initials || (recipient?.name || '?').slice(0,2).toUpperCase();
+
+  document.getElementById('nfBody').innerHTML = `
+    <div class="nf-summary">
+      <div class="nf-icon">${summaryIcon || '✦'}</div>
+      <div>
+        <b>${summaryTitle}</b>
+        <span>${summarySub || ''}</span>
+      </div>
+    </div>
+    <div class="nf-recipient">
+      <div class="avatar ${recipientCls}">${recipientInitials}</div>
+      <div>
+        <b>${recipient?.name || '—'}</b>
+        <span>${recipient?.role || ''}</span>
+      </div>
+      <span class="nf-email-tag ${hasEmail?'':'missing'}">${hasEmail ? recipient.email : 'SEM E-MAIL CADASTRADO'}</span>
+    </div>
+    ${preview ? `
+      <div class="nf-preview">
+        <div class="nf-preview-head">Prévia do conteúdo</div>
+        ${preview}
+      </div>` : ''}
+  `;
+
+  const confirmBtn = document.getElementById('nfConfirmBtn');
+  confirmBtn.disabled = !hasEmail;
+  confirmBtn.title = hasEmail ? '' : 'Sem e-mail cadastrado — não é possível enviar';
+
+  _nfPendingAction = onConfirm;
+  confirmBtn.onclick = async () => {
+    if (!_nfPendingAction) return;
+    confirmBtn.disabled = true;
+    const original = confirmBtn.innerHTML;
+    confirmBtn.innerHTML = '<svg viewBox="0 0 24 24" style="animation:spin 1s linear infinite;width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10" stroke-dasharray="40 20"/></svg> Enviando…';
+    try {
+      await _nfPendingAction();
+    } finally {
+      confirmBtn.innerHTML = original;
+      confirmBtn.disabled = false;
+      _nfPendingAction = null;
+    }
+    closeModal('modalNotifyConfirm');
+  };
+
+  openModal('modalNotifyConfirm');
+}
+
+/* ---------- Núcleo de envio (chama API serverless) ---------- */
+async function sendNotificationEmail({ to, subject, html, text, replyTo, attachments, kind, relatedId, relatedType, recipientName }){
+  if (!to){
+    logNotification({ kind, to:'', recipientName, subject, status:'falha', error:'Destinatário vazio', relatedId, relatedType });
+    toast('error','Sem destinatário','E-mail do destinatário não cadastrado.');
+    return { ok:false };
+  }
+  try {
+    const resp = await fetch('/api/send-os-email', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ to, subject, html, text, replyTo, attachments, kind, relatedId }),
+    });
+    const ct = resp.headers.get('content-type') || '';
+    const data = ct.includes('application/json') ? await resp.json() : { error: await resp.text() };
+    if (!resp.ok){
+      logNotification({ kind, to, recipientName, subject, status:'falha', error:`${data.error||resp.status}${data.detail?` — ${data.detail}`:''}`, relatedId, relatedType });
+      toast('error','Falha no envio', data.error || `HTTP ${resp.status}`);
+      return { ok:false, error: data.error };
+    }
+    logNotification({ kind, to, recipientName, subject, status:'sucesso', messageId: data.messageId, relatedId, relatedType });
+    return { ok:true, messageId: data.messageId };
+  } catch (err) {
+    logNotification({ kind, to, recipientName, subject, status:'falha', error:`network: ${err.message}`, relatedId, relatedType });
+    toast('error','Erro de rede','API serverless inacessível: ' + err.message);
+    return { ok:false, error: err.message };
+  }
+}
+
+/* ============================================
+   FLUXO 1 — Notificação ao consultor quando treinamento é criado
+   ============================================ */
+function offerNotifyConsultantOnTraining(record){
+  if (!record || record.kind !== 'treinamento') return;
+  const c = consultantById(record.consultantId);
+  if (!c) return;
+  const co = companyById(record.companyId);
+
+  const preview = `
+    <b style="color:var(--ink);font-size:12.5px">Assunto:</b> Novo treinamento atribuído — ${record.title}<br>
+    <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
+    Olá ${c.name}, um novo treinamento foi atribuído a você:<br>
+    • Tema: <b>${record.title}</b><br>
+    ${co ? `• Cliente: <b>${co.fantasia}</b><br>` : ''}
+    ${record.date ? `• Data prevista: <b>${isoToBR(record.date)}</b>${record.timeStart?` às ${record.timeStart}`:''}<br>` : ''}
+  `;
+
+  showNotifyConfirm({
+    title: 'Notificar consultor sobre <em>novo treinamento</em>',
+    subtitle: 'FLUXO 1 — CRIAÇÃO DE TREINAMENTO',
+    summaryIcon: '✦',
+    summaryTitle: `Deseja notificar este consultor sobre a criação deste treinamento?`,
+    summarySub: 'O e-mail será enviado automaticamente para o endereço cadastrado no perfil do consultor.',
+    recipient: { name: c.name, role: c.role || c.specialty, email: c.email, avatarCls: c.cls, initials: c.initials },
+    preview,
+    confirmLabel: 'Confirmar e enviar',
+    onConfirm: async () => {
+      const subject = `Novo treinamento atribuído — ${record.title}`;
+      const html = buildTrainingNotificationEmail(record, c, co);
+      const text = `Olá ${c.name},\n\nUm novo treinamento foi atribuído a você no Faktory Flow Agenda:\n\n` +
+        `Tema: ${record.title}\n` +
+        (co ? `Cliente: ${co.fantasia}\n` : '') +
+        (record.date ? `Data: ${isoToBR(record.date)}${record.timeStart?` às ${record.timeStart}`:''}\n` : '') +
+        (record.desc ? `\nDescrição:\n${record.desc}\n` : '') +
+        `\nAcesse o sistema para mais detalhes.\n\n— Faktory Flow Agenda`;
+
+      const result = await sendNotificationEmail({
+        to: c.email,
+        subject, html, text,
+        kind: 'training-created',
+        relatedId: record.id,
+        relatedType: 'record',
+        recipientName: c.name,
+      });
+      if (result.ok){
+        toast('success','Consultor notificado', `${c.name} · ${c.email}`);
+      }
+    },
+  });
+}
+
+function buildTrainingNotificationEmail(record, c, co){
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;color:#14171f">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4">
+        <tr><td style="padding:24px 30px;border-bottom:1px solid #ddd5c4;background:linear-gradient(180deg,#ebe5d8 0%,#fff 100%)">
+          <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px">Faktory Flow Agenda</div>
+          <h1 style="font-size:24px;font-weight:400;letter-spacing:-.025em;margin:0">Novo <em style="font-style:italic;color:#2d5f3f">treinamento</em> atribuído</h1>
+        </td></tr>
+        <tr><td style="padding:22px 30px;font-size:14px;line-height:1.6;color:#2a2e3a">
+          Olá <b>${esc(c.name)}</b>,<br><br>
+          Um novo treinamento foi criado e atribuído a você no sistema.
+        </td></tr>
+        <tr><td style="padding:14px 30px;background:#f4efe6;border-top:1px solid #ddd5c4;border-bottom:1px solid #ddd5c4">
+          <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px">
+            <tr><td style="padding:5px 0;color:#6b7184;width:140px;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Tema</td><td style="padding:5px 0;color:#14171f;font-weight:600">${esc(record.title)}</td></tr>
+            ${co?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Cliente</td><td style="padding:5px 0;color:#14171f;font-weight:600">${esc(co.fantasia)}</td></tr>`:''}
+            ${record.date?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Data</td><td style="padding:5px 0;color:#14171f">${isoToBR(record.date)}${record.timeStart?` · ${record.timeStart}${record.timeEnd?'–'+record.timeEnd:''}`:''}</td></tr>`:''}
+            ${record.status?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Status</td><td style="padding:5px 0;color:#14171f">${esc((statusById(record.status)||{}).label||record.status)}</td></tr>`:''}
+          </table>
+        </td></tr>
+        ${record.desc?`<tr><td style="padding:18px 30px;border-bottom:1px solid #ebe5d8">
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Descrição</div>
+          <div style="font-size:13px;line-height:1.55;color:#4a4f5e">${esc(record.desc)}</div>
+        </td></tr>`:''}
+        <tr><td style="padding:20px 30px;text-align:center;background:#fff">
+          <div style="font-size:12px;color:#4a4f5e;line-height:1.6">Acesse o sistema para visualizar os detalhes completos<br>e gerenciar o material do treinamento.</div>
+        </td></tr>
+        <tr><td style="padding:14px;background:#14171f;color:#d0c6b1;text-align:center;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda · notificação automática</td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+/* Hook em saveRegistro: quando um treinamento é criado, oferece notificação */
+const _origSaveRegistro = (typeof saveRegistro === 'function') ? saveRegistro : null;
+if (_origSaveRegistro){
+  saveRegistro = function(){
+    /* Captura se é criação (não edição) e se é treinamento */
+    const wasCreating = !state.rgEditingId;
+    const kindBeing = document.getElementById('rgKind')?.value;
+    _origSaveRegistro.apply(this, arguments);
+    if (wasCreating && kindBeing === 'treinamento'){
+      /* Pega o último treinamento criado */
+      const lastTraining = [...RECORDS].reverse().find(r => r.kind === 'treinamento');
+      if (lastTraining){
+        setTimeout(() => offerNotifyConsultantOnTraining(lastTraining), 300);
+      }
+    }
+  };
+}
+
+/* Hook na confirmação de cronograma: para cada treinamento gerado, oferece notificar (uma vez por consultor) */
+const _origDoConfirmV2 = (typeof doConfirmSchedule === 'function') ? doConfirmSchedule : null;
+if (_origDoConfirmV2){
+  doConfirmSchedule = function(scheduleId, partial){
+    const s = SCHEDULES.find(x => x.id === scheduleId);
+    const before = new Set(RECORDS.map(r => r.id));
+    _origDoConfirmV2.apply(this, arguments);
+    /* Records criados nesta confirmação */
+    const newTrainings = RECORDS.filter(r => !before.has(r.id) && r.kind === 'treinamento');
+    if (s && s.status === 'confirmado' && newTrainings.length){
+      /* Agrupa por consultor para fazer 1 modal por consultor */
+      const byConsultant = {};
+      newTrainings.forEach(t => {
+        if (!t.consultantId) return;
+        (byConsultant[t.consultantId] = byConsultant[t.consultantId] || []).push(t);
+      });
+      const queue = Object.entries(byConsultant);
+      /* Mostra em sequência (1 modal por consultor) */
+      const showNext = (i) => {
+        if (i >= queue.length) return;
+        const [cid, trainings] = queue[i];
+        const c = consultantById(cid);
+        if (!c){ showNext(i+1); return; }
+        offerNotifyConsultantOnTrainingsBatch(trainings, c, companyById(s.companyId), () => showNext(i+1));
+      };
+      setTimeout(() => showNext(0), 800);
+    }
+  };
+}
+
+/* Variante batch (quando vários treinamentos foram criados pelo mesmo consultor numa confirmação) */
+function offerNotifyConsultantOnTrainingsBatch(trainings, c, co, onDone){
+  if (!c || !trainings.length){ onDone && onDone(); return; }
+  const lines = trainings.map(t => `• ${t.title}${t.date?` — ${isoToBR(t.date)}${t.timeStart?` ${t.timeStart}`:''}`:''}`);
+  const preview = `
+    <b style="color:var(--ink);font-size:12.5px">Assunto:</b> ${trainings.length} novo(s) treinamento(s) atribuído(s)<br>
+    <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
+    ${lines.slice(0,4).map(l => esc(l)).join('<br>')}
+    ${lines.length>4?`<br><i>+ ${lines.length-4} outros</i>`:''}
+  `;
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  showNotifyConfirm({
+    title: 'Notificar consultor sobre <em>novos treinamentos</em>',
+    subtitle: `FLUXO 1 — ${trainings.length} TREINAMENTO(S) CRIADO(S)`,
+    summaryIcon: '✦',
+    summaryTitle: `Deseja notificar ${c.name} sobre ${trainings.length} novo(s) treinamento(s)?`,
+    summarySub: 'O e-mail será enviado automaticamente para o endereço cadastrado.',
+    recipient: { name: c.name, role: c.role||c.specialty, email: c.email, avatarCls: c.cls, initials: c.initials },
+    preview,
+    confirmLabel: 'Confirmar e enviar',
+    onConfirm: async () => {
+      const subject = `${trainings.length} novo(s) treinamento(s) atribuído(s)${co?` — ${co.fantasia}`:''}`;
+      const html = buildBatchTrainingEmail(trainings, c, co);
+      const text = `Olá ${c.name},\n\n${trainings.length} novo(s) treinamento(s) foi(ram) atribuído(s) a você:\n\n${lines.join('\n')}\n\nAcesse o sistema para detalhes.\n\n— Faktory Flow Agenda`;
+      await sendNotificationEmail({
+        to: c.email, subject, html, text,
+        kind: 'training-created',
+        relatedId: trainings.map(t => t.id).join(','),
+        relatedType: 'record-batch',
+        recipientName: c.name,
+      }).then(r => {
+        if (r.ok) toast('success', `${c.name} notificado`, `${trainings.length} treinamento(s) enviado(s)`);
+      });
+      onDone && onDone();
+    },
+  });
+  /* Se o modal for cancelado, ainda chama onDone para continuar a fila */
+  document.getElementById('nfCancelBtn').addEventListener('click', () => {
+    setTimeout(() => onDone && onDone(), 100);
+  }, { once: true });
+}
+
+function buildBatchTrainingEmail(trainings, c, co){
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const rows = trainings.map(t => `
+    <tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #ebe5d8;font-weight:600">${esc(t.title)}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #ebe5d8;font-family:monospace;font-size:11px;color:#4a4f5e">${t.date?isoToBR(t.date):'—'}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #ebe5d8;font-family:monospace;font-size:11px;color:#4a4f5e">${t.timeStart||'—'}${t.timeEnd?'–'+t.timeEnd:''}</td>
+    </tr>`).join('');
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;color:#14171f">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">
+    <table width="640" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4">
+      <tr><td style="padding:24px 30px;border-bottom:1px solid #ddd5c4;background:linear-gradient(180deg,#ebe5d8 0%,#fff 100%)">
+        <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px">Faktory Flow Agenda</div>
+        <h1 style="font-size:24px;font-weight:400;letter-spacing:-.025em;margin:0">${trainings.length} novo(s) <em style="font-style:italic;color:#2d5f3f">treinamento(s)</em> atribuído(s)</h1>
+      </td></tr>
+      <tr><td style="padding:22px 30px;font-size:14px;line-height:1.6">
+        Olá <b>${esc(c.name)}</b>,<br><br>
+        ${co ? `A confirmação do cronograma de <b>${esc(co.fantasia)}</b> gerou ${trainings.length} novo(s) treinamento(s) sob sua responsabilidade:` : `${trainings.length} novo(s) treinamento(s) foi(ram) atribuído(s) a você:`}
+      </td></tr>
+      <tr><td style="padding:0 30px 22px">
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #ddd5c4;font-size:12.5px">
+          <thead><tr style="background:#f4efe6">
+            <th style="text-align:left;padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b7184">Tema</th>
+            <th style="text-align:left;padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b7184">Data</th>
+            <th style="text-align:left;padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#6b7184">Horário</th>
+          </tr></thead><tbody>${rows}</tbody>
+        </table>
+      </td></tr>
+      <tr><td style="padding:14px;background:#14171f;color:#d0c6b1;text-align:center;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda · notificação automática</td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+}
+
+/* ============================================
+   FLUXO 2 — Envio de cronograma em PDF ao cliente
+   ============================================ */
+function offerSendScheduleToClient(scheduleId){
+  const s = SCHEDULES.find(x => x.id === scheduleId);
+  if (!s) return;
+  const co = companyById(s.companyId);
+  if (!co){ toast('error','Empresa não encontrada'); return; }
+  const c = consultantById(s.consultantId);
+  const items = s.items || [];
+  const trainings = items.filter(i => i.kind === 'treinamento').length;
+  const tasks = items.filter(i => i.kind === 'tarefa').length;
+
+  const preview = `
+    <b style="color:var(--ink);font-size:12.5px">Assunto:</b> Cronograma para aprovação — ${co.fantasia}<br>
+    <b style="color:var(--ink);font-size:12.5px">Anexo:</b> cronograma-${co.fantasia.replace(/\s/g,'_').toLowerCase()}.pdf<br>
+    <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
+    Período: ${isoToBR(s.from)} → ${isoToBR(s.to)}<br>
+    ${trainings} treinamento(s) · ${tasks} tarefa(s) · ${items.length} item(ns) no total
+  `;
+
+  /* Identifica destinatário: usa contato (responsável) da empresa */
+  const recipientName = co.responsavel || co.fantasia;
+  const recipientEmail = co.contato;
+
+  showNotifyConfirm({
+    title: 'Enviar cronograma para <em>aprovação</em>',
+    subtitle: 'FLUXO 2 — ENVIO DE PDF AO CLIENTE',
+    summaryIcon: '§',
+    summaryTitle: `Deseja enviar este cronograma em PDF para o cliente por e-mail?`,
+    summarySub: `O PDF será gerado automaticamente com os dados atuais e anexado ao e-mail.`,
+    recipient: {
+      name: recipientName,
+      role: co.fantasia + (co.razao?` · ${co.razao}`:''),
+      email: recipientEmail,
+      avatarCls: 'c3',
+      initials: (recipientName||'??').slice(0,2).toUpperCase(),
+    },
+    preview,
+    confirmLabel: 'Gerar PDF e enviar',
+    onConfirm: async () => {
+      toast('info','Gerando PDF…','Aguarde alguns segundos.');
+      let pdfBase64;
+      try {
+        pdfBase64 = await generateScheduleAsBase64PDF(s, co, c);
+      } catch (err) {
+        toast('error','Falha ao gerar PDF', err.message);
+        logNotification({
+          kind:'schedule-approval', to: recipientEmail||'', recipientName,
+          subject:`Cronograma para aprovação — ${co.fantasia}`,
+          status:'falha', error:`pdf-gen: ${err.message}`,
+          relatedId: s.id, relatedType:'schedule',
+        });
+        return;
+      }
+      const subject = `Cronograma para aprovação — ${co.fantasia}`;
+      const html = buildScheduleEmail(s, co, c);
+      const text = `Olá ${recipientName},\n\nSegue em anexo o cronograma de atividades para sua análise e aprovação.\n\nPeríodo: ${isoToBR(s.from)} → ${isoToBR(s.to)}\nTotal de itens: ${items.length}\n\nResponda este e-mail confirmando o aceite ou solicitando ajustes.\n\nAtenciosamente,\n${c?c.name:''}\n— Faktory Flow Agenda`;
+      const filename = `cronograma-${(co.fantasia||'cliente').replace(/[^\w]/g,'_').toLowerCase()}-${s.from}.pdf`;
+      const result = await sendNotificationEmail({
+        to: recipientEmail,
+        subject, html, text,
+        replyTo: c?.email || undefined,
+        attachments: [{ filename, content: pdfBase64, encoding:'base64', contentType:'application/pdf' }],
+        kind: 'schedule-approval',
+        relatedId: s.id,
+        relatedType: 'schedule',
+        recipientName,
+      });
+      if (result.ok){
+        toast('success','Cronograma enviado', `${recipientEmail} · PDF anexado`);
+        s.lastSentToClientAt = nowISO();
+        s.lastSentToClientBy = CURRENT_USER?.id || null;
+        pushHistory(s, 'cronograma enviado por e-mail', `para ${recipientEmail}`);
+        persist();
+      }
+    },
+  });
+}
+
+/* Geração de PDF do cronograma — usa html2pdf bundle */
+async function generateScheduleAsBase64PDF(s, co, c){
+  if (typeof html2pdf === 'undefined'){
+    throw new Error('Biblioteca html2pdf não carregada');
+  }
+  const items = s.items || [];
+  const trainings = items.filter(i => i.kind === 'treinamento');
+  const tasks = items.filter(i => i.kind === 'tarefa');
+  const esc = str => (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  const itemsHTML = items.length ? items.map(it => {
+    const cs = consultantById(it.responsibleId) || c;
+    return `
+      <tr>
+        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-weight:600">${it.kind==='treinamento'?'✦':'☰'} ${esc(it.title)}</td>
+        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-family:monospace;font-size:11px">${it.date?isoToBR(it.date):'<em style="color:#b8632a">sem data</em>'}</td>
+        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-family:monospace;font-size:11px">${it.timeStart?`${it.timeStart}–${it.timeEnd||''}`:'—'}</td>
+        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-size:11px">${cs?esc(cs.name):'—'}</td>
+        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-size:10.5px;color:#6b7184">${esc((statusById(it.status||'provisorio')||{}).label||'')}</td>
+      </tr>`;
+  }).join('') : '<tr><td colspan="5" style="padding:20px;text-align:center;color:#6b7184;font-style:italic">Sem itens neste cronograma</td></tr>';
+
+  const html = `
+    <div style="font-family:Georgia,'Times New Roman',serif;color:#14171f;padding:36px 32px;max-width:780px;background:#fff">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #b8895a;padding-bottom:14px;margin-bottom:24px">
+        <div>
+          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#6b7184;margin-bottom:4px">Faktory Flow Agenda</div>
+          <h1 style="font-size:30px;font-weight:400;letter-spacing:-.025em;margin:0;line-height:1.1">Cronograma <em style="font-style:italic;color:#b8895a">de atividades</em></h1>
+        </div>
+        <div style="text-align:right;font-family:monospace;font-size:10px;color:#6b7184;letter-spacing:.08em">
+          Emitido em<br><b style="color:#14171f;font-size:11px">${new Date().toLocaleString('pt-BR')}</b>
+        </div>
+      </div>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px;margin-bottom:24px">
+        <tr>
+          <td style="padding:5px 0;color:#6b7184;width:140px;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Cliente</td>
+          <td style="padding:5px 0;font-weight:600">${esc(co.fantasia)}${co.razao?` <span style="color:#6b7184;font-weight:400">— ${esc(co.razao)}</span>`:''}</td>
+        </tr>
+        ${co.cnpj?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">CNPJ</td><td style="padding:5px 0;font-family:monospace">${esc(co.cnpj)}</td></tr>`:''}
+        ${co.responsavel?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Responsável</td><td style="padding:5px 0">${esc(co.responsavel)}</td></tr>`:''}
+        ${c?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Consultor</td><td style="padding:5px 0">${esc(c.name)}${c.email?` <span style="color:#6b7184;font-family:monospace;font-size:11px">— ${esc(c.email)}</span>`:''}</td></tr>`:''}
+        <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Período</td><td style="padding:5px 0;font-family:monospace">${isoToBR(s.from)} → ${isoToBR(s.to)}</td></tr>
+        <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Itens</td><td style="padding:5px 0">${items.length} no total · ${trainings.length} treinamento(s) · ${tasks.length} tarefa(s)</td></tr>
+      </table>
+
+      <h2 style="font-size:16px;font-weight:500;letter-spacing:-.01em;margin:0 0 10px;color:#14171f">Detalhamento</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #ddd5c4;font-size:12px">
+        <thead><tr style="background:#f4efe6">
+          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Item</th>
+          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Data</th>
+          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Horário</th>
+          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Responsável</th>
+          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Status</th>
+        </tr></thead>
+        <tbody>${itemsHTML}</tbody>
+      </table>
+
+      <div style="margin-top:32px;padding-top:18px;border-top:1px solid #ddd5c4;font-size:11px;color:#6b7184;text-align:center;letter-spacing:.08em;text-transform:uppercase">
+        Faktory Flow Agenda · Documento gerado automaticamente
+      </div>
+      <div style="margin-top:18px;padding:14px;background:#f4efe6;border:1px dashed #b8895a;text-align:center;font-size:12px;color:#4a4f5e">
+        Para aprovar este cronograma, responda o e-mail com este PDF anexo confirmando o aceite.<br>
+        Para solicitar ajustes, descreva-os na resposta.
+      </div>
+    </div>
+  `;
+
+  /* Renderiza em um container offscreen e converte para PDF */
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '800px';
+  container.innerHTML = html;
+  document.body.appendChild(container);
+
+  try {
+    const blob = await html2pdf().set({
+      margin: 10,
+      filename: 'cronograma.pdf',
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    }).from(container).outputPdf('blob');
+    /* Converte blob → base64 (sem prefixo data:...) */
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result || '';
+        const idx = result.indexOf('base64,');
+        resolve(idx >= 0 ? result.slice(idx + 7) : result);
+      };
+      reader.onerror = () => reject(new Error('Falha ao converter PDF para base64'));
+      reader.readAsDataURL(blob);
+    });
+    return base64;
+  } finally {
+    container.remove();
+  }
+}
+
+function buildScheduleEmail(s, co, c){
+  const items = s.items || [];
+  const esc = str => (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;color:#14171f">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4">
+      <tr><td style="padding:24px 30px;border-bottom:1px solid #ddd5c4;background:linear-gradient(180deg,#ebe5d8 0%,#fff 100%)">
+        <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px">Faktory Flow Agenda</div>
+        <h1 style="font-size:26px;font-weight:400;letter-spacing:-.025em;margin:0">Cronograma para <em style="font-style:italic;color:#b8895a">aprovação</em></h1>
+      </td></tr>
+      <tr><td style="padding:22px 30px;font-size:14px;line-height:1.6;color:#2a2e3a">
+        Olá ${co.responsavel?`<b>${esc(co.responsavel)}</b>`:`<b>${esc(co.fantasia)}</b>`},<br><br>
+        Segue em <b>anexo (PDF)</b> o cronograma de atividades para sua análise e aprovação.
+      </td></tr>
+      <tr><td style="padding:14px 30px;background:#f4efe6;border-top:1px solid #ddd5c4;border-bottom:1px solid #ddd5c4">
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px">
+          <tr><td style="padding:5px 0;color:#6b7184;width:120px;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Cliente</td><td style="padding:5px 0;font-weight:600">${esc(co.fantasia)}</td></tr>
+          <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Período</td><td style="padding:5px 0;font-family:monospace">${isoToBR(s.from)} → ${isoToBR(s.to)}</td></tr>
+          <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Itens</td><td style="padding:5px 0">${items.length} item(ns) no cronograma</td></tr>
+          ${c?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Consultor</td><td style="padding:5px 0">${esc(c.name)}${c.email?` · <a href="mailto:${esc(c.email)}" style="color:#b8895a">${esc(c.email)}</a>`:''}</td></tr>`:''}
+        </table>
+      </td></tr>
+      <tr><td style="padding:22px 30px;text-align:center">
+        <a href="mailto:${esc(c?.email||'')}?subject=Aprovado%20-%20Cronograma%20${encodeURIComponent(co.fantasia)}" style="display:inline-block;background:#2d5f3f;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.04em">Responder confirmando aprovação</a>
+        <div style="margin-top:12px;font-size:11.5px;color:#6b7184">Ou descreva ajustes desejados na resposta.</div>
+      </td></tr>
+      <tr><td style="padding:14px;background:#14171f;color:#d0c6b1;text-align:center;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda · documento anexo em PDF</td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+}
+
+/* Hook em saveDraftSchedule(submitForApproval) → após enviar, oferece envio ao cliente */
+const _origSaveDraftV2 = (typeof saveDraftSchedule === 'function') ? saveDraftSchedule : null;
+if (_origSaveDraftV2){
+  saveDraftSchedule = function(opts = {}){
+    const result = _origSaveDraftV2.apply(this, arguments);
+    if (opts.submitForApproval){
+      /* Pega o cronograma recém-enviado (status='aguardando-cliente') */
+      const latest = [...SCHEDULES].reverse().find(s => s.status === 'aguardando-cliente');
+      if (latest){
+        setTimeout(() => offerSendScheduleToClient(latest.id), 600);
+      }
+    }
+    return result;
+  };
+}
+
+/* Hook adicional: botão "Confirmar com cliente" no modal de cronograma também pode disparar */
+window.offerSendScheduleToClient = offerSendScheduleToClient;
+
+/* ============================================
+   Modal: log de notificações
+   ============================================ */
+function openNotifLogModal(){
+  renderNotifLog();
+  openModal('modalNotifLog');
+}
+window.openNotifLogModal = openNotifLogModal;
+
+function renderNotifLog(){
+  const wrap = document.getElementById('nlBody');
+  if (!NOTIFICATIONS_LOG.length){
+    wrap.innerHTML = `<div class="nl-empty">Nenhuma notificação enviada ainda.<br><br><span style="font-size:10.5px">Os envios automáticos de e-mail aparecem aqui (sucessos e falhas).</span></div>`;
+    return;
+  }
+
+  /* Filtros simples no topo */
+  const stats = {
+    total: NOTIFICATIONS_LOG.length,
+    sucesso: NOTIFICATIONS_LOG.filter(l => l.status==='sucesso').length,
+    falha:   NOTIFICATIONS_LOG.filter(l => l.status==='falha').length,
+  };
+
+  const kindLabel = (k) => ({
+    'training-created':   'Notificação de treinamento',
+    'schedule-approval':  'Envio de cronograma',
+  })[k] || k;
+
+  wrap.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)">
+      <div class="cc-stat"><b>${pad(stats.total)}</b><span>Total</span></div>
+      <div class="cc-stat"><b style="color:var(--forest)">${pad(stats.sucesso)}</b><span>Sucessos</span></div>
+      <div class="cc-stat"><b style="color:var(--burgundy)">${pad(stats.falha)}</b><span>Falhas</span></div>
+    </div>
+    <div style="padding:8px 0">
+      ${NOTIFICATIONS_LOG.slice(0,200).map(l => `
+        <div class="nl-row ${l.status}">
+          <div class="nl-icon">${l.status==='sucesso'?'✓':'×'}</div>
+          <div>
+            <b>${l.subject||kindLabel(l.kind)}</b>
+            <span>${kindLabel(l.kind)} · ${l.to||'(sem destinatário)'} ${l.recipientName?`(${l.recipientName})`:''}</span>
+            ${l.error?`<span style="color:var(--burgundy);font-style:italic">Erro: ${l.error}</span>`:''}
+            ${l.messageId?`<span style="opacity:.6">msgId: ${l.messageId.slice(0,40)}…</span>`:''}
+          </div>
+          <span class="nl-pill">${l.status}</span>
+          <div class="nl-time">
+            <b>${fmtDateTime(l.at)}</b>
+            <span>${l.userName||''}</span>
+          </div>
+        </div>`).join('')}
+      ${NOTIFICATIONS_LOG.length>200?`<div style="padding:14px;text-align:center;font-size:11px;color:var(--ink-3);font-family:var(--font-mono)">Mostrando 200 mais recentes de ${NOTIFICATIONS_LOG.length}</div>`:''}
+    </div>
+  `;
+}
+
+document.getElementById('nlClearBtn').onclick = () => {
+  if (!NOTIFICATIONS_LOG.length){ toast('info','Log vazio'); return; }
+  if (!confirm(`Limpar todos os ${NOTIFICATIONS_LOG.length} registros do log?`)) return;
+  NOTIFICATIONS_LOG = [];
+  persist();
+  updateSidebarNotifCount();
+  renderNotifLog();
+  toast('success','Log limpo');
+};
+
+document.getElementById('nlExportBtn').onclick = () => {
+  if (!NOTIFICATIONS_LOG.length){ toast('warn','Nada para exportar'); return; }
+  const header = 'Data/Hora;Tipo;Destinatario;Nome;Assunto;Status;Erro;Usuario\n';
+  const rows = NOTIFICATIONS_LOG.map(l => [
+    fmtDateTime(l.at),
+    l.kind,
+    l.to,
+    l.recipientName,
+    (l.subject||'').replace(/;/g,','),
+    l.status,
+    (l.error||'').replace(/;/g,',').replace(/\n/g,' '),
+    l.userName||'',
+  ].join(';')).join('\n');
+  const blob = new Blob(['﻿'+header+rows], { type:'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `notificacoes-${Date.now()}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('success','CSV exportado', `${NOTIFICATIONS_LOG.length} registros`);
+};
+
+/* Atualiza o badge do sidebar quando carrega/persiste */
+const _origRenderAllV5 = renderAll;
+renderAll = function(){
+  _origRenderAllV5.apply(this, arguments);
+  updateSidebarNotifCount();
+};
 
 /* ============ CARREGA DADOS SALVOS E INICIA ============ */
 const _loaded = loadPersisted();

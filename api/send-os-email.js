@@ -44,6 +44,28 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(204).end();
 
+  // Health check: GET retorna se o SMTP está configurado (sem expor credenciais)
+  if (req.method === 'GET') {
+    const cfg = {
+      smtp_host: !!process.env.SMTP_HOST,
+      smtp_user: !!process.env.SMTP_USER,
+      smtp_pass: !!process.env.SMTP_PASS,
+      smtp_from: !!process.env.SMTP_FROM,
+      smtp_from_name: !!process.env.SMTP_FROM_NAME,
+    };
+    const ready = cfg.smtp_host && cfg.smtp_user && cfg.smtp_pass;
+    return res.status(200).json({
+      service: 'Faktory Flow Agenda — send-os-email',
+      version: '1.1.0',
+      ready,
+      configured: cfg,
+      hint: ready
+        ? 'API pronta. Faça POST com { to, subject, html, text } para enviar.'
+        : 'Configure as variáveis de ambiente SMTP_* no Vercel.',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido. Use POST.' });
   }

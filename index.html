@@ -1643,6 +1643,32 @@
   .cc-item.confirmed-training .cc-item-actions button.primary:hover{
     background:var(--forest-2);
   }
+
+  /* Card no Kanban com pendências em aberto — piscada vermelha discreta */
+  @keyframes pendBlink {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(138,38,56,0); border-color: var(--line-2); }
+    50%      { box-shadow: 0 0 0 3px rgba(138,38,56,.32); border-color: var(--burgundy); }
+  }
+  .ckb-card.has-pendencias{
+    animation: pendBlink 1.4s ease-in-out infinite;
+    border-left:3px solid var(--burgundy)!important;
+  }
+  .ckb-card.has-pendencias::after{
+    content:"! PENDÊNCIAS";
+    position:absolute;top:6px;right:6px;
+    font-family:var(--font-mono);font-size:8.5px;font-weight:700;letter-spacing:.12em;
+    color:var(--paper);background:var(--burgundy);
+    padding:2px 6px;border-radius:8px;
+  }
+  .ckb-card{position:relative}
+
+  /* Aba "Pendências" — quando ativa */
+  .cc-tab[data-cct="pendencias"].active{
+    border-bottom-color:var(--burgundy);color:var(--burgundy);
+  }
+  .cc-tab[data-cct="pendencias"] .cc-tab-count{
+    background:var(--burgundy-bg);color:var(--burgundy);
+  }
   .cc-item-icon{
     width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
     background:var(--paper-2);font-size:13px;border:1px solid var(--line-2);
@@ -2716,6 +2742,7 @@
       <div class="cc-tab" data-cct="atendimento">Atendimentos <span class="cc-tab-count" id="cctAtend">0</span></div>
       <div class="cc-tab" data-cct="treinamento">Treinamentos <span class="cc-tab-count" id="cctTrain">0</span></div>
       <div class="cc-tab" data-cct="tarefa">Tarefas <span class="cc-tab-count" id="cctTask">0</span></div>
+      <div class="cc-tab" data-cct="pendencias">Pendências <span class="cc-tab-count" id="cctPend">0</span></div>
       <div class="cc-tab" data-cct="cronogramas">Cronogramas <span class="cc-tab-count" id="cctSched">0</span></div>
     </div>
     <div class="modal-body" id="ccBody" style="max-height:60vh;overflow-y:auto;padding:0"></div>
@@ -8480,8 +8507,13 @@ function renderClientCard(card){
   const dates = items.map(i => i.date).filter(Boolean).sort();
   const lastDate = dates.length ? dates[dates.length - 1] : null;
 
+  /* Detecta pendências em aberto: flag explícita do auto-conclude OU itens em "Pendências" OU tarefas/treinos abertos quando o card está em "concluida" */
+  const pendItemsCount = items.filter(i => i.raw && i.raw.inPendencias === true).length;
+  const tasksOpen = items.filter(i => i.kind === 'tarefa' && !['concluido','cancelado'].includes(i.status) && !(i.raw && i.raw.inPendencias)).length;
+  const hasPendencias = pendItemsCount > 0 || (card.status === 'concluida' && tasksOpen > 0) || card.hasPendencias === true;
+
   return `
-    <div class="ckb-card ${card.status}" draggable="true" data-card-id="${card.id}" onclick="openClientCardModal('${card.id}')">
+    <div class="ckb-card ${card.status}${hasPendencias?' has-pendencias':''}" draggable="true" data-card-id="${card.id}" onclick="openClientCardModal('${card.id}')" title="${hasPendencias?`${pendItemsCount+tasksOpen} pendência(s) em aberto`:''}">
       <div class="ckb-card-head">
         <h5>${co.fantasia}</h5>
       </div>
@@ -8746,6 +8778,14 @@ function renderClientCardModal(){
   document.getElementById('cctTask').textContent = tTask;
   const cctSchedEl = document.getElementById('cctSched');
   if (cctSchedEl) cctSchedEl.textContent = companySchedules.length;
+  /* Contagem de pendências = itens marcados como pendência OU tarefas/treinamentos não-concluídos vindos para pendências */
+  const pendCount = items.filter(i => (i.raw && i.raw.inPendencias === true)).length;
+  const cctPendEl = document.getElementById('cctPend');
+  if (cctPendEl){
+    cctPendEl.textContent = pendCount;
+    cctPendEl.style.background = pendCount ? 'var(--burgundy)' : '';
+    cctPendEl.style.color = pendCount ? 'var(--paper)' : '';
+  }
 
   document.querySelectorAll('#ccTabs .cc-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.cct === state.ccTab);
@@ -8753,9 +8793,16 @@ function renderClientCardModal(){
   });
 
   /* Body */
-  const filter = (kind) => state.ccTab === 'all' ? items.filter(i => i.kind === kind) : items.filter(i => i.kind === state.ccTab);
+  /* Itens em Pendências NÃO aparecem nas abas normais (apenas na aba "pendencias") */
+  const isInPendencias = (i) => !!(i.raw && i.raw.inPendencias === true);
+  const filter = (kind) => {
+    if (state.ccTab === 'pendencias') return [];
+    const base = state.ccTab === 'all' ? items.filter(i => i.kind === kind) : items.filter(i => i.kind === state.ccTab);
+    return base.filter(i => !isInPendencias(i));
+  };
 
   const renderSection = (kind, label, icon) => {
+    if (state.ccTab === 'pendencias') return '';
     if (state.ccTab !== 'all' && state.ccTab !== kind) return '';
     const sec = filter(kind);
     return `
@@ -8767,6 +8814,23 @@ function renderClientCardModal(){
           </button>
         </div>
         ${sec.length ? sec.map(it => renderCcItem(it, card)).join('') : `<div class="cc-add-bar"><span>Nenhum ${kind} ainda</span><button class="btn btn-xs" onclick="ccAddItem('${kind}','${card.companyId}')">Adicionar</button></div>`}
+      </div>`;
+  };
+
+  /* Seção dedicada de Pendências */
+  const renderPendenciasSection = () => {
+    if (state.ccTab !== 'all' && state.ccTab !== 'pendencias') return '';
+    const pendItems = items.filter(isInPendencias);
+    if (state.ccTab === 'all' && !pendItems.length) return '';
+    return `
+      <div class="cc-section">
+        <div class="cc-section-head">
+          <h4><span style="display:inline-block;width:22px;height:22px;background:var(--burgundy-bg);color:var(--burgundy);border-radius:50%;text-align:center;line-height:22px;margin-right:8px;font-size:11px">!</span> Pendências <em>· ${pendItems.length}</em></h4>
+          ${pendItems.length?`<span style="font-family:var(--font-mono);font-size:10px;color:var(--burgundy);letter-spacing:.1em;text-transform:uppercase;font-weight:700">${pendItems.length} item(ns) a resolver</span>`:''}
+        </div>
+        ${pendItems.length
+          ? pendItems.map(it => renderCcItem(it, card)).join('')
+          : `<div class="cc-add-bar"><span>Nenhuma pendência — tudo em dia</span></div>`}
       </div>`;
   };
 
@@ -8812,10 +8876,40 @@ function renderClientCardModal(){
 
   document.getElementById('ccBody').innerHTML = `
     ${renderSchedulesSection()}
+    ${renderPendenciasSection()}
     ${renderSection('atendimento','Atendimentos','●')}
     ${renderSection('treinamento','Treinamentos','✦')}
     ${renderSection('tarefa','Tarefas','☰')}
   `;
+
+  /* CICLO DE VIDA AUTOMÁTICO:
+     - Todos treinamentos do card decididos (realizados ou não-realizados) → move card para "concluida"
+     - Mas se existirem pendências, mantém com piscada vermelha (visual no kanban) */
+  try {
+    const trainings = items.filter(i => i.kind === 'treinamento' && !isInPendencias(i));
+    const pendItems = items.filter(isInPendencias);
+    const tasksOpen = items.filter(i => i.kind === 'tarefa'
+                                     && !['concluido','cancelado'].includes(i.status)
+                                     && !isInPendencias(i));
+    if (trainings.length){
+      const allDecided = trainings.every(t => {
+        const r = t.raw || t;
+        return r.realizationStatus === 'realizado' || r.realizationStatus === 'nao-realizado'
+            || ['atendido','concluido','cancelado'].includes(t.status);
+      });
+      const hasPending = pendItems.length > 0 || tasksOpen.length > 0;
+      if (allDecided && !card.statusManual && card.status !== 'concluida'){
+        card.status = 'concluida';
+        card.hasPendencias = hasPending;
+        pushHistory(card, 'auto: todos treinamentos decididos', hasPending ? `${pendItems.length + tasksOpen.length} pendência(s) em aberto` : 'sem pendências');
+        persist();
+        setTimeout(() => renderClientKanban(), 50);
+      } else if (card.status === 'concluida'){
+        /* mantém flag atualizada para o piscar do kanban */
+        card.hasPendencias = hasPending;
+      }
+    }
+  } catch(e){ console.warn('auto-conclude erro:', e); }
 
   /* Footer */
   document.getElementById('ccArchiveBtn').onclick = () => {
@@ -8943,9 +9037,19 @@ function renderCcItem(it, card){
           <button title="Abrir OS gerada" onclick="ccOpenOSForItem('${it._src}','${it.id}')">
             <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>` : ''}
+          ${!notRealized ? `
+          <button title="Reagendar" onclick="ccReagendarItem('${it._src}','${it.id}')">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
+          </button>` : ''}
+          <button title="${raw.inPendencias?'Voltar para Treinamentos':'Enviar para Pendências'}" onclick="ccSendToPendencias('${it._src}','${it.id}')" style="${raw.inPendencias?'background:var(--burgundy);color:var(--paper);border-color:var(--burgundy)':''}">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          </button>
+          <button title="Editar" onclick="ccEditItem('${it._src}','${it.id}')">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
           ${decided ? `
           <button title="Reabrir (voltar para não decidido)" onclick="ccSetTrainingRealization('${it._src}','${it.id}','reset')">
-            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 10 15 10"/></svg>
           </button>` : ''}
         </div>
       </div>
@@ -9071,6 +9175,30 @@ window.ccReagendarItem = (src, id) => {
 
   if (!ref){ toast('error','Item não encontrado para reagendar'); return; }
   openReagendarModal(ref, source);
+};
+
+/* Move um item (treinamento/tarefa) para a aba "Pendências" do card.
+   Mantém o registro no banco e apenas marca a flag `inPendencias`. */
+window.ccSendToPendencias = (src, id) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  let target = null;
+  if (src === 'record') target = RECORDS.find(r => r.id === id);
+  else if (src === 'event') target = EVENTS.find(e => e.id === id);
+  if (!target){ toast('error','Item não encontrado'); return; }
+  if (target.inPendencias){
+    target.inPendencias = false;
+    target.pendenciaSentAt = null;
+    if (typeof pushHistory === 'function') pushHistory(target, 'removido de pendências');
+    toast('info','Removido de pendências','Item voltou para sua aba original.');
+  } else {
+    target.inPendencias = true;
+    target.pendenciaSentAt = new Date().toISOString();
+    if (typeof pushHistory === 'function') pushHistory(target, 'enviado para pendências');
+    toast('success','Enviado para pendências','Acompanhe na aba "Pendências".');
+  }
+  persist();
+  renderClientCardModal();
+  renderClientKanban();
 };
 
 /* Encerra uma tarefa/item dentro do card: marca como cancelado com motivo "encerrado pelo cliente". */
@@ -10125,6 +10253,9 @@ renderCcItem = function(it, card){
         <button title="Encerrar tarefa" onclick="ccEncerrarItem('${it._src}','${it.id}','${card.id}')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
         </button>` : ''}
+        <button title="${(it.raw&&it.raw.inPendencias)?'Voltar para esta aba':'Enviar para Pendências'}" onclick="ccSendToPendencias('${it._src}','${it.id}')" style="${(it.raw&&it.raw.inPendencias)?'background:var(--burgundy);color:var(--paper);border-color:var(--burgundy)':''}">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </button>
         <button title="Editar" onclick="ccEditItem('${it._src}','${it.id}')">
           <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>

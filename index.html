@@ -5570,6 +5570,22 @@ function renderTemplateItemEditor(it, i){
       <label>Descrição / observações</label>
       <textarea oninput="updateTplItemField(${i},'desc',this.value)">${it.desc||''}</textarea>
     </div>
+    <div>
+      <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-3);display:block;margin-bottom:6px">Tarefas do treinamento <span style="text-transform:none;letter-spacing:0;color:var(--ink-4);font-weight:400">(viram checklist no registro e pendências internas na OS)</span></label>
+      <div>
+        ${(it.checklist||[]).map((step, ci) => `
+          <div class="checklist-item">
+            <div class="ci-bullet"></div>
+            <input type="text" value="${(step||'').replace(/"/g,'&quot;')}"
+                   oninput="updateTplChecklist(${i},${ci},this.value)"
+                   placeholder="Descrição da tarefa do treinamento..." />
+            <button type="button" onclick="removeTplChecklist(${i},${ci})">×</button>
+          </div>`).join('')}
+        <button type="button" class="btn btn-xs" onclick="addTplChecklist(${i})" style="margin-top:6px">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Tarefa
+        </button>
+      </div>
+    </div>
   ` : `
     <div class="tpl-item-fields">
       <div class="field">
@@ -8028,8 +8044,8 @@ loadPersisted = function(){
 
 const CKB_COLS = [
   { id:'nao-iniciada',  label:'Não iniciada' },
-  { id:'em-andamento',  label:'Em andamento' },
   { id:'aguardando',    label:'Aguardando cliente' },
+  { id:'em-andamento',  label:'Em andamento' },
   { id:'concluida',     label:'Concluída' },
   { id:'cancelada',     label:'Cancelada' },
 ];
@@ -8672,6 +8688,9 @@ function renderCcItem(it, card){
       </select>
       <div class="cc-item-actions">
         ${canEncerrar ? `
+        <button title="Reagendar" onclick="ccReagendarItem('${it._src}','${it.id}')">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
+        </button>
         <button title="Encerrar tarefa (cliente decidiu não fazer agora)" onclick="ccEncerrarItem('${it._src}','${it.id}','${card.id}')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
         </button>` : ''}
@@ -8685,6 +8704,48 @@ function renderCcItem(it, card){
     </div>
   `;
 }
+
+/* Abre o modal de reagendamento a partir de um item do card.
+   Encontra o EVENTO vinculado (preferência) ou o item do schedule; cai para record se nada mais existir. */
+window.ccReagendarItem = (src, id) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  /* 1. Tenta resolver para um EVENTO real */
+  let ref = null;
+  let source = null;
+
+  if (src === 'event'){
+    ref = EVENTS.find(e => e.id === id);
+    source = 'event';
+  } else if (src === 'record'){
+    const r = RECORDS.find(x => x.id === id);
+    if (r){
+      /* Se o record é um treinamento com linkedEventId, reagenda o evento */
+      if (r.linkedEventId){
+        const e = EVENTS.find(ev => ev.id === r.linkedEventId);
+        if (e){ ref = e; source = 'event'; }
+      }
+      if (!ref){
+        /* Cai pro próprio record (tratado como pseudo-evento) */
+        ref = { id: r.id, title: r.title, companyId: r.companyId, consultantId: r.consultantId, date: r.date, timeStart: r.timeStart || '09:00', timeEnd: r.timeEnd || '11:00', status: r.status };
+        source = 'event'; /* o modal usa source 'event' para criar novo registro */
+        ref._recordRef = r; /* anexa para tratar depois se quiser */
+      }
+    }
+  }
+
+  if (!ref){
+    /* Tenta como item de schedule */
+    let foundItem = null;
+    SCHEDULES.forEach(s => {
+      const it = (s.items||[]).find(i => i.id === id);
+      if (it) foundItem = it;
+    });
+    if (foundItem){ ref = foundItem; source = 'scheduleItem'; }
+  }
+
+  if (!ref){ toast('error','Item não encontrado para reagendar'); return; }
+  openReagendarModal(ref, source);
+};
 
 /* Encerra uma tarefa/item dentro do card: marca como cancelado com motivo "encerrado pelo cliente". */
 window.ccEncerrarItem = (src, id, cardId) => {
@@ -10302,10 +10363,10 @@ function offerSendScheduleToClient(scheduleId){
 
   const preview = `
     <b style="color:var(--ink);font-size:12.5px">Assunto:</b> Cronograma para aprovação — ${co.fantasia}<br>
-    <b style="color:var(--ink);font-size:12.5px">Anexo:</b> cronograma-${co.fantasia.replace(/\s/g,'_').toLowerCase()}.pdf<br>
     <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
     Período: ${isoToBR(s.from)} → ${isoToBR(s.to)}<br>
-    ${trainings} treinamento(s) · ${tasks} tarefa(s) · ${items.length} item(ns) no total
+    ${trainings} treinamento(s) · ${tasks} tarefa(s) · ${items.length} item(ns) no total<br>
+    <i style="color:var(--ink-3);font-size:11px">Envio apenas por mensagem (sem PDF anexo).</i>
   `;
 
   /* Identifica destinatário: usa contato (responsável) da empresa */
@@ -10314,10 +10375,10 @@ function offerSendScheduleToClient(scheduleId){
 
   showNotifyConfirm({
     title: 'Enviar cronograma para <em>aprovação</em>',
-    subtitle: 'FLUXO 2 — ENVIO DE PDF AO CLIENTE',
+    subtitle: 'FLUXO 2 — MENSAGEM AO CLIENTE',
     summaryIcon: '§',
-    summaryTitle: `Deseja enviar este cronograma em PDF para o cliente por e-mail?`,
-    summarySub: `O PDF será gerado automaticamente com os dados atuais e anexado ao e-mail.`,
+    summaryTitle: `Deseja enviar este cronograma por e-mail para o cliente?`,
+    summarySub: `Será enviada uma mensagem com o resumo do cronograma para confirmação (sem PDF anexo).`,
     recipient: {
       name: recipientName,
       role: co.fantasia + (co.razao?` · ${co.razao}`:''),
@@ -10326,38 +10387,22 @@ function offerSendScheduleToClient(scheduleId){
       initials: (recipientName||'??').slice(0,2).toUpperCase(),
     },
     preview,
-    confirmLabel: 'Gerar PDF e enviar',
+    confirmLabel: 'Enviar mensagem',
     onConfirm: async () => {
-      toast('info','Gerando PDF…','Aguarde alguns segundos.');
-      let pdfBase64;
-      try {
-        pdfBase64 = await generateScheduleAsBase64PDF(s, co, c);
-      } catch (err) {
-        toast('error','Falha ao gerar PDF', err.message);
-        logNotification({
-          kind:'schedule-approval', to: recipientEmail||'', recipientName,
-          subject:`Cronograma para aprovação — ${co.fantasia}`,
-          status:'falha', error:`pdf-gen: ${err.message}`,
-          relatedId: s.id, relatedType:'schedule',
-        });
-        return;
-      }
       const subject = `Cronograma para aprovação — ${co.fantasia}`;
       const html = buildScheduleEmail(s, co, c);
-      const text = `Olá ${recipientName},\n\nSegue em anexo o cronograma de atividades para sua análise e aprovação.\n\nPeríodo: ${isoToBR(s.from)} → ${isoToBR(s.to)}\nTotal de itens: ${items.length}\n\nResponda este e-mail confirmando o aceite ou solicitando ajustes.\n\nAtenciosamente,\n${c?c.name:''}\n— Faktory Flow Agenda`;
-      const filename = `cronograma-${(co.fantasia||'cliente').replace(/[^\w]/g,'_').toLowerCase()}-${s.from}.pdf`;
+      const text = `Olá ${recipientName},\n\nSegue para sua análise o cronograma de atividades.\n\nPeríodo: ${isoToBR(s.from)} → ${isoToBR(s.to)}\nTotal de itens: ${items.length}\n\nResponda este e-mail confirmando o aceite ou solicitando ajustes.\n\nAtenciosamente,\n${c?c.name:''}\n— Faktory Flow Agenda`;
       const result = await sendNotificationEmail({
         to: recipientEmail,
         subject, html, text,
         replyTo: c?.email || undefined,
-        attachments: [{ filename, content: pdfBase64, encoding:'base64', contentType:'application/pdf' }],
         kind: 'schedule-approval',
         relatedId: s.id,
         relatedType: 'schedule',
         recipientName,
       });
       if (result.ok){
-        toast('success','Cronograma enviado', `${recipientEmail} · PDF anexado`);
+        toast('success','Cronograma enviado', `${recipientEmail} · mensagem entregue`);
         s.lastSentToClientAt = nowISO();
         s.lastSentToClientBy = CURRENT_USER?.id || null;
         pushHistory(s, 'cronograma enviado por e-mail', `para ${recipientEmail}`);

@@ -9668,91 +9668,334 @@ function offerSendScheduleToClient(scheduleId){
 }
 
 /* Geração de PDF do cronograma — usa html2pdf bundle */
-async function generateScheduleAsBase64PDF(s, co, c){
-  if (typeof html2pdf === 'undefined'){
-    throw new Error('Biblioteca html2pdf não carregada');
+/* Garante que html2pdf esteja disponível — tenta CDN alternativo se falhou */
+async function ensureHtml2Pdf(){
+  if (typeof html2pdf !== 'undefined') return true;
+  const tryLoad = (src) => new Promise((resolve, reject) => {
+    const sc = document.createElement('script');
+    sc.src = src;
+    sc.onload = () => resolve(true);
+    sc.onerror = () => reject(new Error('falhou carregar ' + src));
+    document.head.appendChild(sc);
+  });
+  const candidates = [
+    'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
+    'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js',
+    'https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js',
+  ];
+  for (const src of candidates){
+    try { await tryLoad(src); if (typeof html2pdf !== 'undefined') return true; }
+    catch(e){ /* tenta próxima */ }
   }
-  const items = s.items || [];
-  const trainings = items.filter(i => i.kind === 'treinamento');
-  const tasks = items.filter(i => i.kind === 'tarefa');
-  const esc = str => (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return typeof html2pdf !== 'undefined';
+}
 
-  const itemsHTML = items.length ? items.map(it => {
+/* Resolve cor por status */
+function pdfStatusColor(status){
+  return ({
+    confirmado: { bg:'#e7efe8', fg:'#2d5f3f', border:'#2d5f3f' },
+    provisorio: { bg:'#f7e9d3', fg:'#b8632a', border:'#c87533' },
+    pendente:   { bg:'#e3e5e9', fg:'#525c6b', border:'#525c6b' },
+    reagendado: { bg:'#dee1ef', fg:'#2f3a78', border:'#4555a3' },
+    cancelado:  { bg:'#f1d6d9', fg:'#8a2638', border:'#8a2638' },
+  })[status] || { bg:'#e3e5e9', fg:'#525c6b', border:'#525c6b' };
+}
+
+async function generateScheduleAsBase64PDF(s, co, c){
+  const ready = await ensureHtml2Pdf();
+  if (!ready) throw new Error('Não foi possível carregar a biblioteca html2pdf (CDN bloqueado?)');
+
+  const items = (s.items || []).slice();
+  const trainings   = items.filter(i => i.kind === 'treinamento');
+  const tasks       = items.filter(i => i.kind === 'tarefa');
+  const atend       = items.filter(i => i.kind === 'atendimento');
+
+  /* Datas mais cedo/tarde efetivamente preenchidas */
+  const dated = items.filter(i => i.date).map(i => i.date).sort();
+  const minDate = dated[0] || s.from;
+  const maxDate = dated[dated.length-1] || s.to;
+
+  /* Total de tempo planejado */
+  let totalMinutes = 0;
+  items.forEach(i => {
+    if (i.timeStart && i.timeEnd){
+      const ms = (parseInt(i.timeStart.slice(0,2))*60 + parseInt(i.timeStart.slice(3)));
+      const me = (parseInt(i.timeEnd.slice(0,2))*60 + parseInt(i.timeEnd.slice(3)));
+      if (me > ms) totalMinutes += (me - ms);
+    }
+  });
+  const totalHoursStr = totalMinutes ? `${Math.floor(totalMinutes/60)}h${totalMinutes%60?` ${totalMinutes%60}min`:''}` : '—';
+
+  const esc = str => String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const escMulti = str => esc(str).replace(/\n/g,'<br>');
+
+  /* Bloco de item (cada item renderizado em card horizontal, agrupado por tipo) */
+  const renderItemCard = (it) => {
     const cs = consultantById(it.responsibleId) || c;
+    const stMeta = statusById(it.status || 'provisorio') || { label: it.status || 'Provisório' };
+    const statusCol = pdfStatusColor(it.status || 'provisorio');
+    const accentCol = it.kind === 'treinamento' ? '#2d5f3f'
+                    : it.kind === 'tarefa'      ? '#2f3a78'
+                    : '#b8632a';
+    const accentBg  = it.kind === 'treinamento' ? '#e7efe8'
+                    : it.kind === 'tarefa'      ? '#dee1ef'
+                    : '#f7e9d3';
+    const icon = it.kind === 'treinamento' ? '✦' : it.kind === 'tarefa' ? '☰' : '●';
+    const kindLabel = it.kind === 'treinamento' ? 'Treinamento'
+                    : it.kind === 'tarefa'      ? 'Tarefa'
+                    : 'Atendimento';
+
+    let dateBlock = '';
+    if (it.date){
+      const d = parseISO(it.date);
+      dateBlock = `
+        <div style="background:#fff;border:1px solid #ddd5c4;border-radius:4px;padding:8px 11px;text-align:center;min-width:64px">
+          <div style="font-size:24px;font-weight:600;color:#14171f;line-height:1;font-family:Georgia,serif">${pad(d.getDate())}/${pad(d.getMonth()+1)}</div>
+          <div style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">${dowShortPT(d.getDay())} ${d.getFullYear()}</div>
+        </div>`;
+    } else {
+      dateBlock = `
+        <div style="background:#f1d6d9;border:1px solid #8a2638;border-radius:4px;padding:8px 11px;text-align:center;min-width:64px">
+          <div style="font-size:14px;font-weight:600;color:#8a2638;line-height:1.2;font-family:Georgia,serif">Sem<br>data</div>
+        </div>`;
+    }
+
+    const timeBlock = (it.timeStart && it.timeEnd)
+      ? `<span style="font-family:'Courier New',monospace;font-size:13px;font-weight:600;color:#14171f">${esc(it.timeStart)} — ${esc(it.timeEnd)}</span>`
+      : it.timeStart
+        ? `<span style="font-family:'Courier New',monospace;font-size:13px;font-weight:600;color:#14171f">a partir de ${esc(it.timeStart)}</span>`
+        : `<span style="font-size:11px;color:#8a2638;font-style:italic">horário não definido</span>`;
+
     return `
-      <tr>
-        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-weight:600">${it.kind==='treinamento'?'✦':'☰'} ${esc(it.title)}</td>
-        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-family:monospace;font-size:11px">${it.date?isoToBR(it.date):'<em style="color:#b8632a">sem data</em>'}</td>
-        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-family:monospace;font-size:11px">${it.timeStart?`${it.timeStart}–${it.timeEnd||''}`:'—'}</td>
-        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-size:11px">${cs?esc(cs.name):'—'}</td>
-        <td style="padding:9px 11px;border-bottom:1px solid #ebe5d8;font-size:10.5px;color:#6b7184">${esc((statusById(it.status||'provisorio')||{}).label||'')}</td>
-      </tr>`;
-  }).join('') : '<tr><td colspan="5" style="padding:20px;text-align:center;color:#6b7184;font-style:italic">Sem itens neste cronograma</td></tr>';
+      <tr><td style="padding:0 0 12px 0">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid ${accentCol};border-radius:3px">
+          <tr>
+            <td style="padding:14px 16px;vertical-align:top;width:84px">
+              ${dateBlock}
+            </td>
+            <td style="padding:14px 16px;vertical-align:top">
+              <div style="display:inline-block;padding:3px 9px;background:${accentBg};color:${accentCol};border:1px solid ${accentCol};border-radius:10px;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px">${icon}&nbsp;&nbsp;${kindLabel}</div>
+              <div style="font-family:Georgia,serif;font-size:16px;font-weight:600;color:#14171f;line-height:1.25;margin-bottom:4px">${esc(it.title || 'Sem título')}</div>
+              <div style="font-size:11.5px;color:#4a4f5e;line-height:1.55">
+                ${timeBlock}
+                ${cs ? ` &nbsp;·&nbsp; <span style="font-size:11.5px;color:#4a4f5e">Responsável: <b style="color:#14171f">${esc(cs.name)}</b>${cs.email?` <span style="font-family:'Courier New',monospace;font-size:10px;color:#6b7184">(${esc(cs.email)})</span>`:''}</span>` : ''}
+              </div>
+              ${it.priority && it.kind === 'tarefa' ? `<div style="margin-top:6px"><span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:8px;background:#f7e9d3;color:#b8632a">Prioridade ${esc((it.priority||'media'))}</span></div>` : ''}
+              ${it.desc ? `<div style="margin-top:8px;font-size:11.5px;color:#4a4f5e;line-height:1.5;padding:8px 10px;background:#faf6ec;border-left:2px solid #d4a574">${escMulti(it.desc)}</div>` : ''}
+              ${it.resources ? `<div style="margin-top:6px;font-size:11px;color:#4a4f5e"><b style="text-transform:uppercase;font-size:9.5px;letter-spacing:.12em;color:#6b7184">Recursos:</b> ${escMulti(it.resources)}</div>` : ''}
+              ${(it.checklist && it.checklist.length) ? `
+                <div style="margin-top:8px;font-size:11.5px;color:#4a4f5e">
+                  <div style="text-transform:uppercase;font-size:9.5px;letter-spacing:.12em;color:#6b7184;font-weight:700;margin-bottom:4px">Checklist (${it.checklist.length})</div>
+                  <ul style="margin:0;padding-left:18px;font-size:11.5px;color:#2a2e3a">${it.checklist.map(step => `<li style="margin:2px 0">${esc(step)}</li>`).join('')}</ul>
+                </div>` : ''}
+            </td>
+            <td style="padding:14px 16px;vertical-align:top;width:120px;text-align:right">
+              <span style="display:inline-block;padding:5px 11px;background:${statusCol.bg};color:${statusCol.fg};border:1px solid ${statusCol.border};border-radius:11px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-family:Arial,sans-serif">${esc(stMeta.label)}</span>
+            </td>
+          </tr>
+        </table>
+      </td></tr>`;
+  };
+
+  const renderGroup = (label, color, bgColor, icon, arr) => {
+    if (!arr.length) return '';
+    return `
+      <tr><td style="padding:8px 0 4px 0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:34px;height:34px;border-radius:50%;background:${bgColor};color:${color};display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid ${color};font-family:Arial,sans-serif">${icon}</div>
+          <div>
+            <div style="font-family:Georgia,serif;font-size:18px;font-weight:500;color:#14171f;letter-spacing:-.01em;line-height:1">${label}</div>
+            <div style="font-family:'Courier New',monospace;font-size:10px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">${arr.length} item(ns)</div>
+          </div>
+        </div>
+        <table width="100%" cellpadding="0" cellspacing="0">${arr.map(renderItemCard).join('')}</table>
+      </td></tr>`;
+  };
+
+  /* Status summary chips */
+  const stCounts = {};
+  items.forEach(it => { stCounts[it.status||'provisorio'] = (stCounts[it.status||'provisorio']||0) + 1; });
+  const stChips = Object.entries(stCounts).map(([st, n]) => {
+    const sm = statusById(st) || { label: st };
+    const cc = pdfStatusColor(st);
+    return `<span style="display:inline-block;padding:4px 11px;background:${cc.bg};color:${cc.fg};border:1px solid ${cc.border};border-radius:11px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:Arial,sans-serif;margin-right:4px">${esc(sm.label)} · ${n}</span>`;
+  }).join('');
 
   const html = `
-    <div style="font-family:Georgia,'Times New Roman',serif;color:#14171f;padding:36px 32px;max-width:780px;background:#fff">
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #b8895a;padding-bottom:14px;margin-bottom:24px">
-        <div>
-          <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#6b7184;margin-bottom:4px">Faktory Flow Agenda</div>
-          <h1 style="font-size:30px;font-weight:400;letter-spacing:-.025em;margin:0;line-height:1.1">Cronograma <em style="font-style:italic;color:#b8895a">de atividades</em></h1>
-        </div>
-        <div style="text-align:right;font-family:monospace;font-size:10px;color:#6b7184;letter-spacing:.08em">
-          Emitido em<br><b style="color:#14171f;font-size:11px">${new Date().toLocaleString('pt-BR')}</b>
-        </div>
-      </div>
+    <div id="pdfRoot" style="width:794px;background:#fff;color:#14171f;font-family:Georgia,'Times New Roman',serif;padding:0;box-sizing:border-box;font-size:13px;line-height:1.45">
 
-      <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px;margin-bottom:24px">
+      <!-- HEADER COM FAIXA -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#14171f;color:#f4efe6">
         <tr>
-          <td style="padding:5px 0;color:#6b7184;width:140px;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Cliente</td>
-          <td style="padding:5px 0;font-weight:600">${esc(co.fantasia)}${co.razao?` <span style="color:#6b7184;font-weight:400">— ${esc(co.razao)}</span>`:''}</td>
+          <td style="padding:28px 36px;vertical-align:middle">
+            <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.24em;color:#d4a574;margin-bottom:6px">FAKTORY FLOW AGENDA</div>
+            <div style="font-family:Georgia,serif;font-size:30px;font-weight:400;letter-spacing:-.02em;color:#f4efe6;line-height:1.1">Cronograma <em style="font-style:italic;color:#d4a574;font-weight:300">de atividades</em></div>
+            <div style="font-size:12px;color:#d0c6b1;margin-top:6px">Documento oficial para análise e aprovação do cliente</div>
+          </td>
+          <td style="padding:28px 36px;vertical-align:middle;text-align:right;width:200px;border-left:1px solid rgba(244,239,230,.1)">
+            <div style="font-family:'Courier New',monospace;font-size:9px;color:rgba(244,239,230,.6);letter-spacing:.16em;text-transform:uppercase">Emitido em</div>
+            <div style="font-family:Georgia,serif;font-size:15px;color:#f4efe6;font-weight:500;margin-top:4px">${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}</div>
+            <div style="font-family:'Courier New',monospace;font-size:11px;color:#d4a574;margin-top:2px">${new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</div>
+          </td>
         </tr>
-        ${co.cnpj?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">CNPJ</td><td style="padding:5px 0;font-family:monospace">${esc(co.cnpj)}</td></tr>`:''}
-        ${co.responsavel?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Responsável</td><td style="padding:5px 0">${esc(co.responsavel)}</td></tr>`:''}
-        ${c?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Consultor</td><td style="padding:5px 0">${esc(c.name)}${c.email?` <span style="color:#6b7184;font-family:monospace;font-size:11px">— ${esc(c.email)}</span>`:''}</td></tr>`:''}
-        <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Período</td><td style="padding:5px 0;font-family:monospace">${isoToBR(s.from)} → ${isoToBR(s.to)}</td></tr>
-        <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Itens</td><td style="padding:5px 0">${items.length} no total · ${trainings.length} treinamento(s) · ${tasks.length} tarefa(s)</td></tr>
       </table>
 
-      <h2 style="font-size:16px;font-weight:500;letter-spacing:-.01em;margin:0 0 10px;color:#14171f">Detalhamento</h2>
-      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #ddd5c4;font-size:12px">
-        <thead><tr style="background:#f4efe6">
-          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Item</th>
-          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Data</th>
-          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Horário</th>
-          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Responsável</th>
-          <th style="text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7184;border-bottom:1px solid #ddd5c4">Status</th>
-        </tr></thead>
-        <tbody>${itemsHTML}</tbody>
-      </table>
+      <!-- CONTEÚDO -->
+      <div style="padding:30px 36px;background:#fff">
 
-      <div style="margin-top:32px;padding-top:18px;border-top:1px solid #ddd5c4;font-size:11px;color:#6b7184;text-align:center;letter-spacing:.08em;text-transform:uppercase">
-        Faktory Flow Agenda · Documento gerado automaticamente
+        <!-- CLIENTE / EMPRESA -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px">
+          <tr>
+            <td style="padding:18px 20px;background:linear-gradient(180deg,#f4efe6 0%,#ebe5d8 100%);border:1px solid #ddd5c4;border-radius:4px">
+              <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#6b7184;margin-bottom:6px;font-weight:700">Cliente</div>
+              <div style="font-family:Georgia,serif;font-size:26px;font-weight:500;color:#14171f;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px">${esc(co.fantasia || 'Empresa não identificada')}</div>
+              ${co.razao && co.razao !== co.fantasia ? `<div style="font-size:12px;color:#4a4f5e;font-style:italic;margin-bottom:6px">${esc(co.razao)}</div>` : ''}
+              <table width="100%" cellpadding="0" cellspacing="0" style="font-size:11.5px;margin-top:10px">
+                ${co.cnpj?`<tr><td style="padding:3px 0;width:120px;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">CNPJ</td><td style="padding:3px 0;font-family:'Courier New',monospace;color:#14171f;font-size:12px">${esc(co.cnpj)}</td></tr>`:''}
+                ${co.responsavel?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Responsável</td><td style="padding:3px 0;color:#14171f;font-weight:600">${esc(co.responsavel)}</td></tr>`:''}
+                ${co.contato?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">E-mail</td><td style="padding:3px 0;font-family:'Courier New',monospace;color:#14171f;font-size:11.5px">${esc(co.contato)}</td></tr>`:''}
+                ${co.projeto?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Projeto</td><td style="padding:3px 0;color:#14171f"><span style="display:inline-block;padding:3px 10px;background:#f0e1c8;color:#b8895a;border:1px solid #d4a574;border-radius:10px;font-size:11px;font-weight:600">${esc(co.projeto)}</span></td></tr>`:''}
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <!-- CONSULTOR + PERÍODO em 2 colunas -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px">
+          <tr>
+            <td style="vertical-align:top;width:50%;padding-right:8px">
+              <div style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid #2d5f3f;border-radius:3px;padding:14px 16px;height:100%">
+                <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Consultor responsável</div>
+                ${c ? `
+                  <div style="font-family:Georgia,serif;font-size:17px;font-weight:600;color:#14171f;line-height:1.2">${esc(c.name)}</div>
+                  ${c.role || c.specialty ? `<div style="font-size:11.5px;color:#4a4f5e;font-style:italic;margin-top:2px">${esc(c.role || c.specialty)}</div>` : ''}
+                  ${c.email ? `<div style="font-family:'Courier New',monospace;font-size:11px;color:#2d5f3f;margin-top:6px;padding:4px 8px;background:#e7efe8;border:1px solid #2d5f3f;border-radius:10px;display:inline-block">${esc(c.email)}</div>` : ''}
+                ` : '<div style="font-size:13px;color:#8a2638;font-style:italic">Consultor não definido</div>'}
+              </div>
+            </td>
+            <td style="vertical-align:top;width:50%;padding-left:8px">
+              <div style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid #b8895a;border-radius:3px;padding:14px 16px;height:100%">
+                <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Período do cronograma</div>
+                <div style="font-family:Georgia,serif;font-size:15px;font-weight:600;color:#14171f;line-height:1.3">
+                  <span style="display:inline-block;padding:3px 8px;background:#f4efe6;border:1px solid #ddd5c4;border-radius:4px;font-family:'Courier New',monospace;font-size:13px">${esc(isoToBR(s.from))}</span>
+                  <span style="color:#b8895a;margin:0 6px">→</span>
+                  <span style="display:inline-block;padding:3px 8px;background:#f4efe6;border:1px solid #ddd5c4;border-radius:4px;font-family:'Courier New',monospace;font-size:13px">${esc(isoToBR(s.to))}</span>
+                </div>
+                ${minDate && minDate !== s.from ? `<div style="font-size:11px;color:#6b7184;margin-top:6px;font-style:italic">Atividades agendadas: ${esc(isoToBR(minDate))} até ${esc(isoToBR(maxDate))}</div>` : ''}
+                <div style="margin-top:8px;font-size:11px;color:#4a4f5e">Tempo total planejado: <b>${totalHoursStr}</b></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <!-- KPIs / RESUMO -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;border:1px solid #ddd5c4;background:#fafafa;border-radius:3px">
+          <tr>
+            <td style="padding:14px 16px;text-align:center;border-right:1px solid #ddd5c4;width:25%">
+              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#14171f;line-height:1">${pad(items.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Itens totais</div>
+            </td>
+            <td style="padding:14px 16px;text-align:center;border-right:1px solid #ddd5c4;width:25%">
+              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#2d5f3f;line-height:1">${pad(trainings.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Treinamentos</div>
+            </td>
+            <td style="padding:14px 16px;text-align:center;border-right:1px solid #ddd5c4;width:25%">
+              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#2f3a78;line-height:1">${pad(tasks.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Tarefas</div>
+            </td>
+            <td style="padding:14px 16px;text-align:center;width:25%">
+              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#b8632a;line-height:1">${pad(atend.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Atendimentos</div>
+            </td>
+          </tr>
+        </table>
+
+        ${stChips ? `
+          <div style="margin-bottom:22px;padding:10px 14px;background:#faf6ec;border:1px solid #ebe5d8;border-radius:3px">
+            <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Distribuição por status</div>
+            <div style="line-height:2">${stChips}</div>
+          </div>` : ''}
+
+        <!-- DETALHAMENTO -->
+        <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #b8895a">
+          <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:2px">SEÇÃO 1</div>
+          <div style="font-family:Georgia,serif;font-size:22px;font-weight:500;color:#14171f;letter-spacing:-.015em">Detalhamento <em style="font-style:italic;color:#b8895a;font-weight:400">dos itens</em></div>
+        </div>
+
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px">
+          ${renderGroup('Treinamentos', '#2d5f3f', '#e7efe8', '✦', trainings)}
+          ${renderGroup('Tarefas',      '#2f3a78', '#dee1ef', '☰', tasks)}
+          ${renderGroup('Atendimentos', '#b8632a', '#f7e9d3', '●', atend)}
+          ${!items.length ? `
+            <tr><td style="padding:30px;text-align:center;background:#fafafa;border:1px dashed #ddd5c4;color:#6b7184;font-style:italic">
+              Este cronograma ainda não possui itens cadastrados.
+            </td></tr>` : ''}
+        </table>
+
+        <!-- APROVAÇÃO -->
+        <div style="margin-top:30px;padding:22px 26px;background:linear-gradient(135deg,#f4efe6 0%,#fff 100%);border:1px solid #b8895a;border-radius:4px;text-align:center">
+          <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:8px">Aprovação do cliente</div>
+          <div style="font-family:Georgia,serif;font-size:17px;color:#14171f;line-height:1.5;margin-bottom:10px">
+            Para <b>aprovar</b> este cronograma, responda o e-mail confirmando o aceite.<br>
+            Para solicitar ajustes, descreva-os na resposta.
+          </div>
+          <div style="display:inline-block;padding:10px 24px;background:#2d5f3f;color:#fff;font-family:Arial,sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px">
+            Resposta esperada por e-mail
+          </div>
+        </div>
+
       </div>
-      <div style="margin-top:18px;padding:14px;background:#f4efe6;border:1px dashed #b8895a;text-align:center;font-size:12px;color:#4a4f5e">
-        Para aprovar este cronograma, responda o e-mail com este PDF anexo confirmando o aceite.<br>
-        Para solicitar ajustes, descreva-os na resposta.
-      </div>
+
+      <!-- FOOTER -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#14171f;color:#d0c6b1">
+        <tr>
+          <td style="padding:14px 36px;font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase">
+            Faktory Flow Agenda · Central de Consultoria
+          </td>
+          <td style="padding:14px 36px;text-align:right;font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.1em;color:rgba(208,198,177,.6)">
+            Documento gerado automaticamente · ${esc(s.id||'')}
+          </td>
+        </tr>
+      </table>
     </div>
   `;
 
-  /* Renderiza em um container offscreen e converte para PDF */
+  /* Container mounted in DOM visible enough para o html2canvas capturar.
+     Truque: position absolute em z-index baixo, com width fixa (794px = A4 a 96dpi). */
   const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.left = '-9999px';
-  container.style.top = '0';
-  container.style.width = '800px';
+  container.setAttribute('aria-hidden', 'true');
+  container.style.cssText = 'position:absolute;left:0;top:0;width:794px;background:#fff;z-index:-99999;opacity:0;pointer-events:none;';
   container.innerHTML = html;
   document.body.appendChild(container);
 
+  /* Aguarda 2 frames para garantir layout pronto */
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  /* Aguarda um instante extra para fontes (Georgia/Courier são system, mas garante) */
+  await new Promise(r => setTimeout(r, 120));
+
   try {
     const blob = await html2pdf().set({
-      margin: 10,
+      margin: [10, 8, 10, 8],   /* top, right, bottom, left em mm */
       filename: 'cronograma.pdf',
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-    }).from(container).outputPdf('blob');
-    /* Converte blob → base64 (sem prefixo data:...) */
+      image: { type: 'jpeg', quality: 0.97 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 794,
+        width: 794,
+        scrollX: 0,
+        scrollY: 0,
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+      pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' },
+    }).from(container.querySelector('#pdfRoot') || container).outputPdf('blob');
+
+    if (!blob || blob.size < 1000){
+      throw new Error('PDF gerado vazio (size: ' + (blob?blob.size:0) + ' bytes)');
+    }
+
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -9765,9 +10008,37 @@ async function generateScheduleAsBase64PDF(s, co, c){
     });
     return base64;
   } finally {
-    container.remove();
+    /* atraso pequeno antes de remover, evita warning do html2canvas em alguns navegadores */
+    setTimeout(() => container.remove(), 200);
   }
 }
+
+/* Helper exposto para teste manual no console:
+   downloadSchedulePDF('schedule-id') — salva PDF local pra debug visual */
+window.downloadSchedulePDF = async (scheduleId) => {
+  const s = SCHEDULES.find(x => x.id === scheduleId);
+  if (!s){ toast('error','Cronograma não encontrado'); return; }
+  const co = companyById(s.companyId);
+  const c = consultantById(s.consultantId);
+  toast('info','Gerando PDF...','Aguarde.');
+  try {
+    const base64 = await generateScheduleAsBase64PDF(s, co, c);
+    const bin = atob(base64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cronograma-${(co?.fantasia||'cliente').replace(/[^\w]/g,'_').toLowerCase()}-${s.from}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('success','PDF baixado','Confira o resultado.');
+  } catch (err){
+    toast('error','Falha', err.message);
+    console.error(err);
+  }
+};
 
 function buildScheduleEmail(s, co, c){
   const items = s.items || [];
@@ -9821,6 +10092,125 @@ if (_origSaveDraftV2){
 
 /* Hook adicional: botão "Confirmar com cliente" no modal de cronograma também pode disparar */
 window.offerSendScheduleToClient = offerSendScheduleToClient;
+
+/* ============================================
+   FLUXO 3 — Notificação ao consultor quando uma empresa é criada/atribuída
+   ============================================ */
+function offerNotifyConsultantOnCompany(company, isNew){
+  if (!company) return;
+  const c = consultantById(company.consultantId);
+  if (!c) return; /* sem consultor atribuído → nada a notificar */
+
+  const preview = `
+    <b style="color:var(--ink);font-size:12.5px">Assunto:</b> ${isNew ? 'Nova empresa atribuída' : 'Atualização de atribuição'} — ${company.fantasia}<br>
+    <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
+    Olá ${c.name}, você foi ${isNew ? 'atribuído como consultor responsável' : 'mantido como consultor responsável'} da empresa:<br>
+    • Empresa: <b>${company.fantasia}</b>${company.razao?` (${company.razao})`:''}<br>
+    ${company.cnpj?`• CNPJ: ${company.cnpj}<br>`:''}
+    ${company.responsavel?`• Responsável do cliente: ${company.responsavel}<br>`:''}
+    ${company.projeto?`• Projeto: ${company.projeto}<br>`:''}
+  `;
+
+  showNotifyConfirm({
+    title: 'Notificar consultor sobre <em>nova empresa atribuída</em>',
+    subtitle: 'FLUXO 3 — ATRIBUIÇÃO DE EMPRESA',
+    summaryIcon: '◇',
+    summaryTitle: `Deseja notificar ${c.name} sobre a atribuição desta empresa?`,
+    summarySub: 'O e-mail será enviado automaticamente para o endereço cadastrado no perfil do consultor.',
+    recipient: { name: c.name, role: c.role || c.specialty, email: c.email, avatarCls: c.cls, initials: c.initials },
+    preview,
+    confirmLabel: 'Confirmar e enviar',
+    onConfirm: async () => {
+      const subject = `${isNew?'Nova empresa atribuída':'Atualização de atribuição'} — ${company.fantasia}`;
+      const html = buildCompanyAssignmentEmail(company, c, isNew);
+      const text = `Olá ${c.name},\n\nVocê foi ${isNew?'atribuído como consultor responsável':'mantido como consultor responsável'} da seguinte empresa no Faktory Flow Agenda:\n\n` +
+        `Empresa: ${company.fantasia}\n` +
+        (company.razao?`Razão social: ${company.razao}\n`:'') +
+        (company.cnpj?`CNPJ: ${company.cnpj}\n`:'') +
+        (company.responsavel?`Responsável do cliente: ${company.responsavel}${company.contato?` (${company.contato})`:''}\n`:'') +
+        (company.projeto?`Projeto: ${company.projeto}\n`:'') +
+        `\nAcesse o sistema para criar o cronograma e gerenciar a agenda deste cliente.\n\n— Faktory Flow Agenda`;
+
+      const result = await sendNotificationEmail({
+        to: c.email,
+        subject, html, text,
+        kind: 'company-assigned',
+        relatedId: company.id,
+        relatedType: 'company',
+        recipientName: c.name,
+      });
+      if (result.ok){
+        toast('success','Consultor notificado', `${c.name} · ${c.email}`);
+      }
+    },
+  });
+}
+
+function buildCompanyAssignmentEmail(company, c, isNew){
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;color:#14171f">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4">
+      <tr><td style="padding:24px 30px;border-bottom:1px solid #ddd5c4;background:linear-gradient(180deg,#ebe5d8 0%,#fff 100%)">
+        <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px">Faktory Flow Agenda</div>
+        <h1 style="font-size:24px;font-weight:400;letter-spacing:-.025em;margin:0">${isNew?'Nova empresa':'Empresa'} <em style="font-style:italic;color:#2f3a78">atribuída</em></h1>
+      </td></tr>
+      <tr><td style="padding:22px 30px;font-size:14px;line-height:1.6">
+        Olá <b>${esc(c.name)}</b>,<br><br>
+        ${isNew?'Você foi <b>atribuído como consultor responsável</b> de uma nova empresa no sistema.':'A atribuição da empresa abaixo foi atualizada para você.'}
+      </td></tr>
+      <tr><td style="padding:14px 30px;background:#f4efe6;border-top:1px solid #ddd5c4;border-bottom:1px solid #ddd5c4">
+        <div style="font-family:Georgia,serif;font-size:22px;font-weight:500;color:#14171f;line-height:1.1;margin-bottom:6px">${esc(company.fantasia)}</div>
+        ${company.razao && company.razao !== company.fantasia ? `<div style="font-size:12.5px;color:#4a4f5e;font-style:italic;margin-bottom:10px">${esc(company.razao)}</div>` : ''}
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px;margin-top:8px">
+          ${company.cnpj?`<tr><td style="padding:4px 0;width:140px;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">CNPJ</td><td style="padding:4px 0;font-family:monospace">${esc(company.cnpj)}</td></tr>`:''}
+          ${company.responsavel?`<tr><td style="padding:4px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Responsável</td><td style="padding:4px 0">${esc(company.responsavel)}</td></tr>`:''}
+          ${company.contato?`<tr><td style="padding:4px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">E-mail do cliente</td><td style="padding:4px 0;font-family:monospace;font-size:11.5px">${esc(company.contato)}</td></tr>`:''}
+          ${company.projeto?`<tr><td style="padding:4px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:700">Projeto</td><td style="padding:4px 0">${esc(company.projeto)}</td></tr>`:''}
+        </table>
+      </td></tr>
+      <tr><td style="padding:20px 30px;background:#fff">
+        <div style="font-size:12px;color:#4a4f5e;line-height:1.6">
+          Próximos passos sugeridos:<br>
+          • Acessar o card desta empresa no Kanban<br>
+          • Configurar templates de treinamento, se aplicável<br>
+          • Montar o cronograma inicial para envio ao cliente
+        </div>
+      </td></tr>
+      <tr><td style="padding:14px;background:#14171f;color:#d0c6b1;text-align:center;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda · notificação automática</td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+}
+
+/* Hook em saveCadastro para entity=company */
+const _origSaveCadastro = (typeof saveCadastro === 'function') ? saveCadastro : null;
+if (_origSaveCadastro){
+  saveCadastro = function(){
+    const entity = state.cdEntity;
+    const wasNew = !state.cdEditingId;
+    /* Captura consultantId selecionado ANTES de chamar o original (que vai limpar o modal) */
+    let selectedConsultantId = null;
+    let fantasiaInput = null;
+    if (entity === 'company'){
+      selectedConsultantId = document.getElementById('cdConsultantDef')?.value || null;
+      fantasiaInput = document.getElementById('cdFantasia')?.value?.trim();
+    }
+    _origSaveCadastro.apply(this, arguments);
+    /* Se foi criação/edição de empresa com consultor → oferece notificação */
+    if (entity === 'company' && selectedConsultantId && fantasiaInput){
+      const created = COMPANIES.find(co => co.fantasia === fantasiaInput && co.consultantId === selectedConsultantId);
+      if (created){
+        setTimeout(() => offerNotifyConsultantOnCompany(created, wasNew), 300);
+      }
+    }
+  };
+  /* Re-aplica binding no botão (saveCadastro foi reassinado) */
+  const btn = document.getElementById('cdSaveBtn');
+  if (btn) btn.onclick = saveCadastro;
+}
 
 /* ============================================
    Modal: log de notificações

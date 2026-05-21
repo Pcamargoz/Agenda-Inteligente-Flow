@@ -10064,6 +10064,27 @@ document.getElementById('osDeleteBtn').onclick = () => {
    ============================================ */
 const _origRenderCcItem = renderCcItem;
 renderCcItem = function(it, card){
+  /* MODO PÓS-CONFIRMAÇÃO (treinamento) — toggle Realizado/Não realizado.
+     Detecção idêntica à do renderer original, ANTES de qualquer outro branch. */
+  const raw = it.raw || it;
+  const linkedSch = raw.scheduleId ? SCHEDULES.find(s => s.id === raw.scheduleId) : null;
+  const isConfirmedTraining = it.kind === 'treinamento' && (
+       raw.fromConfirmedSchedule === true
+    || (linkedSch && linkedSch.status === 'confirmado')
+    || ['em-andamento','atendido','concluido'].includes(it.status)
+    || ['realizado','nao-realizado'].includes(raw.realizationStatus)
+  );
+  if (isConfirmedTraining){
+    /* Delega para o renderer original que já implementa o toggle */
+    return _origRenderCcItem(it, card);
+  }
+
+  /* Cancelado/reagendado também passam pelo renderer original (visual com listras) */
+  if (it.status === 'cancelado' || it.status === 'reagendado'){
+    return _origRenderCcItem(it, card);
+  }
+
+  /* Caso geral (atendimento/tarefa não-confirmados): wrapper com badge de OS + ações padrão */
   const c = consultantById(it.consultantId);
   const st = statusById(it.status) || {};
   const whenHTML = it.date
@@ -10078,6 +10099,8 @@ renderCcItem = function(it, card){
     const label = lastOrder.status === 'assinada' ? `OS assinada` : lastOrder.status === 'enviada' ? `OS enviada` : `OS rascunho`;
     osBadgeHTML = `<span class="cc-item-os-badge ${cls}" onclick="event.stopPropagation();openOSModal('${it._src}','${it.id}','${lastOrder.id}')" title="Ver OS">§ ${label}${orders.length>1?` (${orders.length})`:''}</span>`;
   }
+
+  const canEncerrar = !['concluido','cancelado','reagendado','atendido'].includes(it.status);
 
   return `
     <div class="cc-item ${it.kind}">
@@ -10095,6 +10118,13 @@ renderCcItem = function(it, card){
         <button title="Nova OS · enviar para assinatura" onclick="openOSModal('${it._src}','${it.id}')" style="border-color:var(--champagne);color:var(--champagne)">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
         </button>
+        ${canEncerrar ? `
+        <button title="Reagendar" onclick="ccReagendarItem('${it._src}','${it.id}')">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
+        </button>
+        <button title="Encerrar tarefa" onclick="ccEncerrarItem('${it._src}','${it.id}','${card.id}')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+        </button>` : ''}
         <button title="Editar" onclick="ccEditItem('${it._src}','${it.id}')">
           <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>

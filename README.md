@@ -8,11 +8,11 @@ Front-end estático + serverless function (Vercel) para envio de **Ordens de Ser
 
 ```
 .
-├── Agenda Inteligente Flow.html   # Aplicação front-end (single-file, localStorage)
+├── index.html                     # Aplicação front-end (single-file, localStorage)
 ├── api/
 │   └── send-os-email.js           # Serverless function — envia OS via SMTP
 ├── package.json                   # Dependências (nodemailer)
-├── vercel.json                    # Rewrites + headers + config das functions
+├── vercel.json                    # Headers + config das functions
 ├── .env.example                   # Modelo das variáveis SMTP
 ├── .gitignore
 └── README.md

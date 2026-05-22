@@ -1,421 +1,555 @@
-# Dokumentação Técnica — Faktory Flow Agenda
+# Documentação Técnica — Faktory Flow Agenda
 
-Abaixo está a documentação técnica completa, organizada e detalhada o suficiente para outra pessoa entender, manter e recriar o sistema do zero, cobrindo arquitetura, fluxos, regras de negócio, integrações, estados e decisões técnicas.
+Esta documentação foi produzida a partir da análise completa do código e descreve, em profundidade, a arquitetura, os fluxos e as decisões técnicas do sistema. O objetivo é permitir que qualquer desenvolvedor consiga entender, manter, evoluir e recriar o projeto do zero.
 
-# 1. Visão geral e arquitetura
+## 1. Visão geral do projeto
 
-O projeto é uma **aplicação web single-file** (HTML/CSS/JS em `index.html`) com persistência **100% local via `localStorage`**, e um único backend **serverless** para envio de e-mails SMTP.
-A escolha por **SPA estática** reduz custo operacional e facilita deploy (Vercel), enquanto o **serverless** guarda credenciais SMTP fora do navegador, evitando exposição.
+### Objetivo principal do sistema
+Centralizar o planejamento e a execução de atendimentos e treinamentos de consultorias, integrando agenda, cronogramas, registros operacionais e emissão de Ordem de Serviço (OS) em um fluxo único e rastreável.
 
-**Visão macro:**
+### Problema que o projeto resolve
+Empresas de consultoria precisam controlar compromissos, status de execução, pendências, evidências de atendimento e comunicação com clientes. O sistema elimina planilhas dispersas, reduz retrabalho e cria um fluxo operacional padronizado.
+
+### Público-alvo ou cenário de uso
+Consultorias e equipes internas que gerenciam agendas, treinamentos, tarefas e relacionamento com clientes, com necessidade de cronogramas e emissão de OS.
+
+### Como a aplicação funciona em alto nível
+O front-end é uma SPA em um único arquivo `index.html`, com persistência local total via `localStorage`. O back-end é uma única função serverless (Vercel) responsável por enviar e-mails SMTP e manter credenciais fora do navegador. Fluxo geral:
 
 ```
-Browser (SPA) ──fetch──> /api/send-os-email (Vercel Function) ──SMTP──> Email
-              └─ localStorage (dados)
+Usuário → SPA (index.html) → localStorage (dados)
+                    └─ fetch → /api/send-os-email → SMTP
 ```
 
-# 2. Stack, bibliotecas, dependências e ferramentas
-
-| Componente | Uso | Motivo da escolha |
-|---|---|---|
-| HTML/CSS/JS puro | UI, lógica e renderização | Zero build, deploy direto, fácil manutenção |
-| `localStorage` | Persistência local de todos os dados | Sem backend de dados; experiência offline |
-| `html2pdf.js` (CDN) | Geração de PDFs no browser | Evita backend para geração de documentos |
-| Vercel Serverless | Endpoint de envio SMTP | Segredos no servidor, escala simples |
-| `nodemailer` | Envio SMTP | Padrão no ecossistema Node |
-| Vercel CLI (`vercel dev`) | Desenvolvimento local | Replica o runtime serverless |
-
-# 3. Estrutura de pastas
-
-| Caminho | Responsabilidade |
+### Principais módulos e responsabilidades gerais
+| Módulo | Responsabilidade |
 |---|---|
-| `index.html` | Aplicação inteira: layout, estilos e lógica de negócio |
-| `api/send-os-email.js` | Função serverless para envio de e-mails via SMTP |
-| `package.json` | Dependência (`nodemailer`) e scripts de deploy |
-| `vercel.json` | Configuração Vercel (headers, timeout, function) |
-| `.env.example` | Modelo das variáveis SMTP |
+| Agenda | Calendário mensal/semanal/diário, eventos, conflitos e disponibilidade |
+| Cronogramas | Planejamento de execução (builder simples e template V2) |
+| Registros | Controle de atendimentos, treinamentos e tarefas |
+| Templates | Modelos de cronogramas com itens e checklist |
+| Dashboard | Visões operacionais (lista, kanban, calendário) |
+| Kanban de Clientes | Estado macro por empresa |
+| Ordem de Serviço | Geração, PDF, envio e assinatura |
+| Notificações | Disparo de e-mails automáticos e log |
 
-# 4. Modelo de dados (entidades, campos e relações)
+## 2. Requisitos funcionais
 
-## 4.1 Convenções gerais
-- IDs são gerados por `uid(prefix)` com prefixo semântico (`c`, `co`, `e`, `r`, `sch`, `tpl` etc.).
-- Relações são por **ID** e não por referência direta.
-- A maioria das entidades possui `history` com trilha de auditoria (ação, usuário e timestamp).
-
----
-
-## 4.2 CONSULTANTS (consultores)
-**Relações:**
-- `EVENTS.consultantId`
-- `RECORDS.consultantId`
-- `COMPANIES.consultantId` (consultor padrão)
-
-**Campos principais**
-| Campo | Exemplo | Propósito |
-|---|---|---|
-| `id` | `c7h2...` | Identificador |
-| `name` | `Ana Martins` | Nome |
-| `initials` | `AM` | Avatar |
-| `role` | `Consultora` | Cargo |
-| `specialty` | `PCP` | Especialidade |
-| `email` | `ana@...` | Contato para notificações |
-| `phone` | `+55...` | Contato |
-| `workStart/workEnd` | `08:00–17:00` | Jornada |
-| `lunchMin` | `60` | Almoço |
-| `freeDays` | `[1,2,3,4,5]` | Dias livres |
-| `freePeriods` | `['manha']` | Preferência |
-| `blockedDates` | `['2026-05-25']` | Bloqueios |
-| `defaultRecurrence` | `weekly` | Recorrência padrão |
-| `cls` | `c1..c5` | Cor do avatar |
-
-**Regras importantes**
-- `consultantDailyCapacityMin()` calcula capacidade diária descontando almoço.
-- `consultantDayLoad()` calcula carga usada por dia (ocupado vs provisionado).
-- `isConsultantFreeOn()` verifica se o consultor atende naquele dia (freeDays + bloqueios).
-
----
-
-## 4.3 COMPANIES (empresas/cliente)
-**Relações:**
-- `EVENTS.companyId`, `RECORDS.companyId`, `SCHEDULES.companyId`, `CLIENT_CARDS.companyId`, `ORDERS_SERVICE.companyId`
-
-**Campos principais**
-| Campo | Exemplo | Propósito |
-|---|---|---|
-| `id` | `co1...` | Identificador |
-| `razao` | `Empresa X LTDA` | Razão social |
-| `fantasia` | `Empresa X` | Nome fantasia |
-| `cnpj` | `00.000.000/0001-00` | CNPJ |
-| `responsavel` | `João` | Pessoa de contato |
-| `contato` | `joao@...` | E-mail |
-| `consultantId` | `c...` | Consultor padrão |
-| `tipoAgenda` | `consultoria` | Tipo padrão do evento |
-| `projeto` | `Implantação PCP` | Projeto |
-| `whatsapp/phone` | opcional | Envio de OS |
-
----
-
-## 4.4 EVENT_TYPES / STATUSES / PERIODS / RECURRENCES
-Tabelas auxiliares editáveis (Cadastros → Tabelas).
-Influenciam UI, filtros e regras.
-
-**Status principais e semântica**
-- `criado`, `provisorio`, `confirmado`, `em-andamento`, `em-atendimento`, `atendido`, `concluido`, `pendente`, `reagendado`, `cancelado`
-- Paleta semântica (warning/progress/success/danger) para UI.
-
-**Transições permitidas**
-Definidas em `STATUS_TRANSITIONS` e validadas por `canTransitionTo`.
-
----
-
-## 4.5 EVENTS (agenda)
-**Relações:**
-- `seriesId` liga eventos de um cronograma ou recorrência
-- `scheduleId`, `templateId`, `itemId` em cronogramas template
-
-**Campos**
-| Campo | Propósito |
+### Funcionalidades principais
+| Funcionalidade | Descrição |
 |---|---|
+| Gestão de agenda | Criar, editar, reagendar e cancelar eventos, com filtros e detecção de conflitos |
+| Cronogramas | Planejar cronogramas com disponibilidade e templates |
+| Registros | Registrar atendimentos, treinamentos e tarefas com status e checklist |
+| Templates V2 | Modelar itens reutilizáveis para cronogramas estruturados |
+| Dashboard | Operação diária com múltiplas visões e filtros salvos |
+| Kanban por cliente | Visualizar estágio macro do cliente |
+| OS | Emitir, gerar PDF, enviar por e-mail e marcar como assinada |
+| Notificações | Enviar e registrar e-mails automáticos em eventos chave |
+| Integridade | Verificar e corrigir inconsistências do localStorage |
+
+### Entidades principais e campos críticos
+As entidades abaixo são persistidas no `localStorage` e representam o domínio funcional do sistema.
+
+#### CONSULTANTS (consultores)
+| Campo | Descrição |
+|---|---|
+| `id` | Identificador gerado por `uid(prefix)` |
+| `name` | Nome completo |
+| `initials` | Iniciais para avatar |
+| `role` | Cargo |
+| `specialty` | Especialidade |
+| `email` | Contato principal |
+| `phone` | Contato secundário |
+| `workStart`, `workEnd` | Jornada de trabalho |
+| `lunchMin` | Tempo de almoço |
+| `freeDays` | Dias de trabalho disponíveis |
+| `freePeriods` | Períodos preferenciais |
+| `blockedDates` | Datas indisponíveis |
+| `defaultRecurrence` | Recorrência padrão |
+| `cls` | Classe visual do avatar |
+
+Relações: usado em `EVENTS`, `RECORDS`, `SCHEDULES` e `COMPANIES`.
+
+#### COMPANIES (empresas)
+| Campo | Descrição |
+|---|---|
+| `id` | Identificador |
+| `razao` | Razão social |
+| `fantasia` | Nome fantasia |
+| `cnpj` | Documento |
+| `responsavel` | Contato principal |
+| `contato` | E-mail |
+| `consultantId` | Consultor padrão |
+| `tipoAgenda` | Tipo padrão de evento |
+| `projeto` | Projeto associado |
+| `whatsapp`, `phone` | Contatos para OS |
+
+Relações: usado em `EVENTS`, `RECORDS`, `SCHEDULES`, `CLIENT_CARDS` e `ORDERS_SERVICE`.
+
+#### Tabelas auxiliares (cadastros)
+| Tabela | Função |
+|---|---|
+| `EVENT_TYPES` | Tipos de evento e cores |
+| `STATUSES` | Status e semântica visual |
+| `PERIODS` | Períodos (manhã, tarde, etc.) |
+| `RECURRENCES` | Recorrências (semanal, quinzenal, mensal) |
+| `PRIORITIES` | Prioridades para tarefas |
+
+#### EVENTS (agenda)
+| Campo | Descrição |
+|---|---|
+| `id` | Identificador |
 | `consultantId`, `companyId` | Vínculos |
-| `date`, `timeStart`, `timeEnd` | Data/hora |
+| `date`, `timeStart`, `timeEnd` | Data e horário |
 | `typeId`, `title` | Tipo e título |
-| `status` | Status da agenda |
-| `period`, `recurrence` | Período/recorrência |
-| `priority`, `desc`, `details`, `notes` | Metadados |
-| `seriesId` | Série do cronograma |
-| `reagendadoDe` | Link com evento original |
+| `status` | Estado operacional |
+| `period`, `recurrence` | Período e recorrência |
+| `priority` | Relevância |
+| `desc`, `details`, `notes` | Observações |
+| `seriesId` | Série de cronograma/recorrência |
+| `scheduleId`, `templateId`, `itemId` | Origem do cronograma |
+| `reagendadoDe` | Referência ao evento anterior |
 
-**Regra de negócio**
-Eventos `cancelado` e `reagendado` **não aparecem** na agenda principal, a não ser que o filtro peça explicitamente.
-
----
-
-## 4.6 SCHEDULES (cronogramas)
-Existem **dois modos**:
-
-1. **Builder simples (dias livres)**
-   - Gera eventos diretos em `EVENTS`.
-2. **Modo template (V2)**
-   - Armazena **itens internos** (`items`) + gera eventos só quando há data/hora.
-   - Suporta rascunho, envio ao cliente e confirmação.
-
-**Campos principais**
-| Campo | Propósito |
+#### SCHEDULES (cronogramas)
+| Campo | Descrição |
 |---|---|
-| `id`, `companyId`, `consultantId` | Identidade |
-| `from/to` | Período macro |
-| `status` | `rascunho`, `aguardando-cliente`, `confirmado` etc. |
+| `id` | Identificador |
+| `companyId`, `consultantId` | Vínculos |
+| `from`, `to` | Período macro |
+| `status` | Ciclo do cronograma |
 | `mode` | `template` ou vazio |
-| `items`, `itemIds` | Itens do cronograma |
-| `eventIds` | Eventos criados |
+| `items`, `itemIds` | Itens internos |
+| `eventIds` | Eventos gerados |
 | `history` | Auditoria |
 
----
-
-## 4.7 RECORDS (atendimentos, treinamentos, tarefas)
-**Tipos:** `atendimento`, `treinamento`, `tarefa`.
-
-**Campos relevantes**
-| Campo | Uso |
+#### RECORDS (registros)
+| Campo | Descrição |
 |---|---|
-| `kind` | Tipo do registro |
+| `id` | Identificador |
+| `kind` | `atendimento`, `treinamento`, `tarefa` |
 | `consultantId`, `companyId` | Vínculos |
-| `date`, `timeStart`, `timeEnd` | Datas |
-| `status` | Status do ciclo de vida |
-| `priority` | Apenas tarefa |
-| `checklist` | Treinamento |
-| `linkedTaskIds` | Atendimento → tarefas vinculadas |
-| `linkedEventId` | Conexão com agenda |
+| `date`, `timeStart`, `timeEnd` | Execução |
+| `status` | Status do ciclo |
+| `priority` | Prioridade (tarefa) |
+| `checklist` | Checklist (treinamento/tarefa) |
+| `linkedTaskIds` | Tarefas vinculadas |
+| `linkedEventId` | Ligação com agenda |
 | `history` | Auditoria |
 
-**Regras críticas**
-- Atendimento **não pode** ir direto para `concluido`; é convertido para `atendido`.
-  OS é que marca `concluido`.
-- Treinamento concluído com checklist incompleta gera **tarefa pendente** automática.
-
----
-
-## 4.8 TEMPLATES (V2, composto)
-Template = coleção de itens (treinamentos + tarefas).
-
-**Item do template**
-| Campo | Uso |
+#### TEMPLATES (modelos V2)
+| Campo | Descrição |
 |---|---|
-| `kind` | `treinamento` ou `tarefa` |
-| `name/desc` | Título e descrição |
-| `checklist` | Etapas (treino/tarefa) |
-| `suggestedDays` | Dias sugeridos |
-| `timeStart/timeEnd` | Sugestão de horário |
-| `priority`, `defaultResponsibleId` | Tarefas |
+| `id` | Identificador |
+| `name` | Nome do template |
+| `items` | Itens do cronograma |
 
----
+Campos de item de template: `kind`, `name`, `desc`, `checklist`, `suggestedDays`, `timeStart`, `timeEnd`, `priority`, `defaultResponsibleId`.
 
-## 4.9 CLIENT_CARDS (Kanban por cliente)
-Representa o **estado macro** de uma empresa.
-
-**Status do card**
-`nao-iniciada`, `aguardando`, `em-andamento`, `concluida`, `cancelada`
-Pode ser automático (com base nos itens) ou manual via drag-and-drop.
-
----
-
-## 4.10 ORDERS_SERVICE (OS)
-OS vinculada a `record` ou `event`.
-
-**Campos essenciais**
-| Campo | Uso |
+#### CLIENT_CARDS (kanban por cliente)
+| Campo | Descrição |
 |---|---|
-| `itemSrc`, `itemId` | Origem |
+| `id` | Identificador |
+| `companyId` | Empresa |
+| `status` | Estado do card |
+| `statusManual` | Indica alteração manual |
+
+#### ORDERS_SERVICE (ordens de serviço)
+| Campo | Descrição |
+|---|---|
+| `id` | Identificador |
+| `itemSrc`, `itemId` | Origem (registro/evento) |
 | `title`, `scope` | Cabeçalho |
-| `internalPending/clientPending` | Pendências |
+| `internalPending`, `clientPending` | Pendências |
 | `status` | `rascunho`, `enviada`, `assinada` |
-| `sentAt/signedAt` | Rastreamento |
-| `history` | Envio/assinatura |
+| `sentAt`, `signedAt` | Rastreamento |
+| `history` | Auditoria |
 
-**Regras**
-- Ao criar OS, o item de origem é movido para `concluido`.
+#### USERS, DASH_VIEWS, NOTIFICATIONS_LOG
+| Entidade | Função |
+|---|---|
+| `USERS` | Perfis (`admin`, `editor`, `confirmador`, `visualizador`) |
+| `DASH_VIEWS` | Filtros salvos por usuário |
+| `NOTIFICATIONS_LOG` | Histórico de notificações enviadas e falhas |
 
----
+### Fluxos de uso
+1. Cadastrar consultores, empresas e tabelas auxiliares.
+2. Criar cronograma (builder simples ou template V2).
+3. Enviar cronograma ao cliente e confirmar.
+4. Gerar eventos e registros a partir do cronograma.
+5. Registrar execução (atendimento/treinamento/tarefa).
+6. Emitir OS e enviar para o cliente.
+7. Monitorar com dashboard e kanban.
 
-## 4.11 USERS / DASH_VIEWS / NOTIFICATIONS_LOG
-- `USERS`: perfis (`admin`, `editor`, `confirmador`, `visualizador`)
-- `DASH_VIEWS`: filtros salvos por usuário
-- `NOTIFICATIONS_LOG`: histórico de e-mails enviados/falhos
+### Ações permitidas ao usuário
+| Entidade | Ações |
+|---|---|
+| Consultores | Criar, editar, bloquear datas, definir jornada |
+| Empresas | Criar, editar, vincular consultor e projeto |
+| Eventos | Criar, editar, reagendar, cancelar, filtrar |
+| Cronogramas | Criar, enviar, confirmar, bloquear edição |
+| Registros | Criar, atualizar status, vincular tarefas |
+| Templates | Criar itens, configurar checklist e sugestões |
+| OS | Criar, editar, gerar PDF, enviar, assinar |
 
-# 5. Estado de UI e persistência
+### Regras de criação, edição, exclusão e consulta
+| Regra | Impacto |
+|---|---|
+| Eventos cancelados ou reagendados não aparecem por padrão | Evita poluição visual na agenda |
+| Cronograma confirmado bloqueia edição | Garante consistência com cliente |
+| Atendimento não pode ser “concluído” diretamente | OS é o documento que finaliza |
+| Treinamento concluído com checklist incompleta cria tarefa | Evita perda de pendências |
 
-## 5.1 `state`
-Mantém visão atual, filtros, calendário, edição de cronogramas, etc.
+### Comportamentos automáticos do sistema
+| Automação | Descrição |
+|---|---|
+| Criação de registros ao confirmar cronograma | Cada item vira registro com status inicial |
+| Atualização do card do cliente | Mudança automática para “em andamento” |
+| Geração de tarefas pendentes | Checklist incompleto gera tarefa |
+| OS move item de origem para concluído | Formaliza encerramento |
 
-Campos relevantes:
-- `view`, `calView`, `viewYear/month`, `viewWeekStart`, `viewDay`
-- `filters`, `regFilters`, `dashFilters`
-- `evSelectedDates`, `evStatus`, `evEditingId`
-- `croPreview`, `croTplItems`, `croDraftScheduleId`
-- `tplEditing`, `tplPickerMonth/year`
-- `osDraft`, `osEditingId`, `osContext`
+### Integrações com telas, componentes, serviços e APIs
+| Integração | Como ocorre |
+|---|---|
+| OS → API | Envio de e-mail via `/api/send-os-email` |
+| OS → WhatsApp | Link `wa.me` com mensagem pré-preenchida |
+| PDF | `html2pdf.js` gera PDF no navegador |
+| Notificações | Front chama API SMTP e registra em log |
 
-## 5.2 Persistência
-- Chave: `atelier_agenda_v2`
-- `persist()` foi **estendido várias vezes** (V2/V3/V4/V5) para incluir novas entidades sem quebrar o legado.
-- `loadPersisted()` também é encadeado para carregar versões antigas.
+### Estados possíveis de cada entidade importante
+| Entidade | Estados |
+|---|---|
+| Evento | `criado`, `provisorio`, `confirmado`, `em-atendimento`, `atendido`, `reagendado`, `cancelado` |
+| Cronograma | `rascunho`, `aguardando-cliente`, `confirmado` |
+| Registro | `em-andamento`, `pendente`, `em-atendimento`, `atendido`, `concluido` |
+| Card cliente | `nao-iniciada`, `aguardando`, `em-andamento`, `concluida`, `cancelada` |
+| OS | `rascunho`, `enviada`, `assinada` |
 
-## 5.3 Integridade
-`validateDataIntegrity()` detecta órfãos (cards, cronogramas, eventos, registros e OS).
-A UI oferece botão **Verificar integridade** com correção automática.
+## 3. Requisitos não funcionais
 
-# 6. Interface (views e modais)
+| Aspecto | Implementação atual | Implicação |
+|---|---|---|
+| Desempenho | Renderização manual e dados locais | Rápido para uso individual, sem latência de rede |
+| Segurança | SMTP em servidor, dados locais | Segredos protegidos, mas sem autenticação real |
+| Escalabilidade | Sem backend de dados | Não há sincronização multiusuário |
+| Manutenibilidade | SPA single-file | Fácil deploy, difícil modularizar |
+| Reuso de código | Funções utilitárias e tabelas de apoio | Evita duplicação de regras |
+| UX | Várias views e modais, feedback visual | Processo guiado e operacional |
+| Tratamento de erros | Validações e mensagens locais | Evita estados inválidos, mas não há logs centralizados |
+| Logs/observabilidade | `NOTIFICATIONS_LOG` + console serverless | Rastreamento básico |
+| Consistência de dados | `validateDataIntegrity()` | Reduz órfãos e inconsistências |
+| Compatibilidade | HTML/CSS/JS padrão | Funciona em navegadores modernos |
 
-**Views principais**
-- Dashboard
-- Agenda completa
-- Cronogramas
-- Registros (lista e Kanban)
-- Cadastros
+## 4. Tecnologias, frameworks e bibliotecas
 
-**Modais principais**
-- Evento
-- Agenda detalhada
-- Cronograma (V1 e V2)
-- Registro
-- Reagendamento
-- Template
-- Configuração de item (hub)
-- Ordem de Serviço
-- Log de notificações
+| Tecnologia | Por que foi escolhida | Onde é usada | Problema que resolve | Impacto no sistema |
+|---|---|---|---|---|
+| HTML/CSS/JS puro | Zero build e deploy simples | `index.html` | SPA sem dependências | Código centralizado |
+| `localStorage` | Persistência sem servidor | Todos os dados | Mantém operação offline | Sem multiusuário |
+| `html2pdf.js` | Geração de PDF client-side | OS e cronograma | Evita backend de documentos | Depende de CDN |
+| Vercel Serverless | Deploy rápido e seguro | `/api/send-os-email` | Envio SMTP sem expor credenciais | Escala sob demanda |
+| `nodemailer` | Padrão SMTP no Node | Função serverless | Envio confiável de e-mails | Configuração simples |
+| Vercel CLI | Ambiente local igual ao deploy | `vercel dev` | Desenvolvimento local do serverless | Consistência de execução |
 
-# 7. Fluxos principais e lógica de negócio
+## 5. Arquitetura geral do sistema
 
-## 7.1 Agenda (eventos)
-1. Usuário abre modal de evento.
-2. Seleciona consultor, empresa, tipo, datas.
-3. Pode selecionar múltiplos dias com mini-calendário.
-4. Conflitos são detectados (`findConflicts`) e exibidos.
-5. Recorrência semanal/quinzenal/mensal cria até 4 ocorrências extras.
-6. Eventos `cancelado`/`reagendado` só aparecem se filtrados.
+### Separação de responsabilidades
+O front-end concentra interface, regras de negócio e persistência local. O back-end existe apenas para envio de e-mails, mantendo credenciais fora do navegador. Não há banco de dados remoto.
 
-**Motivação**: a agenda é o centro operacional e precisa destacar conflitos, capacidade e disponibilidade real.
+### Organização entre front-end, back-end e serviços auxiliares
+| Camada | Componentes | Função |
+|---|---|---|
+| Front-end | `index.html` | UI, regras, persistência, PDF, validações |
+| Back-end | `api/send-os-email.js` | Envio SMTP, validações e rate limit |
+| Serviços externos | SMTP | Transporte de e-mails |
 
----
+### Fluxo de dados entre as camadas
+1. Usuário altera dados na UI.
+2. Estado global é atualizado.
+3. Persistência grava em `localStorage`.
+4. Renderizações atualizam a UI.
+5. Quando necessário, a UI chama `/api/send-os-email`.
 
-## 7.2 Cronograma (builder simples)
-- Usa disponibilidade do consultor (`freeDays`, `blockedDates`) para sugerir datas.
-- Permite marcar dias e gerar eventos provisórios.
-- Pode gerar registros automáticos de treinamento se `isTraining` ativo.
+### Padrões arquiteturais adotados
+| Padrão | Descrição | Motivo |
+|---|---|---|
+| SPA single-file | Tudo em um `index.html` | Simplicidade de deploy |
+| Estado global | Objeto `state` centraliza contexto | Facilita renderização e filtros |
+| Renderização manual | Funções `renderX` atualizam DOM | Controle total sem frameworks |
+| Persistência por versão | `persist()` extendido em V2/V3/V4/V5 | Evolução sem quebrar legado |
+| Auditoria | `history` em entidades | Rastreabilidade de mudanças |
 
----
+### Dependências entre partes do sistema
+| Origem | Destino | Dependência |
+|---|---|---|
+| Cronogramas | Eventos | Geração de compromissos |
+| Cronogramas | Registros | Geração de execução |
+| Registros | OS | Encerramento formal |
+| Templates | Cronogramas | Base para planejamento |
+| Eventos | Reagendamento | Cria novo evento e altera status |
+| Notificações | API SMTP | Envio e registro |
 
-## 7.3 Templates V2 + Hub de Configuração
-- Template agrupa **treinamentos e tarefas**.
-- Cada item pode ter dias sugeridos.
-- Hub permite:
-  - configurar itens em sequência,
-  - marcar “pulado”,
-  - distribuir datas livres,
-  - salvar rascunho ou enviar para aprovação.
+## 6. Estrutura de pastas e arquivos
 
-**Regras**
-- Treinamento precisa de data e horário para envio ao cliente.
-- Tarefa pode ficar “aguardando agendar”.
+| Caminho | Responsabilidade | Conteúdo | Relação com o sistema |
+|---|---|---|---|
+| `index.html` | SPA completa | HTML, CSS, JS e regras de negócio | Núcleo de toda a aplicação |
+| `api/send-os-email.js` | API serverless | Envio SMTP, validações, CORS | Integração de e-mails |
+| `package.json` | Dependências e scripts | `nodemailer`, `vercel dev` | Suporte ao backend |
+| `vercel.json` | Configuração de deploy | Headers e `maxDuration` | Controle de execução |
+| `.env.example` | Variáveis SMTP | Template de `.env` | Configuração segura |
+| `README.md` | Instruções básicas | Uso e deploy | Onboarding inicial |
 
----
+## 7. Back-end
 
-## 7.4 Confirmação com cliente
-- Confirmação gera **records** automaticamente.
-- Status inicial dos novos registros:
-  - `em-andamento` (itens com data)
-  - `pendente` (itens sem data)
-- Card do cliente vai para `em-andamento` automaticamente.
+### Estrutura dos módulos
+O backend é apenas a função `api/send-os-email.js`. Não há controllers, serviços ou repositórios adicionais.
 
----
+### Endpoints e comportamento
+| Método | Rota | Função |
+|---|---|---|
+| `GET` | `/api/send-os-email` | Health check do SMTP |
+| `POST` | `/api/send-os-email` | Envio de e-mail |
+| `OPTIONS` | `/api/send-os-email` | Resposta CORS |
 
-## 7.5 Registros
-- **Atendimento**: ao concluir, sistema corrige para `atendido` (OS é que conclui).
-- **Treinamento**: checklist interativo; incompleto ao concluir → gera tarefa pendente.
-- **Tarefa**: pode ser vinculada a um atendimento, movendo status para `em-atendimento`.
+O endpoint responde com headers CORS para permitir chamadas diretas do front-end, incluindo preflight `OPTIONS`.
 
----
+### Validações e regras
+| Validação | Motivo |
+|---|---|
+| `to` e formato de e-mail | Evita envios inválidos |
+| `subject` obrigatório | Evita mensagens incompletas |
+| `html` ou `text` obrigatório | Garante corpo |
+| Payload máximo ~9MB | Limite de segurança |
+| Rate limit 20 req/min/IP | Proteção contra abuso |
 
-## 7.6 Kanban por cliente
-- Cards são criados automaticamente quando cronograma é confirmado.
-- Drag & drop altera status manualmente (marca `statusManual`).
-- Itens podem ser enviados para **Pendências**, sem apagar o registro.
+### Autenticação e autorização
+Não existe autenticação. A proteção está no rate limit e na exposição restrita da URL pelo próprio sistema.
 
----
+### Tratamento de erros
+Erros são retornados com códigos HTTP apropriados e mensagens JSON. Falhas de SMTP retornam erro e são registradas no log do front-end.
 
-## 7.7 Ordem de Serviço (OS)
-- Pode ser criada a partir de registros/eventos.
-- Pré-preenche pendências:
-  - Internas: checklist não concluído do treinamento.
-  - Cliente: tarefas abertas do cliente.
-- Geração de PDF via `html2pdf`.
-- Envio por e-mail via API (SMTP), com fallback para `mailto:`.
-- Envio por WhatsApp via `wa.me`.
-- Pode ser marcada como **assinada**.
+### Integrações externas
+| Integração | Função |
+|---|---|
+| SMTP | Transporte de e-mails |
 
----
+### Variáveis de ambiente
+`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_FROM_NAME`, `SMTP_BCC`
 
-## 7.8 Notificações automáticas (e-mail)
-Fluxos:
-1. Treinamento criado → notificar consultor.
-2. Cronograma enviado → notificar cliente.
-3. Empresa atribuída → notificar consultor.
-4. Reagendamento → notificar cliente.
+### Limites de execução
+Timeout da function: 15s (configurado em `vercel.json`). Timeouts de socket e conexão no `nodemailer`.
 
-Todos os envios são registrados em `NOTIFICATIONS_LOG`.
+## 8. Front-end
 
----
+### Estrutura geral de páginas e rotas
+A SPA utiliza navegação interna por views. Principais views: Dashboard, Agenda, Cronogramas, Registros e Cadastros. Cada view possui renderização específica e filtros próprios.
 
-## 7.9 Reagendamento
-- Cancela evento original (motivo obrigatório).
-- Cria novo evento com vínculo (`reagendadoDe`).
-- Pode reaproveitar datas do cronograma.
-- Pode enviar e-mail automático ao cliente.
+### Componentes reutilizáveis e layout
+O layout é composto por sidebar, header de filtros, área principal de conteúdo e modais. Os modais são usados para edição e criação de entidades.
 
-# 8. Integrações e API (serverless)
+### Views e modais principais
+| View | Objetivo |
+|---|---|
+| Dashboard | Visão operacional consolidada |
+| Agenda | Calendário e gestão de eventos |
+| Cronogramas | Planejamento e aprovação de cronogramas |
+| Registros | Execução de atendimentos, treinamentos e tarefas |
+| Cadastros | Tabelas auxiliares e entidades base |
 
-## Endpoint `/api/send-os-email`
-**Métodos**
-- `GET`: health check (retorna se SMTP está configurado).
-- `POST`: envia e-mail via SMTP.
-- `OPTIONS`: CORS.
+| Modal | Objetivo |
+|---|---|
+| Evento | Criar e editar eventos |
+| Agenda detalhada | Visualização e ajustes rápidos |
+| Cronograma | Criar e editar cronogramas |
+| Registro | Atualizar status e checklist |
+| Reagendamento | Criar novo evento e cancelar o anterior |
+| Template | Criar e editar templates |
+| Hub de item | Configurar itens em sequência |
+| Ordem de Serviço | Criar, gerar PDF e enviar |
+| Log de notificações | Auditoria de envios |
 
-**Validações**
-- `to`, `subject`, `html|text`, formato de e-mail.
-- Payload máximo ~9MB.
-- Rate limit simples: 20 req/min/IP.
+### Estado global e persistência
+`state` guarda visão atual, filtros, seleção de datas e objetos em edição. `persist()` e `loadPersisted()` salvam e reconstroem toda a base via `localStorage`, com migrações graduais (V2 a V5).
 
-**Env vars necessárias**
-`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_FROM_NAME`, `SMTP_BCC`.
+### Estado global (`state`) e contexto de UI
+| Campo | Função |
+|---|---|
+| `view`, `calView` | View atual e tipo de calendário |
+| `viewYear`, `viewMonth` | Navegação mensal |
+| `viewWeekStart`, `viewDay` | Navegação semanal/diária |
+| `filters`, `regFilters`, `dashFilters` | Filtros por módulo |
+| `evSelectedDates`, `evStatus`, `evEditingId` | Seleção e edição de eventos |
+| `croPreview`, `croTplItems`, `croDraftScheduleId` | Contexto de cronogramas |
+| `tplEditing`, `tplPickerMonth`, `tplPickerYear` | Estado de templates |
+| `osDraft`, `osEditingId`, `osContext` | Contexto de OS |
 
-**Timeouts**
-- Connection: 10s
-- Socket: 15s
-Limite de execução da function: **15s** (ver `vercel.json`).
+### Persistência local e integridade
+| Elemento | Descrição |
+|---|---|
+| `atelier_agenda_v2` | Chave principal no `localStorage` |
+| `persist()` | Serializa estado e entidades |
+| `loadPersisted()` | Carrega versões antigas e migra dados |
+| `validateDataIntegrity()` | Detecta e corrige órfãos |
 
-# 9. Padrões técnicos e decisões
+### Agenda
+| Componente | Função |
+|---|---|
+| Agenda mensal/semanal/diária | Visualizar eventos por período |
+| Mini calendário | Seleção múltipla de datas |
+| Conflitos | `findConflicts` valida sobreposições |
+| Reagendamento | Cria novo evento e cancela o original |
 
-- **Single-file SPA**: facilita deploy e manutenção sem build.
-- **Estado global (`state`)**: simplifica controle sem framework.
-- **Renderização manual**: functions `renderX` atualizam DOM.
-- **Monkey-patching**: módulos V2/V3/V4 estendem funções sem reescrever o fluxo original.
-- **LocalStorage como fonte de verdade**: ideal para uso interno e offline, sem backend.
-- **Auditoria via `history`**: rastreia mudanças importantes.
+Recorrências semanais, quinzenais e mensais geram um número limitado de ocorrências adicionais para evitar excesso de eventos.
 
-# 10. Validações e comportamentos críticos
+### Lógica de disponibilidade e conflito
+| Função | Papel |
+|---|---|
+| `consultantDailyCapacityMin()` | Calcula capacidade diária com base em jornada e almoço |
+| `consultantDayLoad()` | Soma a carga diária ocupada |
+| `isConsultantFreeOn()` | Valida disponibilidade por dia e bloqueios |
+| `findConflicts()` | Detecta sobreposição de horários |
 
-- **Conflitos de agenda**: detectados por sobreposição de horários.
-- **Treinamentos** exigem data/hora para aprovação do cronograma.
-- **Atendimento concluído** é corrigido para `atendido`.
-- **Cronogramas confirmados** são bloqueados para edição.
-- **OS criada** move item de origem para `concluido`.
-- **Pendências** podem remover itens das abas normais e sinalizar o card.
+### Cronogramas
+Dois modos: builder simples e template V2.
+| Modo | Característica |
+|---|---|
+| Builder simples | Sugere datas com base em disponibilidade |
+| Template V2 | Itens com checklist, prioridades e pendências |
 
-# 11. Limitações, riscos e pontos de melhoria
+No builder simples, o sistema considera `freeDays`, `blockedDates` e carga diária do consultor para sugerir datas. No template V2, os itens ficam em rascunho, podem ser enviados ao cliente e, quando confirmados, geram registros automaticamente com status inicial conforme presença de data.
 
-**Limitações atuais**
-1. Dados ficam só no `localStorage` (sem sincronização multiusuário).
-2. Rate limit SMTP é em memória (por instância), não global.
-3. Sem autenticação real; perfis são apenas locais.
-4. PDFs são gerados no browser; dependem de CDN disponível.
-5. E-mails de cronograma indicam PDF anexado, mas o envio atual **não anexa** PDF.
+### Templates e Hub de configuração
+Templates agrupam itens (treinamentos e tarefas). O hub permite configurar cada item em sequência, definir horários e marcar itens como “pulado” ou “aguardando agendar”.
 
-**Melhorias recomendadas**
-1. Backend persistente (Postgres/Vercel KV) para uso multiusuário.
-2. Autenticação real + controle de acesso no backend.
-3. Substituir fallback `mailto` por fila de reenvio.
-4. Anexar PDF do cronograma no envio ao cliente.
-5. Observabilidade: logs centralizados (Sentry/Datadog).
-6. Exportações e backups automáticos do localStorage.
-7. Melhorar validação de e-mail/telefone no frontend.
+### Registros
+Registros são a execução operacional e se ligam a eventos e cronogramas. Existem regras específicas para atendimento, treinamento e tarefa.
 
-# 12. Como recriar o projeto do zero
+### Dashboard e Kanban
+O dashboard agrega filtros e visualizações. O kanban por cliente exibe status macro, com drag-and-drop e atualização automática baseada nos registros.
 
-1. Crie um `index.html` contendo:
-   - Layout completo, estilos e JS (a aplicação inteira).
-2. Crie a função `api/send-os-email.js` com `nodemailer`.
-3. Configure `vercel.json` para headers e `maxDuration`.
-4. Crie `.env.example` com variáveis SMTP.
-5. Suba no Vercel e configure variáveis de ambiente.
-6. Rode com `vercel dev` para ambiente local.
+### Ordem de Serviço
+Gera PDF no navegador e permite envio por e-mail e WhatsApp. A OS pode ser marcada como assinada e altera o status do item de origem.
+Pendências internas são preenchidas a partir de checklist não concluído e pendências do cliente são coletadas de tarefas em aberto relacionadas à empresa.
+
+### Notificações automáticas
+O front dispara notificações de eventos chave e registra cada envio no `NOTIFICATIONS_LOG`.
+Principais gatilhos: treinamento criado, cronograma enviado ao cliente, empresa atribuída a consultor e reagendamento.
+
+## 9. Fluxo completo da aplicação
+
+1. Usuário cadastra consultor e empresa.
+2. Cria cronograma com base em template ou builder.
+3. Envia o cronograma ao cliente e registra no log.
+4. Cliente aprova, cronograma é confirmado.
+5. Eventos e registros são criados automaticamente.
+6. Atendimentos e treinamentos são executados e atualizados.
+7. OS é criada, PDF gerado e enviado.
+8. Sistema registra envio e mantém histórico.
+9. Dashboard e kanban mostram status final.
+
+## 10. Regras de negócio
+
+| Regra | Intenção |
+|---|---|
+| Eventos cancelados e reagendados não aparecem na agenda padrão | Foco nos compromissos válidos |
+| Atendimento concluído vira “atendido” | OS é o fechamento oficial |
+| Treinamento com checklist incompleto gera tarefa | Garantir pendências |
+| Cronograma confirmado bloqueia alterações | Integridade com o cliente |
+| OS move item de origem para concluído | Formalização do encerramento |
+| Registros pendentes saem das abas principais | Priorizar execução |
+| Treinamento precisa de data e horário para envio ao cliente | Evitar cronograma inviável |
+| Itens sem data podem ficar “aguardando agendar” | Manter cronograma parcial |
+| Reagendamento exige motivo e cria vínculo `reagendadoDe` | Rastreabilidade |
+| Capacidade do consultor é calculada por jornada e almoço | Evitar sobrecarga |
+| Transições de status seguem `STATUS_TRANSITIONS` | Coerência de ciclo |
+| OS preenche pendências internas e do cliente automaticamente | Padronizar fechamento |
+| Card de cliente muda de status conforme progresso | Visão macro automática |
+
+## 11. Estados, eventos e validações
+
+### Estados por entidade
+| Entidade | Estados detalhados |
+|---|---|
+| Evento | `criado`, `provisorio`, `confirmado`, `em-andamento`, `em-atendimento`, `atendido`, `reagendado`, `cancelado` |
+| Cronograma | `rascunho`, `aguardando-cliente`, `confirmado` |
+| Registro | `em-andamento`, `pendente`, `em-atendimento`, `atendido`, `concluido` |
+| Template | `ativo` (implícito) com itens `treinamento` e `tarefa` |
+| OS | `rascunho`, `enviada`, `assinada` |
+| Notificação | `success` ou `error` no log |
+
+### Transições de status
+As transições válidas são definidas em `STATUS_TRANSITIONS` e verificadas por `canTransitionTo`, evitando saltos ilegais entre estados (por exemplo, pular etapas de atendimento).
+
+### Eventos importantes
+| Evento | Efeito |
+|---|---|
+| Reagendamento | Cancela original e cria novo evento |
+| Confirmação de cronograma | Gera registros e altera card |
+| Envio de OS | Registra no log e atualiza status |
+| Conclusão de treinamento | Pode gerar tarefa pendente |
+
+### Validações de entrada
+| Validação | Onde ocorre |
+|---|---|
+| Horário inicial < final | Eventos e registros |
+| Campos obrigatórios | Formulários de criação |
+| Checklist completo | Treinamentos ao concluir |
+| E-mail válido | Envio de OS/notificações |
+| Conflito de horário | Agenda e cronogramas |
+| Disponibilidade do consultor | Builder e criação de eventos |
+| Recorrência limitada | Agenda para evitar excesso |
+
+### Comportamentos assíncronos e fallback
+Envio de e-mail é assíncrono via serverless. Em falha, há fallback para `mailto:` e registro no log. PDF é gerado localmente sem esperar backend.
+
+## 12. Integrações e comunicação entre módulos
+
+| Integração | Fluxo |
+|---|---|
+| Agenda ↔ Registros | Eventos criam registros e registros atualizam agenda |
+| Templates ↔ Cronogramas | Templates geram itens, cronogramas geram eventos |
+| Registros ↔ OS | OS finaliza registros |
+| Notificações ↔ API | Front envia payload SMTP e registra resultado |
+| Kanban ↔ Registros | Status do card depende dos registros |
+| Cronograma ↔ Eventos | `seriesId`, `scheduleId`, `itemId` conectam itens |
+| Registros ↔ Eventos | `linkedEventId` mantém vínculo operacional |
+| OS ↔ Origem | `itemSrc` e `itemId` indicam origem |
+| Dashboard ↔ Filtros | `DASH_VIEWS` armazena visões salvas |
+
+## 13. Decisões técnicas e padrões de projeto
+
+| Decisão | Vantagens | Desvantagens |
+|---|---|---|
+| SPA single-file | Deploy simples e rápido | Código grande e menos modular |
+| LocalStorage | Offline e baixo custo | Sem multiusuário e risco de perda |
+| Sem framework | Controle total | Menos reutilização estrutural |
+| Persistência versionada | Evolução segura | Complexidade acumulada |
+| Auditoria via `history` | Rastreamento fácil | Aumenta volume de dados |
+| Renderização manual (`renderX`) | Atualização direta do DOM | Maior acoplamento de UI |
+| Extensões V2/V3/V4/V5 por override | Evolução incremental | Manutenção mais delicada |
+
+## 14. Pontos de melhoria, riscos e limitações
+
+| Ponto | Risco atual | Melhoria sugerida |
+|---|---|---|
+| Dados locais | Perda ao limpar navegador | Persistência em backend |
+| Sem autenticação | Acesso indiscriminado | Login e controle de acesso |
+| Rate limit simples | Pode falhar em alta demanda | Rate limit centralizado |
+| PDF client-side | Dependência de CDN | PDF no servidor ou bundle local |
+| E-mail sem anexo | Comunicação incompleta | Anexar PDF do cronograma |
+| Código monolítico | Manutenção complexa | Modularização gradual |
+
+## 15. Guia para recriar o sistema
+
+1. Definir o modelo de dados e entidades principais (consultores, empresas, eventos, registros, cronogramas, OS).
+2. Implementar estado global e persistência em `localStorage` com versionamento.
+3. Criar interface base com views e modais.
+4. Implementar módulo de agenda com conflitos e filtros.
+5. Criar cronogramas (builder simples e template V2).
+6. Implementar registros e regras específicas de atendimento e treinamento.
+7. Adicionar dashboard e kanban por cliente.
+8. Implementar OS com geração de PDF e envio via API SMTP.
+9. Criar serverless `/api/send-os-email` com `nodemailer` e validações.
+10. Configurar Vercel, variáveis de ambiente e headers.
 

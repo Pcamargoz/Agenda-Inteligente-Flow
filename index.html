@@ -1679,6 +1679,151 @@
     background:var(--forest-2);
   }
 
+  /* ============ SALDO DE HORAS — aba dedicada do card do cliente ============ */
+  .cc-hours-wrap{ padding:18px 24px 6px; }
+  .cc-hours-metrics{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    margin-bottom:18px;
+  }
+  .cc-hours-metric{
+    background:var(--paper);border:1px solid var(--line-2);border-radius:2px;
+    padding:14px 16px;position:relative;
+  }
+  .cc-hours-metric .ch-label{
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;margin-bottom:4px;
+  }
+  .cc-hours-metric .ch-value{
+    font-family:var(--font-display);font-size:30px;font-weight:500;line-height:1.05;
+    color:var(--ink);letter-spacing:-.02em;
+  }
+  .cc-hours-metric .ch-sub{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);margin-top:2px;
+  }
+  .cc-hours-metric.credit{ border-left:3px solid var(--forest); }
+  .cc-hours-metric.credit .ch-value{ color:var(--forest); }
+  .cc-hours-metric.debit{ border-left:3px solid var(--amber-2); }
+  .cc-hours-metric.debit .ch-value{ color:var(--amber); }
+  .cc-hours-metric.balance{ border-left:3px solid var(--indigo-2); }
+  .cc-hours-metric.balance.low{ border:2px solid var(--burgundy);background:var(--burgundy-bg); }
+  .cc-hours-metric.balance.low .ch-value{ color:var(--burgundy); }
+  .cc-hours-metric.balance.negative{ border:2px solid var(--burgundy);background:repeating-linear-gradient(135deg,var(--burgundy-bg),var(--burgundy-bg) 8px,rgba(138,38,56,.05) 8px,rgba(138,38,56,.05) 16px); }
+  .cc-hours-metric.balance.negative .ch-value{ color:var(--burgundy); }
+
+  .cc-hours-progress-block{
+    background:var(--paper);border:1px solid var(--line-2);border-radius:2px;
+    padding:14px 16px;margin-bottom:18px;
+  }
+  .cc-hours-progress-head{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    margin-bottom:8px;
+  }
+  .cc-hours-progress-head b{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;
+  }
+  .cc-hours-progress-head .ch-pct{
+    font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--ink);
+  }
+  .cc-hours-bar{
+    height:10px;background:var(--paper-2);border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  }
+  .cc-hours-bar > div{
+    height:100%;background:linear-gradient(90deg,var(--forest) 0%,var(--amber-2) 70%,var(--burgundy) 100%);
+    transition:width .3s ease;
+  }
+  .cc-hours-bar.low > div{ background:linear-gradient(90deg,var(--amber-2),var(--burgundy)); }
+  .cc-hours-bar.critical > div{ background:var(--burgundy); }
+
+  .cc-hours-alert{
+    display:flex;align-items:center;gap:10px;
+    background:var(--burgundy-bg);border:1px solid var(--burgundy);border-radius:2px;
+    padding:10px 14px;margin-bottom:14px;
+    color:var(--burgundy);
+  }
+  .cc-hours-alert.warning{
+    background:var(--amber-bg);border-color:var(--amber-2);color:var(--amber);
+  }
+  .cc-hours-alert svg{ width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0; }
+  .cc-hours-alert b{ font-weight:700;display:block; }
+  .cc-hours-alert span{ font-size:11.5px;line-height:1.4; }
+
+  .cc-hours-log-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line-2);
+  }
+  .cc-hours-log-head h4{
+    font-family:var(--font-display);font-size:16px;font-weight:500;letter-spacing:-.01em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .cc-hours-log-head h4 em{
+    font-style:italic;color:var(--ink-3);font-weight:300;
+  }
+  .cc-hours-log-actions{ display:flex;gap:6px; }
+  .ch-btn-credit{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--forest);border:1px solid var(--forest);color:var(--paper);
+    padding:6px 12px;border-radius:2px;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;cursor:pointer;
+  }
+  .ch-btn-credit:hover{ background:var(--forest-2);border-color:var(--forest-2); }
+  .ch-btn-credit svg{ width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2; }
+  .ch-btn-debit{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--paper);border:1px solid var(--line-2);color:var(--ink-3);
+    padding:6px 12px;border-radius:2px;font-size:10.5px;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;cursor:pointer;
+  }
+  .ch-btn-debit:hover{ border-color:var(--amber-2);color:var(--amber); }
+  .ch-btn-debit svg{ width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2; }
+  .ch-btn-edit-total{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--paper);border:1px solid var(--line-2);color:var(--ink-3);
+    padding:6px 12px;border-radius:2px;font-size:10.5px;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;cursor:pointer;
+  }
+  .ch-btn-edit-total:hover{ border-color:var(--ink);color:var(--ink); }
+  .ch-btn-edit-total svg{ width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2; }
+
+  .cc-hours-log{ display:flex;flex-direction:column;gap:6px; }
+  .cc-hours-log-item{
+    display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;
+    background:var(--paper);border:1px solid var(--line);border-radius:2px;
+    padding:10px 14px;
+  }
+  .cc-hours-log-item.debit{ border-left:3px solid var(--amber-2); }
+  .cc-hours-log-item.credit{ border-left:3px solid var(--forest); }
+  .cc-hours-log-item.initial{ border-left:3px solid var(--indigo-2); }
+  .cc-hours-log-item.adjust{ border-left:3px solid var(--slate); }
+  .cc-hours-log-item .ch-icon{
+    width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;
+  }
+  .cc-hours-log-item.debit  .ch-icon{ background:var(--amber-bg);color:var(--amber); }
+  .cc-hours-log-item.credit .ch-icon{ background:var(--forest-bg);color:var(--forest); }
+  .cc-hours-log-item.initial .ch-icon{ background:var(--indigo-bg);color:var(--indigo-2); }
+  .cc-hours-log-item.adjust .ch-icon{ background:var(--slate-bg);color:var(--ink-3); }
+  .cc-hours-log-item .ch-desc{ min-width:0; }
+  .cc-hours-log-item .ch-desc b{ display:block;font-size:13px;font-weight:600;color:var(--ink);word-break:break-word; }
+  .cc-hours-log-item .ch-desc span{
+    font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.04em;
+  }
+  .cc-hours-log-item .ch-amount{
+    font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.01em;
+    min-width:80px;text-align:right;
+  }
+  .cc-hours-log-item.debit  .ch-amount{ color:var(--amber); }
+  .cc-hours-log-item.credit .ch-amount,
+  .cc-hours-log-item.initial .ch-amount{ color:var(--forest); }
+  .cc-hours-log-item .ch-balance{
+    text-align:right;min-width:140px;
+    font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);
+  }
+  .cc-hours-log-item .ch-balance b{ display:block;font-family:var(--font-display);font-size:14px;color:var(--ink);font-weight:600; }
+  .cc-hours-log-empty{
+    text-align:center;padding:30px 16px;color:var(--ink-3);font-size:12px;font-style:italic;
+    background:var(--paper);border:1px dashed var(--line-2);border-radius:2px;
+  }
+
   /* Tarefas do treinamento — bloco expansível abaixo do card de treinamento */
   .cc-train-tasks{
     margin:6px 0 18px;
@@ -2985,6 +3130,7 @@
       <div class="cc-tab" data-cct="tarefa">Tarefas <span class="cc-tab-count" id="cctTask">0</span></div>
       <div class="cc-tab" data-cct="pendencias">Pendências <span class="cc-tab-count" id="cctPend">0</span></div>
       <div class="cc-tab" data-cct="cronogramas">Cronogramas <span class="cc-tab-count" id="cctSched">0</span></div>
+      <div class="cc-tab" data-cct="hours">Saldo de Horas <span class="cc-tab-count" id="cctHours">0h</span></div>
     </div>
     <div class="modal-body" id="ccBody" style="max-height:60vh;overflow-y:auto;padding:0"></div>
     <div class="modal-foot">
@@ -5304,6 +5450,11 @@ function saveRegistro(){
         renderAll();
       }
     }, 300);
+  }
+
+  /* Cobra/estorna automaticamente do saldo do card se o registro for tarefa/treinamento */
+  if (savedRecord && (savedRecord.kind === 'tarefa' || savedRecord.kind === 'treinamento')){
+    if (typeof chargeCardForRecord === 'function') chargeCardForRecord(savedRecord);
   }
 
   closeModal('modalRegistro');
@@ -8673,6 +8824,254 @@ function ensureClientCard(companyId, opts = {}){
   return card;
 }
 
+/* ============ SALDO DE HORAS — modelo, persistência e cálculo ============
+   Estrutura por card:
+     card.hoursContracted      → horas iniciais contratadas (number, default null/0)
+     card.hoursLowThresholdPct → percentual abaixo do qual dispara alerta (default 10)
+     card.hoursLog             → [{ id, ts, type, kind, description, hours, prevBalance, nextBalance, recordId?, userId, userName }]
+       type: 'initial' | 'credit' | 'debit' | 'adjust' | 'refund'
+   O saldo NUNCA é armazenado — é sempre derivado do log via cardHoursStats. */
+function _hoursEnsure(card){
+  if (!card) return null;
+  if (typeof card.hoursContracted !== 'number') card.hoursContracted = 0;
+  if (typeof card.hoursLowThresholdPct !== 'number') card.hoursLowThresholdPct = 10;
+  if (!Array.isArray(card.hoursLog)) card.hoursLog = [];
+  return card;
+}
+
+function cardHoursStats(card){
+  _hoursEnsure(card);
+  const log = card.hoursLog;
+  const credited = log.filter(m => m.type === 'initial' || m.type === 'credit').reduce((s,m) => s + (m.hours||0), 0);
+  const debited  = log.filter(m => m.type === 'debit').reduce((s,m) => s + (m.hours||0), 0);
+  const refunded = log.filter(m => m.type === 'refund').reduce((s,m) => s + (m.hours||0), 0);
+  const adjusted = log.filter(m => m.type === 'adjust').reduce((s,m) => s + (m.hours||0), 0);
+  const totalCredit = credited + refunded + Math.max(adjusted, 0);
+  const totalDebit  = debited + Math.max(-adjusted, 0);
+  const balance = totalCredit - totalDebit;
+  const pctUsed = totalCredit > 0 ? Math.min(100, Math.round((totalDebit / totalCredit) * 100)) : 0;
+  const pctRemaining = 100 - pctUsed;
+  const threshold = card.hoursLowThresholdPct || 10;
+  const lowAlert = totalCredit > 0 && pctRemaining <= threshold && balance > 0;
+  const negative = balance < 0;
+  return {
+    contracted: card.hoursContracted || 0,
+    credited: totalCredit,
+    debited: totalDebit,
+    balance,
+    pctUsed,
+    pctRemaining,
+    lowAlert,
+    negative,
+    log,
+  };
+}
+
+/* Calcula duração em horas de um registro (timeStart/timeEnd). */
+function recordDurationHours(r){
+  if (!r) return 0;
+  if (typeof r.durationHours === 'number' && r.durationHours > 0) return r.durationHours;
+  if (r.timeStart && r.timeEnd){
+    const [h1,m1] = r.timeStart.split(':').map(Number);
+    const [h2,m2] = r.timeEnd.split(':').map(Number);
+    if (!isNaN(h1) && !isNaN(h2)){
+      const mins = (h2*60+(m2||0)) - (h1*60+(m1||0));
+      if (mins > 0) return Math.round((mins/60)*100)/100;
+    }
+  }
+  return 0;
+}
+
+/* Insere uma movimentação no log calculando prev/next. */
+function hoursLogPush(card, entry){
+  _hoursEnsure(card);
+  const before = cardHoursStats(card).balance;
+  let delta = 0;
+  if (entry.type === 'debit') delta = -(entry.hours||0);
+  else if (entry.type === 'credit' || entry.type === 'initial' || entry.type === 'refund') delta = (entry.hours||0);
+  else if (entry.type === 'adjust') delta = (entry.hours||0); /* pode ser negativo */
+  const next = before + delta;
+  const movement = {
+    id: uid('hm'),
+    ts: new Date().toISOString(),
+    type: entry.type,
+    kind: entry.kind || null,
+    description: entry.description || '',
+    hours: entry.hours || 0,
+    prevBalance: before,
+    nextBalance: next,
+    recordId: entry.recordId || null,
+    userId: CURRENT_USER?.id || null,
+    userName: CURRENT_USER?.name || null,
+  };
+  card.hoursLog.push(movement);
+  if (typeof pushHistory === 'function') pushHistory(card, `saldo · ${entry.type}`, `${entry.hours||0}h · ${entry.description||''} · saldo ${next}h`);
+  return movement;
+}
+
+/* Modal simples (sem overlay próprio) pra perguntar saldo inicial — usa prompt nativo
+   formatado com sugestões. Mantém o app sem mais um overlay e funciona offline. */
+function askInitialHoursBalance(card, onDone){
+  if (!card) { if (onDone) onDone(); return; }
+  _hoursEnsure(card);
+  const co = companyById(card.companyId);
+  const company = co ? co.fantasia : 'cliente';
+  const raw = prompt(
+`📊 Saldo inicial de horas — ${company}
+
+Quantas horas foram contratadas por este cliente?
+(use ponto ou vírgula para decimais, ex.: 40 · 60 · 100 · 120.5)
+
+Sugestões comuns:  20  ·  40  ·  60  ·  80  ·  100  ·  120  ·  160
+
+Digite 0 (zero) para configurar depois.`,
+    '40'
+  );
+  if (raw === null){
+    /* cancelou — não registra nada, será perguntado de novo no próximo open */
+    card.hoursPrompted = false;
+    if (onDone) onDone();
+    return;
+  }
+  const num = parseFloat(String(raw).replace(',','.'));
+  if (isNaN(num) || num < 0){
+    toast('warn','Valor inválido','Use um número positivo (ex.: 40).');
+    card.hoursPrompted = false;
+    if (onDone) onDone();
+    return;
+  }
+  card.hoursContracted = num;
+  if (num > 0){
+    hoursLogPush(card, {
+      type: 'initial',
+      description: `Saldo inicial contratado — ${num}h`,
+      hours: num,
+    });
+    toast('success','Saldo inicial definido', `${num}h contratadas para ${company}`);
+  } else {
+    toast('info','Saldo zerado','Você pode lançar crédito a qualquer momento na aba "Saldo de Horas".');
+  }
+  persist();
+  if (onDone) onDone();
+}
+
+/* Lança crédito manual no card. */
+window.ccLancarCredito = (cardId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card) return;
+  const raw = prompt('Lançar CRÉDITO de horas\n\nQuantidade (h):', '10');
+  if (raw === null) return;
+  const hours = parseFloat(String(raw).replace(',','.'));
+  if (isNaN(hours) || hours <= 0){ toast('warn','Valor inválido'); return; }
+  const desc = prompt('Descrição do crédito:', 'Aporte adicional de horas') || 'Crédito manual';
+  hoursLogPush(card, {
+    type: 'credit',
+    description: desc.trim(),
+    hours,
+  });
+  card.hoursContracted = (card.hoursContracted || 0) + hours;
+  toast('success','Crédito lançado', `+${hours}h · ${desc}`);
+  persist();
+  renderClientCardModal();
+  renderClientKanban();
+};
+
+/* Lança débito manual (avulso) — para serviços sem registro formal. */
+window.ccLancarDebito = (cardId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card) return;
+  const raw = prompt('Lançar DÉBITO manual de horas\n\nQuantidade (h):', '1');
+  if (raw === null) return;
+  const hours = parseFloat(String(raw).replace(',','.'));
+  if (isNaN(hours) || hours <= 0){ toast('warn','Valor inválido'); return; }
+  const desc = prompt('Descrição do débito:', 'Atendimento avulso') || 'Débito manual';
+  hoursLogPush(card, {
+    type: 'debit',
+    description: desc.trim(),
+    hours,
+  });
+  toast('success','Débito lançado', `−${hours}h · ${desc}`);
+  persist();
+  renderClientCardModal();
+  renderClientKanban();
+};
+
+/* Ajusta o total contratado registrando a diferença como adjust no log (positivo ou negativo). */
+window.ccEditContractedHours = (cardId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card) return;
+  _hoursEnsure(card);
+  const raw = prompt(
+    `Ajustar HORAS CONTRATADAS\n\nValor atual: ${card.hoursContracted || 0}h\n\nDigite o novo total:`,
+    String(card.hoursContracted || 0)
+  );
+  if (raw === null) return;
+  const novo = parseFloat(String(raw).replace(',','.'));
+  if (isNaN(novo) || novo < 0){ toast('warn','Valor inválido'); return; }
+  const diff = novo - (card.hoursContracted || 0);
+  if (diff === 0){ toast('info','Sem alteração','O valor informado é igual ao atual.'); return; }
+  card.hoursContracted = novo;
+  hoursLogPush(card, {
+    type: 'adjust',
+    description: `Ajuste do contrato — total agora ${novo}h (${diff>0?'+':''}${diff}h)`,
+    hours: diff,
+  });
+  toast('success','Contrato ajustado', `${diff>0?'+':''}${diff}h · total ${novo}h`);
+  persist();
+  renderClientCardModal();
+  renderClientKanban();
+};
+
+/* Cobra/estorna automaticamente as horas de um registro com base no status.
+   Idempotente: usa record.chargedToCardAt para impedir cobranças duplicadas.
+   Aplicável a tarefa + treinamento (conforme spec do usuário). */
+function chargeCardForRecord(record){
+  if (!record) return;
+  if (!record.companyId) return;
+  if (record.kind !== 'tarefa' && record.kind !== 'treinamento') return;
+  const card = clientCardByCompany(record.companyId);
+  if (!card) return;
+  _hoursEnsure(card);
+
+  const isCompleted = record.status === 'atendido' || record.status === 'concluido';
+  const wasCharged  = !!record.chargedToCardAt;
+
+  if (isCompleted && !wasCharged){
+    const hours = recordDurationHours(record);
+    if (hours <= 0){
+      /* Sem duração registrada — registra apenas histórico, não desconta */
+      record._noDurationWarned = true;
+      return;
+    }
+    hoursLogPush(card, {
+      type: 'debit',
+      kind: record.kind,
+      description: `${record.kind === 'treinamento' ? 'Treinamento' : 'Tarefa'}: ${record.title || '(sem título)'}`,
+      hours,
+      recordId: record.id,
+    });
+    record.chargedToCardAt = new Date().toISOString();
+    record.chargedHours = hours;
+  } else if (!isCompleted && wasCharged){
+    /* Estorno: status saiu do estado concluído → devolve as horas */
+    const hours = record.chargedHours || recordDurationHours(record);
+    if (hours > 0){
+      hoursLogPush(card, {
+        type: 'refund',
+        kind: record.kind,
+        description: `Estorno — ${record.kind === 'treinamento' ? 'Treinamento' : 'Tarefa'} reaberto(a): ${record.title || '(sem título)'}`,
+        hours,
+        recordId: record.id,
+      });
+    }
+    record.chargedToCardAt = null;
+    record.chargedHours = null;
+  }
+}
+
 /* Helper: encontra todos os registros vinculados a uma empresa (para preview de cascata) */
 function getCompanyDependencies(companyId){
   return {
@@ -9048,7 +9447,8 @@ window.ncCreateCard = (companyId) => {
   closeModal('modalNewCard');
   renderClientKanban();
   persist();
-  setTimeout(() => openClientCardModal(card.id), 100);
+  /* Pergunta o saldo inicial antes de abrir o card. */
+  setTimeout(() => askInitialHoursBalance(card, () => openClientCardModal(card.id)), 150);
 };
 
 window.ncReactivateCard = (cardId) => {
@@ -9071,6 +9471,12 @@ function openClientCardModal(cardId){
   state.ccTab = 'all';
   renderClientCardModal();
   openModal('modalClientCard');
+  /* Se o card foi criado automaticamente (cronograma confirmado) e ainda não teve saldo definido,
+     dispara o modal de saldo inicial após abrir o card. Roda apenas uma vez por card. */
+  if (!card.hoursPrompted && (!card.hoursLog || card.hoursLog.length === 0) && (!card.hoursContracted || card.hoursContracted === 0)){
+    card.hoursPrompted = true;
+    setTimeout(() => askInitialHoursBalance(card, () => renderClientCardModal()), 350);
+  }
 }
 
 function renderClientCardModal(){
@@ -9142,6 +9548,27 @@ function renderClientCardModal(){
     cctPendEl.textContent = pendCount;
     cctPendEl.style.background = pendCount ? 'var(--burgundy)' : '';
     cctPendEl.style.color = pendCount ? 'var(--paper)' : '';
+  }
+  /* Aba de Saldo de Horas: contador mostra horas restantes (com cor crítica se baixo) */
+  const cctHoursEl = document.getElementById('cctHours');
+  if (cctHoursEl){
+    _hoursEnsure(card);
+    const hStats = cardHoursStats(card);
+    const balRound = Math.round(hStats.balance * 10) / 10;
+    cctHoursEl.textContent = `${balRound < 0 ? '−' : ''}${Math.abs(balRound).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}h`;
+    if (hStats.negative){
+      cctHoursEl.style.background = 'var(--burgundy)';
+      cctHoursEl.style.color = 'var(--paper)';
+    } else if (hStats.lowAlert){
+      cctHoursEl.style.background = 'var(--amber-2)';
+      cctHoursEl.style.color = 'var(--paper)';
+    } else if (hStats.credited > 0){
+      cctHoursEl.style.background = 'var(--forest)';
+      cctHoursEl.style.color = 'var(--paper)';
+    } else {
+      cctHoursEl.style.background = '';
+      cctHoursEl.style.color = '';
+    }
   }
 
   document.querySelectorAll('#ccTabs .cc-tab').forEach(t => {
@@ -9231,12 +9658,110 @@ function renderClientCardModal(){
       </div>`;
   };
 
+  /* Aba dedicada de Saldo de Horas */
+  const renderHoursTab = () => {
+    if (state.ccTab !== 'hours') return '';
+    _hoursEnsure(card);
+    const stats = cardHoursStats(card);
+    const fmtH = (n) => `${(Math.round(n*100)/100).toLocaleString('pt-BR',{minimumFractionDigits:n%1===0?1:1,maximumFractionDigits:2})}h`;
+    const balanceCls = stats.negative ? 'negative' : stats.lowAlert ? 'low' : '';
+    const barCls = stats.pctRemaining <= 10 ? 'critical' : stats.pctRemaining <= 30 ? 'low' : '';
+
+    const alertHTML = stats.negative
+      ? `<div class="cc-hours-alert">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div><b>Saldo negativo</b><span>O cliente já consumiu mais do que tinha contratado. Lance crédito adicional para regularizar.</span></div>
+        </div>`
+      : stats.lowAlert
+        ? `<div class="cc-hours-alert warning">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div><b>Saldo crítico — abaixo de ${card.hoursLowThresholdPct}%</b><span>Restam apenas ${fmtH(stats.balance)} (${stats.pctRemaining}% do contrato). Considere lançar mais horas.</span></div>
+          </div>`
+        : '';
+
+    const logRows = [...stats.log].reverse().map(m => {
+      const cls = m.type;
+      const sign = (m.type === 'debit') ? '−' : (m.type === 'credit' || m.type === 'initial' || m.type === 'refund') ? '+' : (m.hours >= 0 ? '+' : '−');
+      const icon = m.type === 'debit' ? '−' : m.type === 'credit' ? '+' : m.type === 'initial' ? '◆' : m.type === 'refund' ? '↺' : '~';
+      const typeLabel = ({ initial:'Saldo inicial', credit:'Crédito manual', debit:'Débito automático', refund:'Estorno', adjust:'Ajuste' })[m.type] || m.type;
+      return `
+        <div class="cc-hours-log-item ${cls}">
+          <div class="ch-icon">${icon}</div>
+          <div class="ch-desc">
+            <b>${(m.description||typeLabel).replace(/</g,'&lt;')}</b>
+            <span>${fmtDateTime(m.ts)} · ${typeLabel}${m.userName?` · ${m.userName}`:''}</span>
+          </div>
+          <div class="ch-amount">${sign}${fmtH(Math.abs(m.hours||0))}</div>
+          <div class="ch-balance">
+            <b>${fmtH(m.nextBalance)}</b>
+            <span>de ${fmtH(m.prevBalance)}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="cc-hours-wrap">
+        <div class="cc-hours-metrics">
+          <div class="cc-hours-metric credit">
+            <div class="ch-label">Crédito total</div>
+            <div class="ch-value">${fmtH(stats.credited)}</div>
+            <div class="ch-sub">${stats.contracted ? `${fmtH(stats.contracted)} contratadas` : 'sem contrato definido'}</div>
+          </div>
+          <div class="cc-hours-metric debit">
+            <div class="ch-label">Débito total</div>
+            <div class="ch-value">${fmtH(stats.debited)}</div>
+            <div class="ch-sub">${stats.pctUsed}% do crédito</div>
+          </div>
+          <div class="cc-hours-metric balance ${balanceCls}">
+            <div class="ch-label">Saldo${stats.lowAlert?' · crítico':stats.negative?' · negativo':''}</div>
+            <div class="ch-value">${stats.balance < 0 ? '−' : ''}${fmtH(Math.abs(stats.balance))}</div>
+            <div class="ch-sub">${stats.pctRemaining}% restante</div>
+          </div>
+        </div>
+
+        ${alertHTML}
+
+        <div class="cc-hours-progress-block">
+          <div class="cc-hours-progress-head">
+            <b>Consumo do contrato</b>
+            <span class="ch-pct">${stats.pctUsed}%</span>
+          </div>
+          <div class="cc-hours-bar ${barCls}"><div style="width:${Math.min(100,stats.pctUsed)}%"></div></div>
+        </div>
+
+        <div class="cc-hours-log-head">
+          <h4>Histórico de movimentações <em>· ${stats.log.length}</em></h4>
+          <div class="cc-hours-log-actions">
+            <button class="ch-btn-edit-total" onclick="ccEditContractedHours('${card.id}')" title="Ajustar horas contratadas">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Ajustar contrato
+            </button>
+            <button class="ch-btn-debit" onclick="ccLancarDebito('${card.id}')" title="Lançar débito manual">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
+              Lançar débito
+            </button>
+            <button class="ch-btn-credit" onclick="ccLancarCredito('${card.id}')" title="Lançar crédito manual">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Lançar crédito
+            </button>
+          </div>
+        </div>
+
+        ${stats.log.length
+          ? `<div class="cc-hours-log">${logRows}</div>`
+          : `<div class="cc-hours-log-empty">Nenhuma movimentação ainda. Defina o saldo contratado e o sistema descontará automaticamente conforme tarefas e treinamentos forem concluídos.</div>`}
+      </div>
+    `;
+  };
+
   document.getElementById('ccBody').innerHTML = `
-    ${renderSchedulesSection()}
-    ${renderPendenciasSection()}
-    ${renderSection('atendimento','Atendimentos','●')}
-    ${renderSection('treinamento','Treinamentos','✦')}
-    ${renderSection('tarefa','Tarefas','☰')}
+    ${renderHoursTab()}
+    ${state.ccTab !== 'hours' ? renderSchedulesSection() : ''}
+    ${state.ccTab !== 'hours' ? renderPendenciasSection() : ''}
+    ${state.ccTab !== 'hours' ? renderSection('atendimento','Atendimentos','●') : ''}
+    ${state.ccTab !== 'hours' ? renderSection('treinamento','Treinamentos','✦') : ''}
+    ${state.ccTab !== 'hours' ? renderSection('tarefa','Tarefas','☰') : ''}
   `;
 
   /* CICLO DE VIDA AUTOMÁTICO:
@@ -9664,6 +10189,8 @@ window.ccSetTrainingRealization = (src, id, value) => {
     if (typeof pushHistory === 'function') pushHistory(target, 'realização reaberta', `${before} → em-andamento`);
     toast('info','Treinamento reaberto','Volte a decidir entre Realizado/Não realizado.');
   }
+  /* Cobra/estorna do saldo de horas do card conforme novo status do treinamento */
+  if (src === 'record') chargeCardForRecord(target);
   persist();
   renderClientCardModal();
   renderClientKanban();
@@ -9823,6 +10350,8 @@ window.ccEncerrarItem = (src, id, cardId) => {
     pushHistory(target._schedule, 'item encerrado pelo card', `${target.title||id} · ${reason}`);
     delete target._schedule;
   }
+  /* Estorna do saldo de horas se já tinha sido cobrado */
+  if (src === 'record' && typeof chargeCardForRecord === 'function') chargeCardForRecord(target);
   /* Se for evento, também não aparece mais na agenda (filtro já remove cancelado) */
   persist();
   toast('success','Tarefa encerrada','O item foi marcado como cancelado e permanece no histórico do card.');
@@ -9939,7 +10468,7 @@ window.ccDeleteItem = (src, id, cardId) => {
 window.ccUpdateItemStatus = (src, id, val) => {
   if (src === 'record'){
     const r = RECORDS.find(x => x.id === id);
-    if (r){ r.status = val; pushHistory(r, 'status alterado', val); }
+    if (r){ r.status = val; pushHistory(r, 'status alterado', val); chargeCardForRecord(r); }
   } else {
     const e = EVENTS.find(x => x.id === id);
     if (e){ e.status = val; }
@@ -10476,6 +11005,8 @@ function osCommit(){
         const before = r.status;
         r.status = 'concluido';
         if (typeof pushHistory === 'function') pushHistory(r, 'concluído via OS', `${before} → concluido (OS ${os.id})`);
+        /* Cobra automaticamente do saldo de horas se for tarefa/treinamento */
+        if (typeof chargeCardForRecord === 'function') chargeCardForRecord(r);
       }
     } else if (os.itemSrc === 'event'){
       const e = EVENTS.find(x => x.id === os.itemId);

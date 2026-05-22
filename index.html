@@ -2958,28 +2958,30 @@ const dowLowerPT = d => ['dom','seg','ter','qua','qui','sex','sáb'][d];
      - vermelho= cancelado
      - cinza   = neutro / rascunho */
 const STATUSES = [
-  { id:'criado',       label:'Criado',       cls:'criado',       sem:'neutral', order:1 },
-  { id:'provisorio',   label:'Provisório',   cls:'provisorio',   sem:'warning', order:2 },
-  { id:'confirmado',   label:'Confirmado',   cls:'confirmado',   sem:'progress',order:3 },
-  { id:'em-andamento', label:'Em andamento', cls:'em-andamento', sem:'progress',order:4 },
-  { id:'atendido',     label:'Atendido',     cls:'atendido',     sem:'success', order:5 },
-  { id:'concluido',    label:'Concluído',    cls:'concluido',    sem:'success', order:6 },
-  { id:'pendente',     label:'Pendente',     cls:'pendente',     sem:'warning', order:7 },
-  { id:'reagendado',   label:'Reagendado',   cls:'reagendado',   sem:'info',    order:8 },
-  { id:'cancelado',    label:'Cancelado',    cls:'cancelado',    sem:'danger',  order:9 },
+  { id:'criado',         label:'Criado',         cls:'criado',       sem:'neutral', order:1 },
+  { id:'provisorio',     label:'Provisório',     cls:'provisorio',   sem:'warning', order:2 },
+  { id:'confirmado',     label:'Confirmado',     cls:'confirmado',   sem:'progress',order:3 },
+  { id:'em-andamento',   label:'Em andamento',   cls:'em-andamento', sem:'progress',order:4 },
+  { id:'em-atendimento', label:'Em atendimento', cls:'em-andamento', sem:'progress',order:4.5 },
+  { id:'atendido',       label:'Atendido',       cls:'atendido',     sem:'success', order:5 },
+  { id:'concluido',      label:'Concluído',      cls:'concluido',    sem:'success', order:6 },
+  { id:'pendente',       label:'Pendente',       cls:'pendente',     sem:'warning', order:7 },
+  { id:'reagendado',     label:'Reagendado',     cls:'reagendado',   sem:'info',    order:8 },
+  { id:'cancelado',      label:'Cancelado',      cls:'cancelado',    sem:'danger',  order:9 },
 ];
 
 /* Transições permitidas a partir de cada status (regras de ciclo de vida) */
 const STATUS_TRANSITIONS = {
-  'criado':       ['confirmado','cancelado'],
-  'provisorio':   ['confirmado','reagendado','cancelado'],
-  'confirmado':   ['em-andamento','reagendado','cancelado'],
-  'em-andamento': ['atendido','reagendado','cancelado'],
-  'atendido':     ['concluido','reagendado'],
-  'concluido':    [],                          /* estado terminal */
-  'pendente':     ['confirmado','cancelado'],
-  'reagendado':   [],                          /* estado terminal — novo item assume a vez */
-  'cancelado':    [],                          /* estado terminal */
+  'criado':         ['confirmado','cancelado','em-atendimento'],
+  'provisorio':     ['confirmado','reagendado','cancelado','em-atendimento'],
+  'confirmado':     ['em-andamento','em-atendimento','reagendado','cancelado'],
+  'em-andamento':   ['atendido','em-atendimento','reagendado','cancelado'],
+  'em-atendimento': ['atendido','concluido','em-andamento','reagendado','cancelado'],
+  'atendido':       ['concluido','reagendado'],
+  'concluido':      [],                          /* estado terminal */
+  'pendente':       ['confirmado','em-atendimento','cancelado'],
+  'reagendado':     [],                          /* estado terminal — novo item assume a vez */
+  'cancelado':      [],                          /* estado terminal */
 };
 function canTransitionTo(fromStatus, toStatus){
   if (fromStatus === toStatus) return true;
@@ -3048,6 +3050,12 @@ function loadPersisted(){
     if (Array.isArray(data.SCHEDULES))     SCHEDULES = data.SCHEDULES;
     if (Array.isArray(data.RECORDS))       RECORDS = data.RECORDS;
     if (Array.isArray(data.STATUSES) && data.STATUSES.length)         STATUSES.splice(0, STATUSES.length, ...data.STATUSES);
+    /* Migração: garante o status "em-atendimento" mesmo em bases antigas */
+    if (!STATUSES.find(s => s.id === 'em-atendimento')){
+      const idx = STATUSES.findIndex(s => s.id === 'em-andamento');
+      const entry = { id:'em-atendimento', label:'Em atendimento', cls:'em-andamento', sem:'progress', order:4.5 };
+      if (idx >= 0) STATUSES.splice(idx+1, 0, entry); else STATUSES.push(entry);
+    }
     if (Array.isArray(data.EVENT_TYPES) && data.EVENT_TYPES.length)   EVENT_TYPES.splice(0, EVENT_TYPES.length, ...data.EVENT_TYPES);
     if (Array.isArray(data.PERIODS) && data.PERIODS.length)           PERIODS.splice(0, PERIODS.length, ...data.PERIODS);
     if (Array.isArray(data.RECURRENCES) && data.RECURRENCES.length)   RECURRENCES.splice(0, RECURRENCES.length, ...data.RECURRENCES);
@@ -4794,6 +4802,15 @@ function openRegistroModal(recordId=null, defaultKind='atendimento'){
           <div id="rgPautaContent" style="font-size:11.5px;color:var(--ink-2);line-height:1.5"></div>
         </div>
       ` : ''}
+      ${kind==='atendimento' ? `
+        <div id="rgLinkedTasksWrap" style="background:var(--paper-2);border:1px solid var(--line-2);padding:10px 12px;border-radius:2px;display:none">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span>Tarefas vinculadas a este atendimento</span>
+            <span id="rgLinkedTasksHint" style="font-family:var(--font-body);font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--ink-3);font-weight:500;font-style:italic">Selecione para mover automaticamente para "Em atendimento"</span>
+          </div>
+          <div id="rgLinkedTasksContent" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto"></div>
+        </div>
+      ` : ''}
     </div>
   `;
   document.getElementById('rgBody').innerHTML = html;
@@ -4803,26 +4820,79 @@ function openRegistroModal(recordId=null, defaultKind='atendimento'){
     renderRgChecklist();
   }
 
-  /* Wire da pauta automática para atendimento novo */
-  if (kind === 'atendimento' && !r){
+  /* Wire da pauta automática + seleção de tarefas vinculadas para atendimento */
+  if (kind === 'atendimento'){
     const coSel = document.getElementById('rgCompany');
+    /* IDs já vinculados (edição) — usados para pré-seleção. */
+    const preLinked = (r && Array.isArray(r.linkedTaskIds)) ? r.linkedTaskIds.slice() : [];
+    state.rgPrevLinkedTaskIds = preLinked.slice();
+
+    const refreshLinkedTasks = () => {
+      const cid = coSel.value;
+      const wrap = document.getElementById('rgLinkedTasksWrap');
+      const content = document.getElementById('rgLinkedTasksContent');
+      if (!wrap || !content) return;
+
+      if (!cid){
+        wrap.style.display = 'none';
+        content.innerHTML = '';
+        return;
+      }
+
+      /* Tarefas elegíveis: tarefas do cliente que NÃO estejam em estado terminal,
+         + tarefas já vinculadas anteriormente a este atendimento (mesmo se concluídas). */
+      const eligible = RECORDS.filter(rec =>
+        rec.kind === 'tarefa'
+        && rec.companyId === cid
+        && (
+          !['concluido','cancelado','reagendado'].includes(rec.status)
+          || preLinked.includes(rec.id)
+        )
+        /* Não mostra tarefas já vinculadas a OUTRO atendimento */
+        && (!rec.linkedAtendimentoId || rec.linkedAtendimentoId === (r ? r.id : null))
+      );
+
+      if (!eligible.length){
+        wrap.style.display = 'block';
+        content.innerHTML = `<div style="font-size:11.5px;color:var(--ink-3);font-style:italic;padding:4px 0">Nenhuma tarefa pendente disponível para vincular.</div>`;
+        return;
+      }
+
+      wrap.style.display = 'block';
+      content.innerHTML = eligible.map(t => {
+        const cons = consultantById(t.consultantId);
+        const st = statusById(t.status) || {};
+        const checked = preLinked.includes(t.id) ? 'checked' : '';
+        const dateStr = t.date ? isoToBR(t.date) : 'sem data';
+        return `
+          <label class="rg-linked-task" style="display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:7px 9px;background:var(--paper);border:1px solid var(--line);border-radius:2px;cursor:pointer">
+            <input type="checkbox" class="rg-link-task-cb" value="${t.id}" ${checked} style="margin:0;width:15px;height:15px;cursor:pointer" />
+            <div style="min-width:0">
+              <b style="font-size:12.5px;font-weight:600;display:block;color:var(--ink)">${(t.title||'').replace(/</g,'&lt;')}</b>
+              <span style="font-size:10.5px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em">
+                ${cons?cons.name:'sem consultor'} · ${dateStr}${t.priority?` · ${t.priority.toUpperCase()}`:''}
+              </span>
+            </div>
+            <span class="pill ${st.cls||''}" style="font-size:9.5px;padding:3px 8px">${st.label||t.status||'—'}</span>
+          </label>
+        `;
+      }).join('');
+    };
+
     const refreshPauta = () => {
       const cid = coSel.value;
-      if (!cid){
-        document.getElementById('rgPautaWrap').style.display = 'none';
-        return;
-      }
+      const pautaWrap = document.getElementById('rgPautaWrap');
+      if (!pautaWrap) return; /* edição não tem o bloco de pauta */
+      if (!cid){ pautaWrap.style.display = 'none'; return; }
       const pending = RECORDS.filter(rec => rec.kind === 'tarefa' && rec.companyId === cid && rec.status !== 'concluido' && rec.status !== 'cancelado');
-      if (!pending.length){
-        document.getElementById('rgPautaWrap').style.display = 'none';
-        return;
-      }
+      if (!pending.length){ pautaWrap.style.display = 'none'; return; }
       const pautaText = pending.map(t => `• ${t.title}${t.priority?` (${t.priority})`:''}`).join('\n');
-      document.getElementById('rgPautaWrap').style.display = 'block';
+      pautaWrap.style.display = 'block';
       document.getElementById('rgPautaContent').innerHTML = pending.map(t =>
         `<div style="padding:3px 0">• <b>${(t.title||'').replace(/</g,'&lt;')}</b> ${t.priority?`<span style="font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3)">[${t.priority.toUpperCase()}]</span>`:''}</div>`
       ).join('');
-      document.getElementById('rgApplyPautaBtn').onclick = () => {
+      const applyBtn = document.getElementById('rgApplyPautaBtn');
+      if (applyBtn) applyBtn.onclick = () => {
         const desc = document.getElementById('rgDesc');
         const existing = desc.value.trim();
         const pauta = `Pauta sugerida (tarefas pendentes):\n${pautaText}`;
@@ -4830,8 +4900,10 @@ function openRegistroModal(recordId=null, defaultKind='atendimento'){
         toast('success','Pauta inserida', `${pending.length} tarefa(s) adicionada(s) à descrição`);
       };
     };
-    coSel.addEventListener('change', refreshPauta);
+
+    coSel.addEventListener('change', () => { refreshPauta(); refreshLinkedTasks(); });
     refreshPauta();
+    refreshLinkedTasks();
   }
 
   /* Botão encerrar tarefa */
@@ -4930,6 +5002,12 @@ function saveRegistro(){
   if (kind === 'treinamento' && Array.isArray(state.rgChecklist)){
     data.checklist = state.rgChecklist.slice();
   }
+  /* Coleta IDs de tarefas marcadas para vincular ao atendimento */
+  let selectedLinkedTaskIds = [];
+  if (kind === 'atendimento'){
+    selectedLinkedTaskIds = Array.from(document.querySelectorAll('.rg-link-task-cb:checked')).map(cb => cb.value);
+    data.linkedTaskIds = selectedLinkedTaskIds.slice();
+  }
   if (!data.title){ toast('error','Título obrigatório'); return; }
 
   /* Detecta se este save está concluindo um treinamento com etapas incompletas */
@@ -4966,6 +5044,43 @@ function saveRegistro(){
     pushHistory(savedRecord, 'criado');
     RECORDS.push(savedRecord);
     toast('success','Registro criado', data.title);
+  }
+
+  /* Vinculação de tarefas ao atendimento:
+     - Tarefas recém-vinculadas → status "em-atendimento" + linkedAtendimentoId.
+     - Tarefas que foram removidas do vínculo → apenas limpa linkedAtendimentoId
+       (não reverte o status, preservando trabalho já feito). */
+  if (kind === 'atendimento'){
+    const newLinked = Array.isArray(data.linkedTaskIds) ? data.linkedTaskIds : [];
+    const prevLinked = Array.isArray(state.rgPrevLinkedTaskIds) ? state.rgPrevLinkedTaskIds : [];
+    const added = newLinked.filter(id => !prevLinked.includes(id));
+    const removed = prevLinked.filter(id => !newLinked.includes(id));
+
+    let movedCount = 0;
+    added.forEach(tid => {
+      const t = RECORDS.find(x => x.id === tid && x.kind === 'tarefa');
+      if (!t) return;
+      const before = t.status;
+      t.linkedAtendimentoId = savedRecord.id;
+      if (t.status !== 'em-atendimento'){
+        t.status = 'em-atendimento';
+        movedCount++;
+        pushHistory(t, 'vinculada ao atendimento', `${before} → em-atendimento · ${savedRecord.title}`);
+      } else {
+        pushHistory(t, 'vinculada ao atendimento', savedRecord.title);
+      }
+    });
+    removed.forEach(tid => {
+      const t = RECORDS.find(x => x.id === tid && x.kind === 'tarefa');
+      if (!t) return;
+      t.linkedAtendimentoId = null;
+      pushHistory(t, 'desvinculada do atendimento', savedRecord.title);
+    });
+    state.rgPrevLinkedTaskIds = newLinked.slice();
+    if (added.length){
+      setTimeout(() => toast('success','Tarefas vinculadas',
+        `${added.length} tarefa(s) ${movedCount?`movidas para "Em atendimento"`:`atualizadas`}.`), 200);
+    }
   }
 
   /* Fluxo automático: treinamento concluído com itens não-feitos → cria tarefa pendente */
@@ -10286,19 +10401,35 @@ renderCcItem = function(it, card){
 
   const canEncerrar = !['concluido','cancelado','reagendado','atendido'].includes(it.status);
 
+  /* Vinculação tarefa ↔ atendimento: badge + botão de atalho. */
+  const linkedAtendId = (it.kind === 'tarefa' && it.raw && it.raw.linkedAtendimentoId) ? it.raw.linkedAtendimentoId : null;
+  const linkedAtend = linkedAtendId ? RECORDS.find(rec => rec.id === linkedAtendId && rec.kind === 'atendimento') : null;
+  const linkBadgeHTML = linkedAtend
+    ? `<span class="cc-item-link-badge" onclick="event.stopPropagation();ccOpenLinkedAtendimento('${linkedAtend.id}')" title="Vinculado ao atendimento: ${linkedAtend.title.replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;gap:5px;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-2);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:8px;cursor:pointer">● Atendimento vinculado</span>`
+    : '';
+  const statusLabel = (linkedAtend && it.kind === 'tarefa' && it.status === 'em-atendimento')
+    ? 'Em atendimento'
+    : (st.label || it.status || '—');
+
   return `
-    <div class="cc-item ${it.kind}">
+    <div class="cc-item ${it.kind}${linkedAtend?' linked-atendimento':''}">
       <div class="cc-item-icon">${it.kind==='atendimento'?'●':it.kind==='treinamento'?'✦':'☰'}</div>
       <div class="cc-item-info">
         <b>${it.title}</b>
-        <span>${c?c.name:'sem consultor'}${it.kind==='tarefa'&&it.priority?` · ${it.priority.toUpperCase()}`:''} · ${st.label||it.status||'—'}</span>
+        <span>${c?c.name:'sem consultor'}${it.kind==='tarefa'&&it.priority?` · ${it.priority.toUpperCase()}`:''} · ${statusLabel}</span>
         ${osBadgeHTML}
+        ${linkBadgeHTML}
       </div>
       <div class="cc-item-when">${whenHTML}</div>
       <select onchange="ccUpdateItemStatus('${it._src}','${it.id}',this.value)" style="border:1px solid var(--line-2);padding:4px 8px;font-size:11px;border-radius:2px;background:var(--paper)">
         ${STATUSES.map(s => `<option value="${s.id}" ${it.status===s.id?'selected':''}>${s.label}</option>`).join('')}
       </select>
       <div class="cc-item-actions">
+        ${linkedAtend ? `
+        <button title="Abrir atendimento vinculado" onclick="ccOpenLinkedAtendimento('${linkedAtend.id}')" style="background:var(--amber-bg);border-color:var(--amber-2);color:var(--amber)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M5 5h6M5 9h4M5 19h6M5 15h4M19 19V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2z"/></svg>
+          Abrir atendimento
+        </button>` : ''}
         <button title="Nova OS · enviar para assinatura" onclick="openOSModal('${it._src}','${it.id}')" style="border-color:var(--champagne);color:var(--champagne)">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
         </button>
@@ -10321,6 +10452,19 @@ renderCcItem = function(it, card){
       </div>
     </div>
   `;
+};
+
+/* Abre o registro de atendimento vinculado a partir de uma tarefa do card.
+   Mantém o modal do card aberto por baixo — ao fechar o atendimento o usuário
+   volta direto para o contexto da tarefa. */
+window.ccOpenLinkedAtendimento = (atendimentoId) => {
+  const at = RECORDS.find(r => r.id === atendimentoId && r.kind === 'atendimento');
+  if (!at){ toast('error','Atendimento não encontrado'); return; }
+  if (typeof openRegistroModal === 'function'){
+    openRegistroModal(atendimentoId);
+  } else {
+    toast('warn','Não foi possível abrir o atendimento');
+  }
 };
 
 /* ============================================

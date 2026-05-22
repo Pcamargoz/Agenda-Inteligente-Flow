@@ -1679,6 +1679,108 @@
     background:var(--forest-2);
   }
 
+  /* Tarefas do treinamento — bloco expansível abaixo do card de treinamento */
+  .cc-train-tasks{
+    margin:6px 0 18px;
+    padding:10px 14px 12px;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-left:3px solid var(--forest-2);
+    border-radius:0 2px 2px 0;
+  }
+  .cc-train-tasks-head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-bottom:8px;
+  }
+  .cc-train-tasks-head .ctt-title{
+    font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--forest);font-weight:700;display:inline-flex;align-items:center;gap:6px;
+  }
+  .cc-train-tasks-head .ctt-count{
+    font-family:var(--font-mono);font-size:10px;color:var(--ink-3);
+  }
+  .cc-train-tasks .ctt-empty{
+    font-size:11.5px;color:var(--ink-3);font-style:italic;padding:6px 0 8px;
+  }
+  .cc-train-task{
+    display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;
+    padding:8px 10px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:2px;
+    margin-bottom:6px;
+  }
+  .cc-train-task.realized{
+    background:linear-gradient(180deg,var(--forest-bg) 0%,var(--paper) 100%);
+    border-color:var(--forest);
+  }
+  .cc-train-task.realized .ctt-text{ color:var(--forest); }
+  .cc-train-task.realized .ctt-text::after{ content:" ✓"; color:var(--forest); font-weight:700; }
+  .cc-train-task.not-realized{
+    background:repeating-linear-gradient(135deg,var(--burgundy-bg),var(--burgundy-bg) 8px,rgba(138,38,56,.05) 8px,rgba(138,38,56,.05) 16px);
+    border-color:var(--burgundy);opacity:.85;
+  }
+  .cc-train-task.not-realized .ctt-text{ text-decoration:line-through; color:var(--burgundy); }
+  .ctt-check{
+    width:18px;height:18px;border:1.5px solid var(--line-3);border-radius:50%;
+    display:grid;place-items:center;cursor:pointer;background:var(--paper);
+    transition:all .15s ease;
+  }
+  .ctt-check:hover{border-color:var(--forest)}
+  .cc-train-task.realized .ctt-check{
+    background:var(--forest);border-color:var(--forest);color:var(--paper);
+  }
+  .cc-train-task.not-realized .ctt-check{
+    background:var(--burgundy);border-color:var(--burgundy);color:var(--paper);
+  }
+  .ctt-text{
+    font-size:13px;color:var(--ink);line-height:1.35;font-weight:500;
+    word-break:break-word;
+  }
+  .ctt-meta{
+    font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3);
+    letter-spacing:.06em;text-transform:uppercase;
+  }
+  .ctt-toggle{
+    display:inline-flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden;
+    background:var(--paper);
+  }
+  .ctt-toggle button{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:4px 8px;font-size:10px;font-weight:600;letter-spacing:.04em;
+    color:var(--ink-3);background:var(--paper);
+    border:none;border-right:1px solid var(--line-2);cursor:pointer;
+    transition:all .15s ease;
+  }
+  .ctt-toggle button:last-child{border-right:none}
+  .ctt-toggle button:hover{background:var(--paper-2);color:var(--ink)}
+  .ctt-toggle button svg{stroke:currentColor;fill:none;width:11px;height:11px}
+  .ctt-toggle button.ok.active{background:var(--forest);color:var(--paper)}
+  .ctt-toggle button.no.active{background:var(--burgundy);color:var(--paper)}
+  .cc-train-task .ctt-actions{ display:flex;gap:4px; }
+  .cc-train-task .ctt-actions button{
+    width:24px;height:24px;border:1px solid var(--line-2);background:var(--paper);
+    border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  }
+  .cc-train-task .ctt-actions button:hover{ border-color:var(--ink);background:var(--paper-2); }
+  .cc-train-task .ctt-actions button svg{ width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.7; }
+  .cc-train-task .ctt-actions button.danger:hover{ color:var(--burgundy);border-color:var(--burgundy);background:var(--burgundy-bg); }
+  .cc-train-tasks-foot{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    margin-top:6px;padding-top:8px;border-top:1px dashed var(--line-2);
+  }
+  .cc-train-tasks-foot .ctt-progress{
+    font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;
+  }
+  .cc-train-tasks-foot button.ctt-add{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--forest-bg);border:1px solid var(--forest-2);color:var(--forest);
+    padding:5px 10px;border-radius:2px;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;cursor:pointer;
+  }
+  .cc-train-tasks-foot button.ctt-add:hover{ background:var(--forest);color:var(--paper); }
+  .cc-train-tasks-foot button.ctt-add svg{ width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2; }
+
   /* Atendimento "ativo" — mesma estrutura do treinamento confirmado, em ROSA */
   .cc-item.confirmed-atendimento{
     grid-template-columns:auto 1fr auto auto;
@@ -7200,6 +7302,7 @@ function renderItemConfigModal(){
               <div class="ic-time-chips">
                 <span class="ic-time-chip ${it.timeStart==='08:00'&&it.timeEnd==='12:00'?'active':''}" onclick="icSetTime('08:00','12:00')">08:00–12:00 manhã</span>
                 <span class="ic-time-chip ${it.timeStart==='09:00'&&it.timeEnd==='11:00'?'active':''}" onclick="icSetTime('09:00','11:00')">09:00–11:00</span>
+                <span class="ic-time-chip ${it.timeStart==='10:00'&&it.timeEnd==='12:00'?'active':''}" onclick="icSetTime('10:00','12:00')">10:00–12:00</span>
                 <span class="ic-time-chip ${it.timeStart==='13:30'&&it.timeEnd==='17:30'?'active':''}" onclick="icSetTime('13:30','17:30')">13:30–17:30 tarde</span>
                 <span class="ic-time-chip ${it.timeStart==='14:00'&&it.timeEnd==='16:00'?'active':''}" onclick="icSetTime('14:00','16:00')">14:00–16:00</span>
               </div>
@@ -9313,6 +9416,7 @@ function renderCcItem(it, card){
           </button>` : ''}
         </div>
       </div>
+      ${renderCcTrainingTasks(it, raw)}
     `;
   }
 
@@ -9345,6 +9449,184 @@ function renderCcItem(it, card){
     </div>
   `;
 }
+
+/* ---------- Tarefas do treinamento dentro do card do cliente ----------
+   O checklist do registro (r.checklist) é tratado como lista de tarefas com as
+   mesmas ações de uma tarefa normal: Realizado, Não realizado, Editar, Excluir,
+   + adicionar nova tarefa. Normaliza strings antigas para objetos. */
+function _normalizeChecklist(r){
+  if (!r) return [];
+  if (!Array.isArray(r.checklist)) r.checklist = [];
+  r.checklist = r.checklist.map(s => {
+    if (s && typeof s === 'object') return s;
+    return { text: String(s||''), done:false };
+  });
+  return r.checklist;
+}
+
+function renderCcTrainingTasks(it, raw){
+  /* Só faz sentido para registros (a edição persistente da checklist exige record).
+     Para eventos sem record, simplesmente não mostra. */
+  if (it._src !== 'record') return '';
+  const r = RECORDS.find(x => x.id === it.id);
+  if (!r) return '';
+  const list = _normalizeChecklist(r);
+
+  const done  = list.filter(s => s.done || s.realizationStatus === 'realizado').length;
+  const total = list.length;
+  const pct   = total ? Math.round((done/total)*100) : 0;
+
+  const taskRows = list.map((s, i) => {
+    const isReal = s.realizationStatus === 'realizado' || s.done === true;
+    const isNot  = s.realizationStatus === 'nao-realizado';
+    const meta = isReal && s.doneAt
+      ? `Realizado em ${fmtDateTime(s.doneAt)}`
+      : isNot && s.notRealizedAt
+        ? `Não realizado · ${s.notRealizedReason ? s.notRealizedReason.replace(/</g,'&lt;') : 'sem motivo'}`
+        : '';
+    return `
+      <div class="cc-train-task ${isReal?'realized':''} ${isNot?'not-realized':''}">
+        <div class="ctt-check" onclick="ccTrainTaskToggle('${r.id}',${i},'${isReal?'reset':'realizado'}')" title="${isReal?'Reabrir':'Marcar como realizado'}">
+          ${isReal?'<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>':isNot?'<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="3"><path d="M6 6l12 12M18 6L6 18"/></svg>':''}
+        </div>
+        <div>
+          <div class="ctt-text">${(s.text||'').replace(/</g,'&lt;') || '<i style="color:var(--ink-3);font-weight:400">tarefa sem descrição</i>'}</div>
+          ${meta?`<div class="ctt-meta">${meta}</div>`:''}
+        </div>
+        <div class="ctt-toggle" role="group" aria-label="Status da tarefa">
+          <button type="button" class="ok ${isReal?'active':''}" onclick="ccTrainTaskToggle('${r.id}',${i},'${isReal?'reset':'realizado'}')" title="${isReal?'Reabrir':'Marcar como realizado'}">
+            <svg viewBox="0 0 24 24" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg>
+            Realizado
+          </button>
+          <button type="button" class="no ${isNot?'active':''}" onclick="ccTrainTaskToggle('${r.id}',${i},'${isNot?'reset':'nao-realizado'}')" title="${isNot?'Reabrir':'Marcar como NÃO realizado'}">
+            <svg viewBox="0 0 24 24" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            Não realizado
+          </button>
+        </div>
+        <div class="ctt-actions">
+          <button title="Editar texto" onclick="ccTrainTaskEdit('${r.id}',${i})">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="danger" title="Excluir tarefa" onclick="ccTrainTaskRemove('${r.id}',${i})">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="cc-train-tasks">
+      <div class="cc-train-tasks-head">
+        <span class="ctt-title">
+          <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Tarefas do treinamento
+        </span>
+        <span class="ctt-count">${pad(done)}/${pad(total)} concluída(s)${total?` · ${pct}%`:''}</span>
+      </div>
+      ${total ? taskRows : `<div class="ctt-empty">Nenhuma tarefa neste treinamento ainda — use o botão abaixo para adicionar.</div>`}
+      <div class="cc-train-tasks-foot">
+        <span class="ctt-progress">${total ? `${done} de ${total} realizada(s)` : 'sem tarefas'}</span>
+        <button type="button" class="ctt-add" onclick="ccTrainTaskAdd('${r.id}')">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          Nova tarefa
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* Marca uma tarefa do checklist como realizada / não-realizada / reset.
+   value ∈ 'realizado' | 'nao-realizado' | 'reset' */
+window.ccTrainTaskToggle = (recordId, idx, value) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r){ toast('error','Registro não encontrado'); return; }
+  const list = _normalizeChecklist(r);
+  const s = list[idx];
+  if (!s){ toast('error','Tarefa não encontrada'); return; }
+
+  if (value === 'realizado'){
+    s.realizationStatus = 'realizado';
+    s.done = true;
+    s.doneAt = new Date().toISOString();
+    s.doneByUserId = CURRENT_USER?.id || null;
+    s.notRealizedAt = null; s.notRealizedReason = null;
+    pushHistory(r, 'tarefa do treino realizada', s.text || `#${idx+1}`);
+    toast('success','Tarefa realizada', s.text);
+  } else if (value === 'nao-realizado'){
+    const reason = prompt('Por que esta tarefa NÃO foi realizada?\n(será registrado no histórico)', 'Cliente não realizou');
+    if (reason === null) return;
+    s.realizationStatus = 'nao-realizado';
+    s.done = false;
+    s.notRealizedAt = new Date().toISOString();
+    s.notRealizedReason = (reason||'').trim() || 'sem motivo informado';
+    s.doneAt = null;
+    pushHistory(r, 'tarefa do treino NÃO realizada', `${s.text||`#${idx+1}`} · ${s.notRealizedReason}`);
+    toast('warn','Tarefa não realizada', s.notRealizedReason);
+  } else if (value === 'reset'){
+    s.realizationStatus = null;
+    s.done = false;
+    s.doneAt = null; s.notRealizedAt = null; s.notRealizedReason = null;
+    pushHistory(r, 'tarefa do treino reaberta', s.text || `#${idx+1}`);
+    toast('info','Tarefa reaberta', s.text);
+  }
+  persist();
+  renderClientCardModal();
+};
+
+/* Edita o texto da tarefa do checklist */
+window.ccTrainTaskEdit = (recordId, idx) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const list = _normalizeChecklist(r);
+  const s = list[idx];
+  if (!s) return;
+  const next = prompt('Editar texto da tarefa:', s.text || '');
+  if (next === null) return;
+  const newText = (next||'').trim();
+  if (!newText){ toast('warn','Texto vazio','Use o botão excluir se quiser remover a tarefa.'); return; }
+  const before = s.text;
+  s.text = newText;
+  pushHistory(r, 'tarefa do treino editada', `"${before||''}" → "${newText}"`);
+  toast('success','Tarefa atualizada');
+  persist();
+  renderClientCardModal();
+};
+
+/* Remove uma tarefa do checklist */
+window.ccTrainTaskRemove = (recordId, idx) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const list = _normalizeChecklist(r);
+  const s = list[idx];
+  if (!s) return;
+  if (!confirm(`Excluir a tarefa "${s.text||'(sem descrição)'}"?\nEssa ação é definitiva.`)) return;
+  list.splice(idx, 1);
+  pushHistory(r, 'tarefa do treino excluída', s.text || `#${idx+1}`);
+  toast('success','Tarefa excluída');
+  persist();
+  renderClientCardModal();
+};
+
+/* Adiciona uma nova tarefa ao checklist do treinamento */
+window.ccTrainTaskAdd = (recordId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const text = prompt('Texto da nova tarefa do treinamento:', '');
+  if (text === null) return;
+  const newText = (text||'').trim();
+  if (!newText){ toast('warn','Texto vazio'); return; }
+  const list = _normalizeChecklist(r);
+  list.push({ text: newText, done:false, createdAt: new Date().toISOString() });
+  pushHistory(r, 'tarefa do treino adicionada', newText);
+  toast('success','Tarefa adicionada', newText);
+  persist();
+  renderClientCardModal();
+};
 
 /* Marca um treinamento confirmado como Realizado ou Não realizado.
    - Realizado → status do registro vai para "atendido" (pronto para virar OS)

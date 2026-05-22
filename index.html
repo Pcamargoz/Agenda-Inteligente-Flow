@@ -1679,6 +1679,427 @@
     background:var(--forest-2);
   }
 
+  /* ============================================================
+     DASHBOARD V3 — Enterprise-grade overhaul
+     Hero metrics + charts + alerts + tables + heatmap + gauge + theme
+     ============================================================ */
+
+  /* Dark theme tokens — aplicados via body[data-theme="dark"] */
+  body[data-theme="dark"]{
+    --paper:#0f1218; --paper-2:#161a23; --paper-3:#1e2330; --paper-4:#252b3a;
+    --ink:#e8eaf0; --ink-2:#c8ccda; --ink-3:#8d93a8; --ink-4:#6a7088;
+    --line:rgba(255,255,255,.06); --line-2:rgba(255,255,255,.12); --line-3:rgba(255,255,255,.22);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.35);
+    --shadow-md:0 4px 14px rgba(0,0,0,.55),0 14px 40px rgba(0,0,0,.5);
+    --shadow-lg:0 28px 72px rgba(0,0,0,.7);
+    --forest-bg:rgba(45,95,63,.18); --amber-bg:rgba(184,99,42,.18);
+    --burgundy-bg:rgba(138,38,56,.18); --indigo-bg:rgba(47,58,120,.22);
+    --champagne-4:rgba(184,137,90,.22); --slate-bg:rgba(82,92,107,.22);
+    --rose-bg:rgba(194,24,91,.16); --rose-bg-2:rgba(194,24,91,.26);
+  }
+  body[data-theme="dark"]{
+    background:var(--paper);
+    background-image:
+      radial-gradient(at 12% 8%,rgba(184,137,90,.06) 0,transparent 40%),
+      radial-gradient(at 88% 92%,rgba(47,58,120,.10) 0,transparent 42%);
+  }
+  body[data-theme="dark"] .sidebar{ background:#070a10; }
+
+  /* Toggle de tema (esfera com sol/lua) */
+  .theme-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border:1px solid var(--line-2);background:var(--paper);
+    border-radius:50%;cursor:pointer;color:var(--ink-3);
+    transition:all .18s ease;
+  }
+  .theme-toggle:hover{ border-color:var(--ink);color:var(--ink); }
+  .theme-toggle svg{ width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8; }
+  body[data-theme="dark"] .theme-toggle .icon-sun{ display:inline; }
+  body[data-theme="dark"] .theme-toggle .icon-moon{ display:none; }
+  body:not([data-theme="dark"]) .theme-toggle .icon-sun{ display:none; }
+  body:not([data-theme="dark"]) .theme-toggle .icon-moon{ display:inline; }
+
+  /* ---------- Container raiz do dashboard novo ---------- */
+  .dash-v3{
+    display:flex;flex-direction:column;gap:18px;margin-bottom:24px;
+    animation:dashFadeIn .35s ease-out;
+  }
+  @keyframes dashFadeIn{
+    from{ opacity:0;transform:translateY(8px); }
+    to{ opacity:1;transform:translateY(0); }
+  }
+
+  /* ---------- Top action bar ---------- */
+  .dash-actionbar{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:14px;align-items:center;
+    background:var(--paper);border:1px solid var(--line-2);border-radius:3px;
+    padding:14px 18px;box-shadow:var(--shadow-sm);
+  }
+  .dab-left{ display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+  .dab-right{ display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+  .dab-quick{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:7px 12px;background:var(--ink);color:var(--paper);
+    border:1px solid var(--ink);border-radius:2px;font-size:11px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+    transition:all .15s ease;
+  }
+  .dab-quick:hover{ background:var(--champagne);border-color:var(--champagne);color:#000; }
+  .dab-quick.alt{
+    background:var(--paper);color:var(--ink-3);border-color:var(--line-2);font-weight:600;
+  }
+  .dab-quick.alt:hover{ color:var(--ink);border-color:var(--ink);background:var(--paper-2); }
+  .dab-quick svg{ width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
+
+  .dab-search{
+    display:flex;align-items:center;gap:8px;
+    background:var(--paper-2);border:1px solid var(--line-2);border-radius:2px;
+    padding:6px 10px;min-width:260px;
+  }
+  .dab-search input{
+    flex:1;background:transparent;border:none;outline:none;font-size:12.5px;color:var(--ink);
+  }
+  .dab-search svg{ width:14px;height:14px;stroke:var(--ink-3);fill:none;stroke-width:2; }
+
+  .dab-chip{
+    padding:6px 11px;background:var(--paper);border:1px solid var(--line-2);
+    border-radius:14px;font-size:10.5px;font-weight:600;color:var(--ink-3);
+    cursor:pointer;letter-spacing:.04em;transition:all .15s ease;
+  }
+  .dab-chip:hover{ border-color:var(--ink-3);color:var(--ink); }
+  .dab-chip.active{
+    background:var(--ink);color:var(--paper);border-color:var(--ink);
+  }
+  .dab-divider{ width:1px;height:24px;background:var(--line-2); }
+
+  .dab-refresh{
+    display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);
+    font-size:10px;color:var(--ink-3);letter-spacing:.06em;
+  }
+  .dab-refresh button{
+    width:30px;height:30px;border:1px solid var(--line-2);background:var(--paper);
+    border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--ink-3);
+  }
+  .dab-refresh button:hover{ color:var(--forest);border-color:var(--forest); }
+  .dab-refresh button svg{ width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
+  .dab-refresh button.spinning svg{ animation:spinAnim 1s linear infinite; }
+  @keyframes spinAnim{ to{ transform:rotate(360deg); } }
+
+  /* ---------- HERO METRICS — cards principais ---------- */
+  .dash-metrics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+  }
+  .dash-metric{
+    position:relative;
+    background:var(--paper);border:1px solid var(--line-2);border-radius:3px;
+    padding:16px 18px;overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:all .2s ease;
+  }
+  .dash-metric:hover{
+    transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--line-3);
+  }
+  .dash-metric .dm-icon{
+    position:absolute;top:14px;right:14px;
+    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    opacity:.92;
+  }
+  .dash-metric .dm-icon svg{ width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2; }
+  .dash-metric .dm-label{
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;margin-bottom:6px;
+  }
+  .dash-metric .dm-value{
+    font-family:var(--font-display);font-size:34px;font-weight:500;letter-spacing:-.02em;
+    color:var(--ink);line-height:1.05;
+  }
+  .dash-metric .dm-value em{ font-style:italic;color:var(--ink-3);font-weight:300;font-size:18px;margin-left:4px; }
+  .dash-metric .dm-sub{
+    margin-top:6px;font-size:11px;color:var(--ink-3);line-height:1.4;
+  }
+  .dash-metric .dm-trend{
+    display:inline-flex;align-items:center;gap:3px;
+    padding:2px 7px;border-radius:8px;font-family:var(--font-mono);
+    font-size:10px;font-weight:700;letter-spacing:.04em;margin-top:8px;
+  }
+  .dash-metric .dm-trend.up{ background:var(--forest-bg);color:var(--forest); }
+  .dash-metric .dm-trend.down{ background:var(--burgundy-bg);color:var(--burgundy); }
+  .dash-metric .dm-trend.flat{ background:var(--slate-bg);color:var(--ink-3); }
+  .dash-metric .dm-trend svg{ width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:3; }
+  .dash-metric.accent-forest{ border-top:3px solid var(--forest); }
+  .dash-metric.accent-forest .dm-icon{ background:var(--forest-bg);color:var(--forest); }
+  .dash-metric.accent-amber{ border-top:3px solid var(--amber-2); }
+  .dash-metric.accent-amber .dm-icon{ background:var(--amber-bg);color:var(--amber); }
+  .dash-metric.accent-indigo{ border-top:3px solid var(--indigo-2); }
+  .dash-metric.accent-indigo .dm-icon{ background:var(--indigo-bg);color:var(--indigo-2); }
+  .dash-metric.accent-burgundy{ border-top:3px solid var(--burgundy); }
+  .dash-metric.accent-burgundy .dm-icon{ background:var(--burgundy-bg);color:var(--burgundy); }
+  .dash-metric.accent-champ{ border-top:3px solid var(--champagne); }
+  .dash-metric.accent-champ .dm-icon{ background:var(--champagne-4);color:var(--champagne); }
+  .dash-metric.accent-rose{ border-top:3px solid var(--rose); }
+  .dash-metric.accent-rose .dm-icon{ background:var(--rose-bg);color:var(--rose); }
+
+  /* Mini sparkline embutida */
+  .dm-spark{
+    margin-top:8px;height:24px;width:100%;
+  }
+  .dm-spark path{ fill:none;stroke-width:1.5; }
+
+  /* ---------- ALERTS strip ---------- */
+  .dash-alerts{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:10px;
+  }
+  .dash-alert{
+    display:flex;align-items:flex-start;gap:10px;
+    background:var(--paper);border:1px solid var(--line-2);border-left:3px solid var(--ink-3);
+    border-radius:2px;padding:11px 14px;
+    transition:all .15s ease;cursor:pointer;
+  }
+  .dash-alert:hover{ background:var(--paper-2);border-color:var(--line-3); }
+  .dash-alert.critical{ border-left-color:var(--burgundy);background:linear-gradient(90deg,var(--burgundy-bg) 0%,var(--paper) 100%); }
+  .dash-alert.warning{ border-left-color:var(--amber-2);background:linear-gradient(90deg,var(--amber-bg) 0%,var(--paper) 100%); }
+  .dash-alert.info{ border-left-color:var(--indigo-2);background:linear-gradient(90deg,var(--indigo-bg) 0%,var(--paper) 100%); }
+  .dash-alert .da-icon{
+    width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;
+    background:var(--paper-2);color:var(--ink-3);font-weight:700;font-size:14px;
+  }
+  .dash-alert.critical .da-icon{ background:var(--burgundy);color:var(--paper); }
+  .dash-alert.warning .da-icon{ background:var(--amber-2);color:var(--paper); }
+  .dash-alert.info .da-icon{ background:var(--indigo-2);color:var(--paper); }
+  .dash-alert .da-body{ min-width:0;flex:1; }
+  .dash-alert .da-title{ font-size:12px;font-weight:700;color:var(--ink);line-height:1.25; }
+  .dash-alert .da-sub{ font-size:10.5px;color:var(--ink-3);margin-top:2px;line-height:1.45; }
+  .dash-alert .da-count{
+    font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--ink);
+    margin-left:auto;line-height:1;align-self:center;
+  }
+
+  /* ---------- Grid de charts ---------- */
+  .dash-charts{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:14px;
+  }
+  .dash-chart{
+    background:var(--paper);border:1px solid var(--line-2);border-radius:3px;
+    padding:14px 16px 16px;box-shadow:var(--shadow-sm);
+    display:flex;flex-direction:column;min-width:0;
+  }
+  .dc-span-4{ grid-column:span 4; }
+  .dc-span-6{ grid-column:span 6; }
+  .dc-span-8{ grid-column:span 8; }
+  .dc-span-12{ grid-column:span 12; }
+  @media (max-width: 1100px){
+    .dc-span-4{ grid-column:span 6; }
+    .dc-span-6{ grid-column:span 12; }
+    .dc-span-8{ grid-column:span 12; }
+  }
+  @media (max-width: 700px){
+    .dc-span-4, .dc-span-6, .dc-span-8{ grid-column:span 12; }
+  }
+  .dash-chart .dch-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
+    margin-bottom:10px;
+  }
+  .dash-chart .dch-title{
+    font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.01em;
+  }
+  .dash-chart .dch-title em{
+    font-style:italic;color:var(--ink-3);font-weight:300;
+  }
+  .dash-chart .dch-sub{
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;margin-top:2px;
+  }
+  .dash-chart .dch-tag{
+    font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+    padding:2px 7px;border-radius:8px;background:var(--paper-2);color:var(--ink-3);font-weight:700;
+  }
+  .dash-chart canvas{ width:100%!important;min-height:0; }
+  .dch-canvas-wrap{ position:relative;min-height:200px;flex:1; }
+  .dch-canvas-wrap.tall{ min-height:280px; }
+  .dch-canvas-wrap.small{ min-height:160px; }
+
+  /* ---------- HEATMAP ---------- */
+  .dash-heatmap{
+    display:grid;grid-template-columns:auto repeat(24,1fr);gap:2px;
+    font-family:var(--font-mono);font-size:8.5px;color:var(--ink-3);
+  }
+  .dhm-corner{ }
+  .dhm-hh{ text-align:center;font-weight:700;letter-spacing:.04em; }
+  .dhm-day{ font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding-right:8px;text-align:right;align-self:center; }
+  .dhm-cell{
+    aspect-ratio:1/1;background:var(--paper-2);border:1px solid var(--line);border-radius:2px;
+    transition:all .12s ease;
+  }
+  .dhm-cell:hover{ transform:scale(1.4);z-index:2;border-color:var(--ink); }
+  .dhm-legend{
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.06em;
+    margin-top:8px;
+  }
+  .dhm-legend-cells{ display:flex;gap:2px; }
+  .dhm-legend-cell{ width:14px;height:14px;border-radius:2px;border:1px solid var(--line); }
+
+  /* ---------- GAUGE ---------- */
+  .dash-gauge{ display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0; }
+  .dash-gauge svg{ width:100%;max-width:260px;height:auto; }
+  .gauge-bg{ fill:none;stroke:var(--paper-2);stroke-width:18;stroke-linecap:round; }
+  .gauge-fg{ fill:none;stroke:var(--forest);stroke-width:18;stroke-linecap:round;transition:stroke-dashoffset .6s ease; }
+  .gauge-fg.warning{ stroke:var(--amber-2); }
+  .gauge-fg.danger{ stroke:var(--burgundy); }
+  .gauge-tip{
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;
+  }
+
+  /* ---------- KPI strip ---------- */
+  .dash-kpis{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:1px;
+    background:var(--line);border:1px solid var(--line-2);border-radius:3px;overflow:hidden;
+  }
+  .dash-kpi-cell{
+    background:var(--paper);padding:14px 18px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .dash-kpi-cell:hover{ background:var(--paper-2); }
+  .dash-kpi-cell .dk-label{
+    font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;
+  }
+  .dash-kpi-cell .dk-value{
+    font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.01em;line-height:1.1;
+  }
+  .dash-kpi-cell .dk-sub{ font-size:10.5px;color:var(--ink-3);line-height:1.4; }
+
+  /* ---------- Tabelas inteligentes ---------- */
+  .dash-table-wrap{
+    background:var(--paper);border:1px solid var(--line-2);border-radius:3px;overflow:hidden;
+    box-shadow:var(--shadow-sm);
+  }
+  .dash-table-head{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    padding:13px 16px;border-bottom:1px solid var(--line-2);background:var(--paper-2);
+  }
+  .dash-table-head h4{
+    font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.01em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dash-table-head h4 em{ font-style:italic;color:var(--ink-3);font-weight:300; }
+  .dash-table-head .dth-search{
+    display:flex;align-items:center;gap:6px;background:var(--paper);border:1px solid var(--line-2);
+    border-radius:2px;padding:4px 8px;
+  }
+  .dash-table-head .dth-search input{
+    background:transparent;border:none;outline:none;font-size:11px;color:var(--ink);width:120px;
+  }
+  .dash-table-head .dth-search svg{ width:11px;height:11px;stroke:var(--ink-3);fill:none;stroke-width:2; }
+  .dash-table{ width:100%;border-collapse:collapse; }
+  .dash-table thead th{
+    font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700;padding:9px 14px;text-align:left;
+    background:var(--paper-2);border-bottom:1px solid var(--line-2);cursor:pointer;
+    white-space:nowrap;
+  }
+  .dash-table thead th:hover{ color:var(--ink); }
+  .dash-table thead th.sorted-asc::after{ content:" ↑";color:var(--champagne); }
+  .dash-table thead th.sorted-desc::after{ content:" ↓";color:var(--champagne); }
+  .dash-table tbody td{
+    padding:9px 14px;font-size:11.5px;color:var(--ink-2);border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  .dash-table tbody tr:hover{ background:var(--paper-2); }
+  .dash-table tbody tr.overdue{ background:linear-gradient(90deg,var(--burgundy-bg) 0%,transparent 80%); }
+  .dash-table tbody tr.overdue td:first-child{ border-left:3px solid var(--burgundy); }
+  .dash-table .dtt-empty{
+    text-align:center;padding:24px;color:var(--ink-3);font-style:italic;
+  }
+  .dash-table .dtt-pager{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    padding:9px 14px;font-family:var(--font-mono);font-size:10px;color:var(--ink-3);
+    background:var(--paper-2);border-top:1px solid var(--line);
+  }
+  .dtt-pager button{
+    width:24px;height:24px;border:1px solid var(--line-2);background:var(--paper);
+    color:var(--ink-3);border-radius:2px;cursor:pointer;display:grid;place-items:center;font-size:11px;
+  }
+  .dtt-pager button:hover:not(:disabled){ border-color:var(--ink);color:var(--ink); }
+  .dtt-pager button:disabled{ opacity:.4;cursor:default; }
+
+  /* Pill compacta para tabelas (status/tipo) */
+  .dtt-pill{
+    display:inline-block;padding:2px 8px;border-radius:8px;
+    font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  }
+  .dtt-pill.kind-treinamento{ background:var(--forest-bg);color:var(--forest); }
+  .dtt-pill.kind-tarefa{ background:var(--indigo-bg);color:var(--indigo-2); }
+  .dtt-pill.kind-atendimento{ background:var(--rose-bg);color:var(--rose); }
+  .dtt-pill.kind-evento{ background:var(--slate-bg);color:var(--ink-3); }
+
+  /* ---------- Mini calendário ---------- */
+  .mini-calendar{
+    display:grid;grid-template-columns:repeat(7,1fr);gap:2px;
+    font-family:var(--font-mono);font-size:9.5px;
+  }
+  .mc-dow{ text-align:center;font-weight:700;color:var(--ink-3);letter-spacing:.06em;padding:4px 0; }
+  .mc-day{
+    aspect-ratio:1/1;display:grid;place-items:center;position:relative;
+    background:var(--paper-2);border:1px solid var(--line);border-radius:2px;
+    color:var(--ink-2);cursor:default;font-size:11px;font-family:var(--font-display);font-weight:500;
+  }
+  .mc-day.empty{ background:transparent;border-color:transparent; }
+  .mc-day.today{ border-color:var(--champagne);color:var(--ink);font-weight:700; }
+  .mc-day.has-events::after{
+    content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+    width:5px;height:5px;border-radius:50%;background:var(--champagne);
+  }
+  .mc-day.density-1{ background:var(--forest-bg); }
+  .mc-day.density-2{ background:var(--amber-bg); }
+  .mc-day.density-3{ background:var(--burgundy-bg);color:var(--burgundy);font-weight:700; }
+
+  /* ---------- Timeline da semana ---------- */
+  .dash-timeline{ display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding-right:4px; }
+  .dt-row{ display:grid;grid-template-columns:80px 1fr;gap:12px;align-items:flex-start; }
+  .dt-day{
+    text-align:right;
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-3);padding-top:7px;line-height:1.4;
+  }
+  .dt-day b{ display:block;font-family:var(--font-display);font-size:18px;color:var(--ink);font-weight:500;letter-spacing:-.01em; }
+  .dt-events{ display:flex;flex-direction:column;gap:4px;border-left:1px dashed var(--line-2);padding-left:12px; }
+  .dt-event{
+    display:flex;align-items:center;gap:8px;
+    background:var(--paper-2);border:1px solid var(--line);border-left:3px solid var(--ink-3);
+    border-radius:2px;padding:6px 10px;font-size:11px;color:var(--ink);
+  }
+  .dt-event.kind-treinamento{ border-left-color:var(--forest); }
+  .dt-event.kind-tarefa{ border-left-color:var(--indigo-2); }
+  .dt-event.kind-atendimento{ border-left-color:var(--rose); }
+  .dt-event .dt-time{
+    font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3);min-width:56px;
+  }
+  .dt-event .dt-title{ flex:1;min-width:0;font-weight:600;font-size:11.5px; }
+  .dt-event .dt-meta{ font-family:var(--font-mono);font-size:9px;color:var(--ink-3); }
+
+  /* ---------- Skeleton loading ---------- */
+  .skeleton{
+    background:linear-gradient(90deg,var(--paper-2) 25%,var(--paper-3) 50%,var(--paper-2) 75%);
+    background-size:200% 100%;animation:skeletonShimmer 1.4s infinite linear;
+    border-radius:3px;
+  }
+  @keyframes skeletonShimmer{
+    0%{ background-position:200% 0; }
+    100%{ background-position:-200% 0; }
+  }
+
   /* ============ SALDO DE HORAS — aba dedicada do card do cliente ============ */
   .cc-hours-wrap{ padding:18px 24px 6px; }
   .cc-hours-metrics{
@@ -1925,6 +2346,38 @@
   }
   .cc-train-tasks-foot button.ctt-add:hover{ background:var(--forest);color:var(--paper); }
   .cc-train-tasks-foot button.ctt-add svg{ width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2; }
+
+  /* Tarefa — toggle Realizado / Não realizado inline (compacto) na linha de ações.
+     Reutiliza .train-toggle visualmente mas usa indigo como cor ativa. */
+  .tarefa-toggle{
+    display:inline-flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden;
+    background:var(--paper);
+  }
+  .tarefa-toggle button{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:5px 10px;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    color:var(--ink-3);background:var(--paper);
+    border:none;border-right:1px solid var(--line-2);cursor:pointer;
+    transition:all .15s ease;font-family:inherit;
+  }
+  .tarefa-toggle button:last-child{border-right:none}
+  .tarefa-toggle button.ok:hover{background:var(--forest-bg);color:var(--forest)}
+  .tarefa-toggle button.no:hover{background:var(--burgundy-bg);color:var(--burgundy)}
+  .tarefa-toggle button svg{stroke:currentColor;fill:none;width:11px;height:11px;stroke-width:2.4}
+  .cc-item.tarefa-realized{
+    background:linear-gradient(180deg,var(--forest-bg) 0%,var(--paper) 100%);
+    border-left-color:var(--forest)!important;
+  }
+  .cc-item.tarefa-realized .cc-item-info b{ color:var(--forest); }
+  .cc-item.tarefa-realized .cc-item-info b::after{ content:" ✓";color:var(--forest);font-weight:700; }
+  .tarefa-badge-decided{
+    display:inline-flex;align-items:center;gap:5px;
+    font-family:var(--font-mono);font-size:9.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;padding:4px 9px;border-radius:2px;
+  }
+  .tarefa-badge-decided.realized{ background:var(--forest-bg);color:var(--forest);border:1px solid var(--forest); }
+  .tarefa-badge-decided.not-realized{ background:var(--burgundy-bg);color:var(--burgundy);border:1px solid var(--burgundy); }
+  .tarefa-badge-decided svg{ stroke:currentColor;fill:none;width:11px;height:11px;stroke-width:2.6; }
 
   /* Atendimento "ativo" — mesma estrutura do treinamento confirmado, em ROSA */
   .cc-item.confirmed-atendimento{
@@ -2406,6 +2859,9 @@
 
     <!-- ============ VIEW: DASHBOARD ============ -->
     <section class="view" id="view-dashboard">
+      <!-- ============ DASHBOARD V3 — enterprise-grade panel ============ -->
+      <div id="dashV3"></div>
+
       <div class="kpi-grid" id="kpiGrid"></div>
 
       <!-- Filtros avançados -->
@@ -10243,6 +10699,59 @@ window.ccSetAtendimentoRealization = (src, id, value) => {
   renderClientKanban();
 };
 
+/* Marca uma TAREFA como Realizada ou Não realizada — análogo a treinamento/atendimento.
+   - Realizado → status='concluido', realizationStatus='realizado' (tarefa não passa por "atendido")
+   - Não realizado → status='cancelado' + motivo
+   - reset → volta para "em-andamento", limpa flags
+   Também dispara o débito/estorno automático de horas via chargeCardForRecord. */
+window.ccSetTarefaRealization = (src, id, value) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  let target = null;
+  if (src === 'record') target = RECORDS.find(r => r.id === id);
+  else if (src === 'event') target = EVENTS.find(e => e.id === id);
+  if (!target){ toast('error','Tarefa não encontrada'); return; }
+
+  if (value === 'realizado'){
+    const before = target.status;
+    target.realizationStatus = 'realizado';
+    target.realizedAt = new Date().toISOString();
+    target.status = 'concluido';
+    if (typeof pushHistory === 'function') pushHistory(target, 'tarefa realizada', `${before} → concluido`);
+    toast('success','Tarefa realizada', target.title || '');
+  } else if (value === 'nao-realizado'){
+    const reason = prompt(
+      'Tarefa NÃO realizada — descreva o motivo (será registrado no histórico):',
+      'Cliente decidiu não realizar agora'
+    );
+    if (reason === null) return;
+    const before = target.status;
+    target.realizationStatus = 'nao-realizado';
+    target.notRealizedAt = new Date().toISOString();
+    target.status = 'cancelado';
+    target.canceledReason = (reason||'').trim() || 'Marcada como não realizada no card';
+    target.encerradoMotivo = target.canceledReason;
+    target.encerradoEm = target.notRealizedAt;
+    if (typeof pushHistory === 'function') pushHistory(target, 'tarefa NÃO realizada', `${before} → cancelado · ${target.canceledReason}`);
+    toast('warn','Tarefa não realizada', target.canceledReason);
+  } else if (value === 'reset'){
+    const before = target.status;
+    target.realizationStatus = null;
+    target.realizedAt = null;
+    target.notRealizedAt = null;
+    target.canceledReason = null;
+    target.encerradoMotivo = null;
+    target.encerradoEm = null;
+    target.status = 'em-andamento';
+    if (typeof pushHistory === 'function') pushHistory(target, 'tarefa reaberta', `${before} → em-andamento`);
+    toast('info','Tarefa reaberta','Volte a decidir entre Realizado / Não realizado.');
+  }
+  /* Débito/estorno automático do saldo de horas */
+  if (src === 'record' && typeof chargeCardForRecord === 'function') chargeCardForRecord(target);
+  persist();
+  renderClientCardModal();
+  renderClientKanban();
+};
+
 /* Abre a OS vinculada a um item do card (treinamento já realizado). */
 window.ccOpenOSForItem = (src, id) => {
   if (typeof ORDERS_SERVICE === 'undefined') return;
@@ -11450,8 +11959,35 @@ renderCcItem = function(it, card){
     ? 'Em atendimento'
     : (st.label || it.status || '—');
 
+  /* Toggle Realizado / Não realizado para TAREFAS (também válido para itens ainda não decididos).
+     Detecta se já foi decidido por status terminal ou por flag realizationStatus. */
+  const isTarefa = it.kind === 'tarefa';
+  const tarefaRealized = isTarefa && (raw.realizationStatus === 'realizado' || it.status === 'concluido' || it.status === 'atendido');
+  const tarefaNotRealized = isTarefa && (raw.realizationStatus === 'nao-realizado');
+  const tarefaDecided = tarefaRealized || tarefaNotRealized;
+  const tarefaTogglerHTML = !isTarefa ? '' : tarefaRealized ? `
+    <span class="tarefa-badge-decided realized" title="Tarefa realizada">
+      <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Realizado
+    </span>
+  ` : tarefaNotRealized ? `
+    <span class="tarefa-badge-decided not-realized" title="Tarefa não realizada">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg> Não realizado
+    </span>
+  ` : `
+    <div class="tarefa-toggle" role="group" aria-label="Status da tarefa">
+      <button type="button" class="ok" onclick="ccSetTarefaRealization('${it._src}','${it.id}','realizado')" title="Marcar como realizado">
+        <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+        Realizado
+      </button>
+      <button type="button" class="no" onclick="ccSetTarefaRealization('${it._src}','${it.id}','nao-realizado')" title="Marcar como NÃO realizado">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        Não realizado
+      </button>
+    </div>
+  `;
+
   return `
-    <div class="cc-item ${it.kind}${linkedAtend?' linked-atendimento':''}">
+    <div class="cc-item ${it.kind}${linkedAtend?' linked-atendimento':''}${tarefaRealized?' tarefa-realized':''}">
       <div class="cc-item-icon">${it.kind==='atendimento'?'●':it.kind==='treinamento'?'✦':'☰'}</div>
       <div class="cc-item-info">
         <b>${it.title}</b>
@@ -11464,6 +12000,7 @@ renderCcItem = function(it, card){
         ${STATUSES.map(s => `<option value="${s.id}" ${it.status===s.id?'selected':''}>${s.label}</option>`).join('')}
       </select>
       <div class="cc-item-actions">
+        ${tarefaTogglerHTML}
         ${linkedAtend ? `
         <button title="Abrir atendimento vinculado · ${linkedAtend.title.replace(/"/g,'&quot;')}" onclick="ccOpenLinkedAtendimento('${linkedAtend.id}')" style="background:var(--amber-bg);border-color:var(--amber-2);color:var(--amber)">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 19V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2zM8 7h6M8 11h4"/></svg>
@@ -11477,6 +12014,10 @@ renderCcItem = function(it, card){
         </button>
         <button title="Encerrar tarefa" onclick="ccEncerrarItem('${it._src}','${it.id}','${card.id}')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+        </button>` : ''}
+        ${isTarefa && tarefaDecided ? `
+        <button title="Reabrir (voltar para não decidido)" onclick="ccSetTarefaRealization('${it._src}','${it.id}','reset')">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 10 15 10"/></svg>
         </button>` : ''}
         <button class="pend-btn ${(it.raw&&it.raw.inPendencias)?'on':''}" title="${(it.raw&&it.raw.inPendencias)?'Remover de Pendências':'Enviar para a aba Pendências'}" onclick="ccSendToPendencias('${it._src}','${it.id}')">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -11555,6 +12096,10 @@ renderDashboard = function(){
   renderDashFavViews();
   renderDashPendingTasks();
   renderDashApprovalsSummary();
+  /* Dashboard V3 — painel enterprise-grade no topo */
+  if (typeof renderDashboardV3 === 'function'){
+    try { renderDashboardV3(); } catch(e){ console.warn('Falha renderDashboardV3:', e); }
+  }
 };
 
 /* Widget: tarefas pendentes de data (em todos os cronogramas ativos) */
@@ -12073,6 +12618,1179 @@ function buildBatchTrainingEmail(trainings, c, co){
 </body></html>`;
 }
 
+/* ============================================================
+   DASHBOARD V3 — Enterprise-grade panel
+   Carregador Chart.js + estado + helpers + render
+   ============================================================ */
+
+/* Carregador lazy do Chart.js — mesma estratégia do html2pdf */
+async function ensureChartJS(){
+  if (typeof Chart !== 'undefined') return true;
+  const tryLoad = (src) => new Promise((resolve, reject) => {
+    const sc = document.createElement('script');
+    sc.src = src;
+    sc.onload  = () => resolve(true);
+    sc.onerror = () => reject(new Error('falhou carregar ' + src));
+    document.head.appendChild(sc);
+  });
+  const candidates = [
+    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
+    'https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js',
+  ];
+  for (const src of candidates){
+    try { await tryLoad(src); if (typeof Chart !== 'undefined') return true; } catch(e){ /* tenta o próximo */ }
+  }
+  return typeof Chart !== 'undefined';
+}
+
+/* Estado do dashboard V3 */
+state.dashV3 = state.dashV3 || {
+  period: 'month',          /* hoje | week | month | quarter | year | custom */
+  customFrom: null,
+  customTo: null,
+  search: '',
+  lastUpdate: null,
+  charts: {},                /* instâncias Chart.js — para destruir antes de re-render */
+  tablePages: {},            /* paginação por tabela */
+  tableSort: {},             /* ordenação por tabela */
+};
+
+/* Tema persistido */
+function applySavedTheme(){
+  try {
+    const t = localStorage.getItem('atelier_theme') || 'light';
+    if (t === 'dark') document.body.setAttribute('data-theme', 'dark');
+  } catch(e){}
+}
+function toggleTheme(){
+  const cur = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  if (next === 'dark') document.body.setAttribute('data-theme', 'dark');
+  else                 document.body.removeAttribute('data-theme');
+  try { localStorage.setItem('atelier_theme', next); } catch(e){}
+  /* Re-render dashboard para gráficos pegarem novas cores */
+  if (state.view === 'dashboard' && typeof renderDashboardV3 === 'function') renderDashboardV3();
+}
+applySavedTheme();
+
+/* Helpers de período */
+function dashPeriodBounds(period){
+  const now = new Date();
+  let from, to;
+  const startOfDay = (d) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+  const endOfDay   = (d) => { const x = new Date(d); x.setHours(23,59,59,999); return x; };
+  if (period === 'today'){
+    from = startOfDay(now); to = endOfDay(now);
+  } else if (period === 'week'){
+    const d = new Date(now);
+    const dow = d.getDay();
+    d.setDate(d.getDate() - dow);
+    from = startOfDay(d);
+    const end = new Date(from); end.setDate(end.getDate()+6);
+    to = endOfDay(end);
+  } else if (period === 'month'){
+    from = startOfDay(new Date(now.getFullYear(), now.getMonth(), 1));
+    to   = endOfDay(new Date(now.getFullYear(), now.getMonth()+1, 0));
+  } else if (period === 'quarter'){
+    const q = Math.floor(now.getMonth()/3);
+    from = startOfDay(new Date(now.getFullYear(), q*3, 1));
+    to   = endOfDay(new Date(now.getFullYear(), q*3+3, 0));
+  } else if (period === 'year'){
+    from = startOfDay(new Date(now.getFullYear(), 0, 1));
+    to   = endOfDay(new Date(now.getFullYear(), 11, 31));
+  } else if (period === 'custom' && state.dashV3.customFrom && state.dashV3.customTo){
+    from = startOfDay(parseISO(state.dashV3.customFrom));
+    to   = endOfDay(parseISO(state.dashV3.customTo));
+  } else {
+    from = startOfDay(new Date(now.getFullYear(), now.getMonth(), 1));
+    to   = endOfDay(new Date(now.getFullYear(), now.getMonth()+1, 0));
+  }
+  /* Período anterior (mesmo span imediatamente antes) */
+  const span = to.getTime() - from.getTime();
+  const prevTo   = new Date(from.getTime() - 1);
+  const prevFrom = new Date(prevTo.getTime() - span);
+  return { from, to, prevFrom, prevTo, span };
+}
+const dashISO = (d) => d.toISOString().slice(0,10);
+const inRange = (iso, from, to) => iso >= dashISO(from) && iso <= dashISO(to);
+
+/* Coleta de itens (record+event) com filtros do dashboard aplicados */
+function dashCollectItems(){
+  const items = [];
+  RECORDS.forEach(r => items.push({ src:'record', id:r.id, kind:r.kind, title:r.title, status:r.status, date:r.date,
+    timeStart:r.timeStart, timeEnd:r.timeEnd, companyId:r.companyId, consultantId:r.consultantId, priority:r.priority,
+    createdAt:r.createdAt, raw:r }));
+  EVENTS.forEach(e => items.push({ src:'event', id:e.id, kind:(e.typeId==='treinamento'||e.typeId==='tarefa'||e.typeId==='atendimento'?e.typeId:'evento'),
+    title:e.title, status:e.status, date:e.date, timeStart:e.timeStart, timeEnd:e.timeEnd,
+    companyId:e.companyId, consultantId:e.consultantId, raw:e }));
+  return items;
+}
+
+function _durationMinutes(it){
+  if (!it.timeStart || !it.timeEnd) return 0;
+  const ms = parseInt(it.timeStart.slice(0,2))*60 + parseInt(it.timeStart.slice(3));
+  const me = parseInt(it.timeEnd.slice(0,2))*60 + parseInt(it.timeEnd.slice(3));
+  return me > ms ? (me - ms) : 0;
+}
+
+/* Tema atual (para cores dos gráficos) */
+function _themeColors(){
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const css = getComputedStyle(document.body);
+  const v = (k, fallback) => (css.getPropertyValue(k) || '').trim() || fallback;
+  return {
+    isDark,
+    ink:    v('--ink',    isDark ? '#e8eaf0' : '#14171f'),
+    ink3:   v('--ink-3',  isDark ? '#8d93a8' : '#4a4f5e'),
+    line:   v('--line-2', isDark ? 'rgba(255,255,255,.12)' : 'rgba(20,23,31,.16)'),
+    paper:  v('--paper',  isDark ? '#0f1218' : '#f4efe6'),
+    forest: v('--forest', '#2d5f3f'),
+    amber:  v('--amber',  '#b8632a'),
+    amber2: v('--amber-2','#c87533'),
+    indigo: v('--indigo-2','#4555a3'),
+    burg:   v('--burgundy','#8a2638'),
+    champ:  v('--champagne','#b8895a'),
+    rose:   v('--rose',   '#c2185b'),
+    slate:  v('--slate',  '#525c6b'),
+  };
+}
+
+/* Destrói gráficos existentes antes de re-renderizar */
+function _destroyDashCharts(){
+  Object.values(state.dashV3.charts).forEach(ch => { try { ch.destroy(); } catch(e){} });
+  state.dashV3.charts = {};
+}
+
+/* ============================================================
+   RENDER PRINCIPAL DO DASHBOARD V3
+   Monta toda a estrutura no #dashV3 e dispara render dos gráficos
+   ============================================================ */
+async function renderDashboardV3(){
+  const root = document.getElementById('dashV3');
+  if (!root) return;
+
+  /* Garante Chart.js carregado — não bloqueia render (gráficos entram async) */
+  ensureChartJS();
+
+  /* Recolhe dados base */
+  const { from, to, prevFrom, prevTo } = dashPeriodBounds(state.dashV3.period);
+  const allItems = dashCollectItems();
+  const inP  = allItems.filter(i => i.date && inRange(i.date, from, to));
+  const inPP = allItems.filter(i => i.date && inRange(i.date, prevFrom, prevTo));
+
+  /* === Métricas principais === */
+  /* Clientes ativos: cards não-arquivados */
+  const activeCards     = CLIENT_CARDS.filter(c => !c.archived);
+  const inactiveCards   = CLIENT_CARDS.filter(c =>  c.archived);
+  const newCardsInPeriod = activeCards.filter(c => c.createdAt && inRange(c.createdAt.slice(0,10), from, to)).length;
+  const newCardsPrev     = activeCards.filter(c => c.createdAt && inRange(c.createdAt.slice(0,10), prevFrom, prevTo)).length;
+
+  const tasks   = inP.filter(i => i.kind === 'tarefa');
+  const tasksDone   = tasks.filter(i => i.status === 'concluido').length;
+  const tasksDoing  = tasks.filter(i => i.status === 'em-andamento' || i.status === 'em-atendimento').length;
+  const todayIso = dashISO(new Date());
+  const tasksOverdue = allItems.filter(i => i.kind === 'tarefa' && i.date && i.date < todayIso && !['concluido','cancelado','reagendado','atendido'].includes(i.status)).length;
+  const tasksDonePrev = inPP.filter(i => i.kind === 'tarefa' && i.status === 'concluido').length;
+
+  const trainsP   = inP.filter(i => i.kind === 'treinamento' && (i.status === 'atendido' || i.status === 'concluido')).length;
+  const trainsPPrev = inPP.filter(i => i.kind === 'treinamento' && (i.status === 'atendido' || i.status === 'concluido')).length;
+
+  let hoursUsed = 0, hoursContracted = 0;
+  CLIENT_CARDS.forEach(c => {
+    if (typeof cardHoursStats === 'function'){
+      const st = cardHoursStats(c);
+      hoursContracted += (st.credited || 0);
+      hoursUsed       += (st.debited  || 0);
+    }
+  });
+  const hoursAvail = hoursContracted - hoursUsed;
+  const hoursUsagePct = hoursContracted > 0 ? Math.round((hoursUsed/hoursContracted)*100) : 0;
+
+  const totalAll   = inP.length;
+  const totalDone  = inP.filter(i => i.status === 'concluido' || i.status === 'atendido').length;
+  const completionPct = totalAll > 0 ? Math.round((totalDone/totalAll)*100) : 0;
+  const totalAllPrev   = inPP.length;
+  const totalDonePrev  = inPP.filter(i => i.status === 'concluido' || i.status === 'atendido').length;
+  const completionPctPrev = totalAllPrev > 0 ? Math.round((totalDonePrev/totalAllPrev)*100) : 0;
+
+  const trendDelta = (cur, prev) => {
+    if (prev === 0 && cur === 0) return { val: 0, dir: 'flat' };
+    if (prev === 0) return { val: 100, dir: 'up' };
+    const d = Math.round(((cur - prev)/Math.max(1,prev))*100);
+    return { val: Math.abs(d), dir: d > 0 ? 'up' : d < 0 ? 'down' : 'flat' };
+  };
+
+  const tCli  = trendDelta(newCardsInPeriod, newCardsPrev);
+  const tDone = trendDelta(tasksDone, tasksDonePrev);
+  const tTrain= trendDelta(trainsP, trainsPPrev);
+  const tHours= trendDelta(hoursUsed, (() => {
+    /* horas usadas no período anterior — soma dos debits cujo ts está em prev */
+    let sum = 0;
+    CLIENT_CARDS.forEach(c => {
+      (c.hoursLog||[]).filter(m => m.type === 'debit' && m.ts && inRange(m.ts.slice(0,10), prevFrom, prevTo))
+        .forEach(m => sum += (m.hours||0));
+    });
+    return sum;
+  })());
+  const tComp = trendDelta(completionPct, completionPctPrev);
+
+  const trendIcon = (dir) => dir === 'up' ? '↑' : dir === 'down' ? '↓' : '→';
+  const fmtH = (n) => `${(Math.round(n*10)/10).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}h`;
+
+  const periodChip = (id, label) => `<span class="dab-chip ${state.dashV3.period === id ? 'active' : ''}" onclick="dashV3SetPeriod('${id}')">${label}</span>`;
+
+  const lastUpdateStr = state.dashV3.lastUpdate ? fmtDateTime(state.dashV3.lastUpdate) : '—';
+
+  /* ====== ALERTS ====== */
+  const alertCriticalCards = CLIENT_CARDS.filter(c => {
+    if (c.archived) return false;
+    const st = cardHoursStats(c);
+    return st.credited > 0 && (st.lowAlert || st.negative);
+  });
+  const in48 = new Date(); in48.setDate(in48.getDate() + 2);
+  const in48Iso = dashISO(in48);
+  const dueSoon = allItems.filter(i => (i.kind === 'tarefa' || i.kind === 'treinamento') && i.date && i.date >= todayIso && i.date <= in48Iso && !['concluido','cancelado','reagendado','atendido'].includes(i.status));
+  const trainsNoDate = allItems.filter(i => i.kind === 'treinamento' && !i.date && !['cancelado','reagendado'].includes(i.status));
+  const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 14);
+  const sevenDaysAgoIso = dashISO(sevenDaysAgo);
+  const stagnant = activeCards.filter(c => {
+    const events = allItems.filter(i => i.companyId === c.companyId);
+    const lastDate = events.map(i => i.date).filter(Boolean).sort().pop();
+    return !lastDate || lastDate < sevenDaysAgoIso;
+  });
+
+  /* HTML do esqueleto principal */
+  root.innerHTML = `
+    <div class="dash-v3">
+
+      <!-- ============ Action Bar ============ -->
+      <div class="dash-actionbar">
+        <div class="dab-left">
+          <button class="dab-quick" onclick="openNewCardModal()" title="Criar novo card de cliente">
+            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+            Novo cliente
+          </button>
+          <button class="dab-quick alt" onclick="openRegistroModal(null,'tarefa')" title="Criar nova tarefa">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Nova tarefa
+          </button>
+          <button class="dab-quick alt" onclick="openRegistroModal(null,'treinamento')" title="Criar novo treinamento">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>
+            Novo treinamento
+          </button>
+          <button class="dab-quick alt" onclick="switchView('cronogramas')" title="Ir para Cronogramas">
+            <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            Enviar agenda
+          </button>
+
+          <div class="dab-divider"></div>
+
+          <div class="dab-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input id="dashV3Search" type="text" placeholder="Buscar clientes, tarefas, treinamentos…" value="${(state.dashV3.search||'').replace(/"/g,'&quot;')}"/>
+          </div>
+        </div>
+        <div class="dab-right">
+          ${periodChip('today','Hoje')}
+          ${periodChip('week','Semana')}
+          ${periodChip('month','Mês')}
+          ${periodChip('quarter','Trimestre')}
+          ${periodChip('year','Ano')}
+          ${periodChip('custom','Personalizado')}
+          <div class="dab-divider"></div>
+          <div class="dab-refresh">
+            <span>Atualizado: <b>${lastUpdateStr}</b></span>
+            <button id="dashV3Refresh" title="Atualizar agora">
+              <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </button>
+          </div>
+          <button class="theme-toggle" id="dashThemeToggle" title="Alternar tema (claro/escuro)">
+            <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ Hero Metrics ============ -->
+      <div class="dash-metrics">
+
+        <div class="dash-metric accent-indigo">
+          <div class="dm-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="dm-label">Clientes ativos</div>
+          <div class="dm-value">${pad(activeCards.length)}</div>
+          <div class="dm-sub"><b>${newCardsInPeriod}</b> novos no período · <b>${inactiveCards.length}</b> arquivados</div>
+          <div class="dm-trend ${tCli.dir}">${trendIcon(tCli.dir)} ${tCli.val}% vs anterior</div>
+        </div>
+
+        <div class="dash-metric accent-forest">
+          <div class="dm-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <div class="dm-label">Tarefas concluídas</div>
+          <div class="dm-value">${pad(tasksDone)}</div>
+          <div class="dm-sub"><b>${tasksDoing}</b> em andamento · <b style="color:var(--burgundy)">${tasksOverdue}</b> atrasada(s)</div>
+          <div class="dm-trend ${tDone.dir}">${trendIcon(tDone.dir)} ${tDone.val}% vs anterior</div>
+        </div>
+
+        <div class="dash-metric accent-amber">
+          <div class="dm-icon">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>
+          </div>
+          <div class="dm-label">Treinamentos no período</div>
+          <div class="dm-value">${pad(trainsP)}</div>
+          <div class="dm-sub">realizados / atendidos</div>
+          <div class="dm-trend ${tTrain.dir}">${trendIcon(tTrain.dir)} ${tTrain.val}% vs anterior</div>
+        </div>
+
+        <div class="dash-metric accent-champ">
+          <div class="dm-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="dm-label">Saldo de horas</div>
+          <div class="dm-value">${fmtH(hoursAvail)} <em>/ ${fmtH(hoursContracted)}</em></div>
+          <div class="dm-sub"><b>${fmtH(hoursUsed)}</b> consumidas · <b>${hoursUsagePct}%</b> do contrato</div>
+          <div class="dm-trend ${tHours.dir}">${trendIcon(tHours.dir)} ${tHours.val}% consumo vs anterior</div>
+        </div>
+
+        <div class="dash-metric accent-rose">
+          <div class="dm-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="dm-label">Taxa de conclusão</div>
+          <div class="dm-value">${completionPct}<em>%</em></div>
+          <div class="dm-sub"><b>${totalDone}</b> de <b>${totalAll}</b> itens no período</div>
+          <div class="dm-trend ${tComp.dir}">${trendIcon(tComp.dir)} ${tComp.val}pp vs anterior</div>
+        </div>
+
+        <div class="dash-metric accent-burgundy">
+          <div class="dm-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <div class="dm-label">Contratos ativos (carga)</div>
+          <div class="dm-value">${fmtH(hoursContracted)}</div>
+          <div class="dm-sub"><b>${activeCards.filter(c => (c.hoursContracted||0) > 0).length}</b> clientes com contrato definido</div>
+          <div class="dm-trend flat">${trendIcon('flat')} estável</div>
+        </div>
+
+      </div>
+
+      <!-- ============ Alerts Panel ============ -->
+      <div class="dash-alerts" id="dashV3Alerts">
+        <div class="dash-alert critical" onclick="dashV3FocusAlert('critical')">
+          <div class="da-icon">!</div>
+          <div class="da-body">
+            <div class="da-title">Saldo de horas crítico</div>
+            <div class="da-sub">${alertCriticalCards.length === 0 ? 'Nenhum cliente com saldo baixo' : `${alertCriticalCards.length} cliente(s) abaixo do limite ou negativo(s)`}</div>
+          </div>
+          <div class="da-count">${pad(alertCriticalCards.length)}</div>
+        </div>
+        <div class="dash-alert warning" onclick="dashV3FocusAlert('due')">
+          <div class="da-icon">⏱</div>
+          <div class="da-body">
+            <div class="da-title">Prazo nas próximas 48h</div>
+            <div class="da-sub">${dueSoon.length === 0 ? 'Sem prazos próximos' : `${dueSoon.length} item(ns) com data nos próximos 2 dias`}</div>
+          </div>
+          <div class="da-count">${pad(dueSoon.length)}</div>
+        </div>
+        <div class="dash-alert info" onclick="dashV3FocusAlert('noDate')">
+          <div class="da-icon">✦</div>
+          <div class="da-body">
+            <div class="da-title">Treinamentos sem agendamento</div>
+            <div class="da-sub">${trainsNoDate.length === 0 ? 'Tudo agendado' : `${trainsNoDate.length} treinamento(s) aguardando data`}</div>
+          </div>
+          <div class="da-count">${pad(trainsNoDate.length)}</div>
+        </div>
+        <div class="dash-alert" onclick="dashV3FocusAlert('stagnant')">
+          <div class="da-icon">○</div>
+          <div class="da-body">
+            <div class="da-title">Clientes sem movimentação</div>
+            <div class="da-sub">${stagnant.length === 0 ? 'Todos com atividade recente' : `${stagnant.length} cliente(s) há mais de 14 dias sem atividade`}</div>
+          </div>
+          <div class="da-count">${pad(stagnant.length)}</div>
+        </div>
+      </div>
+
+      <!-- ============ Charts Grid ============ -->
+      <div class="dash-charts">
+        <div class="dash-chart dc-span-8">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Tarefas concluídas <em>no tempo</em></div>
+              <div class="dch-sub">Evolução diária / semanal / mensal</div>
+            </div>
+            <span class="dch-tag">LINHA</span>
+          </div>
+          <div class="dch-canvas-wrap tall"><canvas id="chTasksTime"></canvas></div>
+        </div>
+
+        <div class="dash-chart dc-span-4">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Tarefas <em>por status</em></div>
+              <div class="dch-sub">Distribuição atual</div>
+            </div>
+            <span class="dch-tag">DONUT</span>
+          </div>
+          <div class="dch-canvas-wrap tall"><canvas id="chTasksStatus"></canvas></div>
+        </div>
+
+        <div class="dash-chart dc-span-6">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Treinamentos <em>por cliente</em></div>
+              <div class="dch-sub">Realizados no período · Top 8</div>
+            </div>
+            <span class="dch-tag">BARRAS</span>
+          </div>
+          <div class="dch-canvas-wrap"><canvas id="chTrainByClient"></canvas></div>
+        </div>
+
+        <div class="dash-chart dc-span-6">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Consumo de <em>horas no tempo</em></div>
+              <div class="dch-sub">Débitos acumulados</div>
+            </div>
+            <span class="dch-tag">ÁREA</span>
+          </div>
+          <div class="dch-canvas-wrap"><canvas id="chHoursTime"></canvas></div>
+        </div>
+
+        <div class="dash-chart dc-span-6">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Ranking de <em>clientes</em></div>
+              <div class="dch-sub">Por total de atividades no período</div>
+            </div>
+            <span class="dch-tag">HORIZONTAL</span>
+          </div>
+          <div class="dch-canvas-wrap"><canvas id="chRankClients"></canvas></div>
+        </div>
+
+        <div class="dash-chart dc-span-6">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Funil de <em>clientes</em></div>
+              <div class="dch-sub">Distribuição por etapa do processo</div>
+            </div>
+            <span class="dch-tag">FUNIL</span>
+          </div>
+          <div class="dch-canvas-wrap"><canvas id="chFunnel"></canvas></div>
+        </div>
+
+        <div class="dash-chart dc-span-8">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Mapa de <em>calor</em></div>
+              <div class="dch-sub">Concentração de atividades por dia da semana × hora</div>
+            </div>
+            <span class="dch-tag">HEATMAP</span>
+          </div>
+          <div id="dashHeatmap" style="margin-top:6px"></div>
+          <div class="dhm-legend">
+            <span>Menos</span>
+            <div class="dhm-legend-cells">
+              <div class="dhm-legend-cell" style="background:var(--paper-2)"></div>
+              <div class="dhm-legend-cell" style="background:var(--forest-bg)"></div>
+              <div class="dhm-legend-cell" style="background:var(--amber-bg)"></div>
+              <div class="dhm-legend-cell" style="background:var(--burgundy-bg)"></div>
+              <div class="dhm-legend-cell" style="background:var(--burgundy)"></div>
+            </div>
+            <span>Mais</span>
+          </div>
+        </div>
+
+        <div class="dash-chart dc-span-4">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Performance <em>do time</em></div>
+              <div class="dch-sub">Indicador geral de execução</div>
+            </div>
+            <span class="dch-tag">GAUGE</span>
+          </div>
+          <div id="dashGauge" class="dash-gauge"></div>
+        </div>
+      </div>
+
+      <!-- ============ KPI strip ============ -->
+      <div class="dash-kpis" id="dashKpiStrip"></div>
+
+      <!-- ============ Tables row ============ -->
+      <div class="dash-charts">
+        <div class="dc-span-6" style="display:contents">
+          <div id="tblActivities" class="dash-table-wrap dc-span-6"></div>
+          <div id="tblUpcoming"   class="dash-table-wrap dc-span-6"></div>
+        </div>
+        <div class="dc-span-6" style="display:contents">
+          <div id="tblHoursLow"  class="dash-table-wrap dc-span-6"></div>
+          <div id="tblOverdue"   class="dash-table-wrap dc-span-6"></div>
+        </div>
+      </div>
+
+      <!-- ============ Calendar + Timeline ============ -->
+      <div class="dash-charts">
+        <div class="dash-chart dc-span-4">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Mini calendário</div>
+              <div class="dch-sub">Densidade de atividades no mês</div>
+            </div>
+            <span class="dch-tag">${monthShortPT(new Date().getMonth())}/${String(new Date().getFullYear()).slice(2)}</span>
+          </div>
+          <div id="dashMiniCal"></div>
+        </div>
+        <div class="dash-chart dc-span-8">
+          <div class="dch-head">
+            <div>
+              <div class="dch-title">Timeline <em>da semana</em></div>
+              <div class="dch-sub">Atividades por dia · próximos 7 dias</div>
+            </div>
+            <span class="dch-tag">SEMANA</span>
+          </div>
+          <div id="dashTimeline" class="dash-timeline"></div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  /* Atualiza timestamp e wire events */
+  state.dashV3.lastUpdate = new Date().toISOString();
+
+  document.getElementById('dashThemeToggle').onclick = toggleTheme;
+  document.getElementById('dashV3Refresh').onclick = () => {
+    const btn = document.getElementById('dashV3Refresh');
+    if (btn) btn.classList.add('spinning');
+    setTimeout(() => { renderDashboardV3(); }, 200);
+  };
+  const searchEl = document.getElementById('dashV3Search');
+  if (searchEl){
+    searchEl.oninput = (e) => {
+      state.dashV3.search = e.target.value || '';
+      _renderDashV3Tables();
+    };
+    searchEl.onkeydown = (e) => {
+      if (e.key === 'Enter'){
+        const q = (state.dashV3.search||'').trim().toLowerCase();
+        if (!q) return;
+        /* Tenta abrir o card do cliente que casa */
+        const co = COMPANIES.find(co => (co.fantasia||'').toLowerCase().includes(q) || (co.razao||'').toLowerCase().includes(q));
+        if (co){
+          const card = clientCardByCompany(co.id);
+          if (card){ openClientCardModal(card.id); return; }
+        }
+        toast('info','Buscando...', `Nenhum cliente encontrado para "${q}"`);
+      }
+    };
+  }
+
+  /* Render assíncrono das partes "pesadas" — heatmap/gauge não esperam Chart.js */
+  _renderDashV3Heatmap(allItems);
+  _renderDashV3Gauge(completionPct);
+  _renderDashV3KpiStrip(allItems, from, to);
+  _renderDashV3Tables();
+  _renderDashV3MiniCal(allItems);
+  _renderDashV3Timeline(allItems);
+
+  /* Gráficos (precisam de Chart.js) */
+  const chartReady = await ensureChartJS();
+  if (chartReady){
+    _destroyDashCharts();
+    _renderDashV3Charts(allItems, from, to);
+  }
+}
+window.renderDashboardV3 = renderDashboardV3;
+window.dashV3SetPeriod = (p) => {
+  state.dashV3.period = p;
+  if (p === 'custom'){
+    const from = prompt('Data inicial (DD/MM/AAAA):');
+    if (!from) return;
+    const to = prompt('Data final (DD/MM/AAAA):');
+    if (!to) return;
+    const toISO = (br) => { const [d,m,y] = br.split('/'); return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`; };
+    state.dashV3.customFrom = toISO(from);
+    state.dashV3.customTo   = toISO(to);
+  }
+  renderDashboardV3();
+};
+window.dashV3FocusAlert = (kind) => {
+  /* Rola até a tabela correspondente */
+  const map = { critical:'tblHoursLow', due:'tblUpcoming', noDate:'tblUpcoming', stagnant:'tblHoursLow' };
+  const id = map[kind];
+  if (id){
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+};
+
+/* ============================================================
+   DASHBOARD V3 — Renderizadores específicos (charts, heatmap, gauge, tabelas, etc)
+   ============================================================ */
+
+function _renderDashV3Charts(allItems, from, to){
+  if (typeof Chart === 'undefined') return;
+  const T = _themeColors();
+
+  /* Chart.js defaults globais consistentes com o tema */
+  Chart.defaults.font.family = "'Manrope',system-ui,sans-serif";
+  Chart.defaults.color = T.ink3;
+  Chart.defaults.borderColor = T.line;
+  Chart.defaults.plugins.legend.labels.boxWidth = 10;
+  Chart.defaults.plugins.legend.labels.boxHeight = 10;
+  Chart.defaults.plugins.legend.labels.padding = 12;
+  Chart.defaults.plugins.tooltip.backgroundColor = T.isDark ? 'rgba(0,0,0,.85)' : 'rgba(20,23,31,.92)';
+  Chart.defaults.plugins.tooltip.titleColor = '#fff';
+  Chart.defaults.plugins.tooltip.bodyColor  = '#fff';
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.cornerRadius = 3;
+
+  /* ---------- Linha: tarefas concluídas no tempo ---------- */
+  (() => {
+    const ctx = document.getElementById('chTasksTime'); if (!ctx) return;
+    const days = []; const cur = new Date(from);
+    while (cur <= to){ days.push(dashISO(cur)); cur.setDate(cur.getDate()+1); }
+    /* Granularidade: se > 60 dias, agrupa por semana; se > 240, por mês */
+    const totalDays = days.length;
+    let labels = [], data = [], grain = 'day';
+    if (totalDays > 240){
+      grain = 'month';
+      const map = {};
+      days.forEach(d => { const k = d.slice(0,7); map[k] = (map[k]||0); });
+      allItems.filter(i => i.kind === 'tarefa' && i.status === 'concluido' && i.date && inRange(i.date, from, to))
+        .forEach(i => { const k = i.date.slice(0,7); if (k in map) map[k]++; });
+      labels = Object.keys(map).map(k => `${k.slice(5)}/${k.slice(2,4)}`);
+      data   = Object.values(map);
+    } else if (totalDays > 60){
+      grain = 'week';
+      const map = {};
+      days.forEach(d => {
+        const dt = parseISO(d); const dow = dt.getDay(); dt.setDate(dt.getDate() - dow);
+        const k = dashISO(dt); map[k] = (map[k]||0);
+      });
+      allItems.filter(i => i.kind === 'tarefa' && i.status === 'concluido' && i.date && inRange(i.date, from, to))
+        .forEach(i => {
+          const dt = parseISO(i.date); const dow = dt.getDay(); dt.setDate(dt.getDate() - dow);
+          const k = dashISO(dt); if (k in map) map[k]++;
+        });
+      labels = Object.keys(map).map(k => `${k.slice(8)}/${k.slice(5,7)}`);
+      data   = Object.values(map);
+    } else {
+      const map = {};
+      days.forEach(d => map[d] = 0);
+      allItems.filter(i => i.kind === 'tarefa' && i.status === 'concluido' && i.date && inRange(i.date, from, to))
+        .forEach(i => { if (i.date in map) map[i.date]++; });
+      labels = Object.keys(map).map(d => `${d.slice(8)}/${d.slice(5,7)}`);
+      data   = Object.values(map);
+    }
+    state.dashV3.charts.tasksTime = new Chart(ctx, {
+      type:'line',
+      data: { labels, datasets:[{
+        label: 'Tarefas concluídas',
+        data,
+        borderColor: T.forest,
+        backgroundColor: 'rgba(45,95,63,.15)',
+        borderWidth: 2.5,
+        tension: 0.32,
+        fill: true,
+        pointBackgroundColor: T.forest,
+        pointRadius: grain==='day' && labels.length > 40 ? 0 : 3,
+        pointHoverRadius: 5,
+      }] },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ font:{size:10}, maxRotation:0, autoSkip:true, maxTicksLimit:12 } },
+          y:{ grid:{ color:T.line, drawBorder:false }, ticks:{ font:{size:10}, precision:0 }, beginAtZero:true },
+        },
+      },
+    });
+  })();
+
+  /* ---------- Donut: tarefas por status ---------- */
+  (() => {
+    const ctx = document.getElementById('chTasksStatus'); if (!ctx) return;
+    const tarefas = allItems.filter(i => i.kind === 'tarefa');
+    const counts = {};
+    tarefas.forEach(t => { counts[t.status||'criado'] = (counts[t.status||'criado']||0) + 1; });
+    const labels = []; const data = []; const colors = [];
+    const colorMap = {
+      concluido:T.forest, atendido:T.forest,
+      'em-andamento':T.indigo, 'em-atendimento':T.rose,
+      provisorio:T.amber2, pendente:T.slate,
+      confirmado:T.indigo, criado:T.slate,
+      reagendado:T.indigo, cancelado:T.burg,
+    };
+    Object.entries(counts).forEach(([k,v]) => {
+      const sm = statusById(k) || { label:k };
+      labels.push(sm.label); data.push(v); colors.push(colorMap[k] || T.slate);
+    });
+    state.dashV3.charts.tasksStatus = new Chart(ctx, {
+      type:'doughnut',
+      data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:T.paper, borderWidth:2 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'68%',
+        plugins:{ legend:{ position:'bottom', labels:{ font:{size:10} } } },
+      },
+    });
+  })();
+
+  /* ---------- Barras: treinamentos por cliente (top 8) ---------- */
+  (() => {
+    const ctx = document.getElementById('chTrainByClient'); if (!ctx) return;
+    const counts = {};
+    allItems.filter(i => i.kind === 'treinamento' && i.date && inRange(i.date, from, to)
+      && (i.status === 'atendido' || i.status === 'concluido')).forEach(t => {
+      const k = t.companyId || 'sem-empresa';
+      counts[k] = (counts[k]||0) + 1;
+    });
+    const arr = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,8);
+    const labels = arr.map(([k]) => { const co = companyById(k); return co ? co.fantasia : '—'; });
+    const data   = arr.map(([,v]) => v);
+    state.dashV3.charts.trainByClient = new Chart(ctx, {
+      type:'bar',
+      data:{ labels, datasets:[{ label:'Treinamentos', data, backgroundColor:T.forest, borderRadius:3, maxBarThickness:32 }] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ font:{size:10}, autoSkip:false, maxRotation:30 } },
+          y:{ grid:{ color:T.line, drawBorder:false }, ticks:{ font:{size:10}, precision:0 }, beginAtZero:true },
+        },
+      },
+    });
+  })();
+
+  /* ---------- Área: consumo de horas no tempo ---------- */
+  (() => {
+    const ctx = document.getElementById('chHoursTime'); if (!ctx) return;
+    const days = []; const cur = new Date(from);
+    while (cur <= to){ days.push(dashISO(cur)); cur.setDate(cur.getDate()+1); }
+    const map = {}; days.forEach(d => map[d] = 0);
+    CLIENT_CARDS.forEach(c => {
+      (c.hoursLog||[]).filter(m => m.type === 'debit' && m.ts && inRange(m.ts.slice(0,10), from, to))
+        .forEach(m => { const k = m.ts.slice(0,10); if (k in map) map[k] += (m.hours||0); });
+    });
+    /* Acumulado */
+    let acc = 0;
+    const accData = days.map(d => { acc += map[d]; return Math.round(acc*10)/10; });
+    const labels = days.map(d => `${d.slice(8)}/${d.slice(5,7)}`);
+    state.dashV3.charts.hoursTime = new Chart(ctx, {
+      type:'line',
+      data:{ labels, datasets:[
+        { label:'Diário (h)', data:days.map(d => Math.round(map[d]*10)/10), borderColor:T.amber, backgroundColor:'rgba(184,99,42,.12)', borderWidth:2, tension:0.3, fill:true, pointRadius:0 },
+        { label:'Acumulado (h)', data:accData, borderColor:T.burg, backgroundColor:'rgba(138,38,56,.10)', borderWidth:2, tension:0.3, fill:false, pointRadius:0, borderDash:[4,3] },
+      ] },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom', labels:{ font:{size:10} } } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ font:{size:9}, maxRotation:0, autoSkip:true, maxTicksLimit:10 } },
+          y:{ grid:{ color:T.line, drawBorder:false }, ticks:{ font:{size:10}, callback:(v) => v + 'h' }, beginAtZero:true },
+        },
+      },
+    });
+  })();
+
+  /* ---------- Barras horizontais: ranking de clientes ---------- */
+  (() => {
+    const ctx = document.getElementById('chRankClients'); if (!ctx) return;
+    const counts = {};
+    allItems.filter(i => i.date && inRange(i.date, from, to) && !['cancelado','reagendado'].includes(i.status))
+      .forEach(i => { counts[i.companyId||'—'] = (counts[i.companyId||'—']||0) + 1; });
+    const arr = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,10);
+    const labels = arr.map(([k]) => { const co = companyById(k); return co ? co.fantasia : '—'; });
+    const data   = arr.map(([,v]) => v);
+    state.dashV3.charts.rankClients = new Chart(ctx, {
+      type:'bar',
+      data:{ labels, datasets:[{ label:'Atividades', data, backgroundColor:T.champ, borderRadius:3, maxBarThickness:18 }] },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{ color:T.line, drawBorder:false }, ticks:{ font:{size:10}, precision:0 }, beginAtZero:true },
+          y:{ grid:{ display:false }, ticks:{ font:{size:10} } },
+        },
+      },
+    });
+  })();
+
+  /* ---------- "Funil": clientes por etapa do card (usando barras horizontais descendentes) ---------- */
+  (() => {
+    const ctx = document.getElementById('chFunnel'); if (!ctx) return;
+    const stages = ['nao-iniciada','aguardando','em-andamento','concluida','cancelada'];
+    const stageLabels = { 'nao-iniciada':'Não iniciado', 'aguardando':'Aguardando cliente', 'em-andamento':'Em andamento', 'concluida':'Concluído', 'cancelada':'Cancelado' };
+    const counts = stages.map(st => CLIENT_CARDS.filter(c => !c.archived && (c.status||'aguardando') === st).length);
+    const labels = stages.map(st => stageLabels[st]);
+    const stageColors = [T.slate, T.amber, T.indigo, T.forest, T.burg];
+    state.dashV3.charts.funnel = new Chart(ctx, {
+      type:'bar',
+      data:{ labels, datasets:[{ label:'Clientes', data:counts, backgroundColor:stageColors, borderRadius:3, maxBarThickness:30 }] },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          x:{ grid:{ color:T.line, drawBorder:false }, ticks:{ font:{size:10}, precision:0 }, beginAtZero:true },
+          y:{ grid:{ display:false }, ticks:{ font:{size:10.5,weight:'600'} } },
+        },
+      },
+    });
+  })();
+}
+
+/* ---------- Heatmap (dias × horas) ---------- */
+function _renderDashV3Heatmap(allItems){
+  const root = document.getElementById('dashHeatmap');
+  if (!root) return;
+  /* Matriz 7 (dias) × 24 (horas) */
+  const matrix = Array.from({length:7}, () => Array(24).fill(0));
+  allItems.forEach(i => {
+    if (!i.date || !i.timeStart) return;
+    if (['cancelado','reagendado'].includes(i.status)) return;
+    const d = parseISO(i.date);
+    const dow = d.getDay();
+    const h = parseInt(i.timeStart.slice(0,2));
+    if (isNaN(h)) return;
+    matrix[dow][h] = (matrix[dow][h]||0) + 1;
+  });
+  const max = Math.max(1, ...matrix.flat());
+  const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const intensity = (n) => {
+    if (n === 0) return { bg:'var(--paper-2)' };
+    const r = n / max;
+    if (r < 0.20) return { bg:'var(--forest-bg)' };
+    if (r < 0.45) return { bg:'var(--amber-bg)' };
+    if (r < 0.75) return { bg:'var(--burgundy-bg)' };
+    return { bg:'var(--burgundy)' };
+  };
+
+  /* Header de horas */
+  let html = `<div class="dash-heatmap"><div class="dhm-corner"></div>`;
+  for (let h = 0; h < 24; h++){
+    html += `<div class="dhm-hh">${pad(h)}</div>`;
+  }
+  for (let d = 0; d < 7; d++){
+    html += `<div class="dhm-day">${days[d]}</div>`;
+    for (let h = 0; h < 24; h++){
+      const v = matrix[d][h];
+      const c = intensity(v);
+      html += `<div class="dhm-cell" style="background:${c.bg}" title="${days[d]} ${pad(h)}:00 — ${v} atividade(s)"></div>`;
+    }
+  }
+  html += '</div>';
+  root.innerHTML = html;
+}
+
+/* ---------- Gauge SVG (semi-círculo) ---------- */
+function _renderDashV3Gauge(pct){
+  const root = document.getElementById('dashGauge'); if (!root) return;
+  const value = Math.max(0, Math.min(100, pct||0));
+  const radius = 80; const circ = Math.PI * radius;
+  const offset = circ - (value/100) * circ;
+  const cls = value < 40 ? 'danger' : value < 70 ? 'warning' : '';
+  const label = value < 40 ? 'Atenção necessária' : value < 70 ? 'Em ritmo aceitável' : 'Excelente performance';
+  root.innerHTML = `
+    <svg viewBox="0 0 200 120">
+      <path class="gauge-bg" d="M20 100 A80 80 0 0 1 180 100" />
+      <path class="gauge-fg ${cls}" d="M20 100 A80 80 0 0 1 180 100"
+        style="stroke-dasharray:${circ};stroke-dashoffset:${offset}" />
+      <text x="100" y="86" text-anchor="middle" style="font-family:var(--font-display);font-size:36px;font-weight:600;fill:var(--ink)">${value}%</text>
+      <text x="100" y="108" text-anchor="middle" style="font-family:var(--font-mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;fill:var(--ink-3);font-weight:700">Conclusão</text>
+    </svg>
+    <div class="gauge-tip">${label}</div>
+  `;
+}
+
+/* ---------- KPI strip (5 indicadores) ---------- */
+function _renderDashV3KpiStrip(allItems, from, to){
+  const root = document.getElementById('dashKpiStrip'); if (!root) return;
+  /* 1) Aproveitamento de horas */
+  let totUsed = 0, totCredit = 0;
+  CLIENT_CARDS.forEach(c => { const st = cardHoursStats(c); totUsed += st.debited; totCredit += st.credited; });
+  const aproveit = totCredit > 0 ? Math.round((totUsed/totCredit)*100) : 0;
+
+  /* 2) Média tarefas/dia */
+  const dias = Math.max(1, Math.ceil((to - from) / (86400000)));
+  const taskDone = allItems.filter(i => i.kind === 'tarefa' && i.status === 'concluido' && i.date && inRange(i.date, from, to)).length;
+  const mediaDia = (taskDone / dias).toFixed(1);
+
+  /* 3) Tempo médio de conclusão (createdAt → updatedAt) */
+  let total = 0, count = 0;
+  RECORDS.filter(r => r.kind === 'tarefa' && r.status === 'concluido' && r.createdAt && r.updatedAt).forEach(r => {
+    const dt = (new Date(r.updatedAt) - new Date(r.createdAt)) / (86400000);
+    if (dt > 0){ total += dt; count++; }
+  });
+  const tmedio = count > 0 ? (total/count).toFixed(1) : '—';
+
+  /* 4) Cliente top engajamento */
+  const counts = {};
+  allItems.filter(i => i.date && inRange(i.date, from, to)).forEach(i => { counts[i.companyId] = (counts[i.companyId]||0)+1; });
+  const top = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
+  const topCo = top ? companyById(top[0]) : null;
+  const topName = topCo ? topCo.fantasia : '—';
+  const topVal  = top ? top[1] : 0;
+
+  /* 5) % agendas no prazo (cronogramas confirmados / total) */
+  const totSched = SCHEDULES.length;
+  const okSched  = SCHEDULES.filter(s => s.status === 'confirmado' || s.status === 'concluido').length;
+  const pctSched = totSched > 0 ? Math.round((okSched/totSched)*100) : 0;
+
+  root.innerHTML = `
+    <div class="dash-kpi-cell">
+      <div class="dk-label">Aproveitamento</div>
+      <div class="dk-value">${aproveit}%</div>
+      <div class="dk-sub">${fmtH(totUsed)} de ${fmtH(totCredit)}</div>
+    </div>
+    <div class="dash-kpi-cell">
+      <div class="dk-label">Média tarefas/dia</div>
+      <div class="dk-value">${mediaDia}</div>
+      <div class="dk-sub">${taskDone} no período (${dias} dias)</div>
+    </div>
+    <div class="dash-kpi-cell">
+      <div class="dk-label">Tempo médio conclusão</div>
+      <div class="dk-value">${tmedio} <em style="font-size:13px;color:var(--ink-3);font-weight:400">dias</em></div>
+      <div class="dk-sub">${count} tarefa(s) avaliada(s)</div>
+    </div>
+    <div class="dash-kpi-cell">
+      <div class="dk-label">Cliente top engajamento</div>
+      <div class="dk-value" style="font-size:15px;line-height:1.2;font-weight:600">${topName}</div>
+      <div class="dk-sub">${topVal} atividade(s) no período</div>
+    </div>
+    <div class="dash-kpi-cell">
+      <div class="dk-label">Agendas confirmadas</div>
+      <div class="dk-value">${pctSched}%</div>
+      <div class="dk-sub">${okSched} de ${totSched} cronogramas</div>
+    </div>
+  `;
+
+  function fmtH(n){ return `${(Math.round(n*10)/10).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}h`; }
+}
+
+/* ---------- Tabelas ---------- */
+function _renderDashV3Tables(){
+  const { from, to } = dashPeriodBounds(state.dashV3.period);
+  const allItems = dashCollectItems();
+  const search = (state.dashV3.search||'').trim().toLowerCase();
+  const matchSearch = (s) => !search || (s||'').toString().toLowerCase().includes(search);
+  const fmtH = (n) => `${(Math.round(n*10)/10).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}h`;
+
+  /* === Últimas atividades (ordenadas decrescente) === */
+  (() => {
+    const wrap = document.getElementById('tblActivities'); if (!wrap) return;
+    const items = allItems
+      .filter(i => i.date)
+      .filter(i => {
+        const co = companyById(i.companyId);
+        return matchSearch(i.title) || matchSearch(co?.fantasia);
+      })
+      .sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.timeStart||'').localeCompare(a.timeStart||''))
+      .slice(0,12);
+    const rows = items.map(i => {
+      const co = companyById(i.companyId);
+      const cs = consultantById(i.consultantId);
+      const st = statusById(i.status) || { label:i.status||'—' };
+      const kind = i.kind || 'evento';
+      return `
+        <tr>
+          <td><span class="dtt-pill kind-${kind}">${kind.charAt(0).toUpperCase()+kind.slice(1)}</span></td>
+          <td><b>${(i.title||'(sem título)').replace(/</g,'&lt;')}</b></td>
+          <td>${co ? co.fantasia : '—'}</td>
+          <td>${cs ? cs.name : '—'}</td>
+          <td style="font-family:var(--font-mono);font-size:10px">${i.date ? isoToBR(i.date) : '—'}</td>
+          <td><span class="dtt-pill">${st.label}</span></td>
+        </tr>
+      `;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="dash-table-head">
+        <h4><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Últimas atividades <em>· ${items.length}</em></h4>
+      </div>
+      <table class="dash-table">
+        <thead><tr><th>Tipo</th><th>Atividade</th><th>Cliente</th><th>Responsável</th><th>Data</th><th>Status</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="6" class="dtt-empty">Nenhuma atividade encontrada</td></tr>`}</tbody>
+      </table>
+    `;
+  })();
+
+  /* === Próximas tarefas/treinamentos (futuro) === */
+  (() => {
+    const wrap = document.getElementById('tblUpcoming'); if (!wrap) return;
+    const todayIso = dashISO(new Date());
+    const items = allItems
+      .filter(i => i.date && i.date >= todayIso && (i.kind === 'tarefa' || i.kind === 'treinamento'))
+      .filter(i => !['cancelado','reagendado','concluido','atendido'].includes(i.status))
+      .filter(i => {
+        const co = companyById(i.companyId);
+        return matchSearch(i.title) || matchSearch(co?.fantasia);
+      })
+      .sort((a,b) => (a.date||'').localeCompare(b.date||'') || (a.timeStart||'').localeCompare(b.timeStart||''))
+      .slice(0,12);
+    const rows = items.map(i => {
+      const co = companyById(i.companyId);
+      const cs = consultantById(i.consultantId);
+      const time = i.timeStart && i.timeEnd ? `${i.timeStart}–${i.timeEnd}` : (i.timeStart||'—');
+      return `
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:10px;color:var(--ink);font-weight:600">${i.date ? isoToBR(i.date) : '—'}</td>
+          <td style="font-family:var(--font-mono);font-size:10px">${time}</td>
+          <td><span class="dtt-pill kind-${i.kind}">${i.kind.charAt(0).toUpperCase()+i.kind.slice(1)}</span></td>
+          <td><b>${(i.title||'').replace(/</g,'&lt;')}</b></td>
+          <td>${co ? co.fantasia : '—'}</td>
+          <td>${cs ? cs.name : '—'}</td>
+        </tr>
+      `;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="dash-table-head">
+        <h4><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="1"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Próximas tarefas e treinamentos <em>· ${items.length}</em></h4>
+      </div>
+      <table class="dash-table">
+        <thead><tr><th>Data</th><th>Horário</th><th>Tipo</th><th>Atividade</th><th>Cliente</th><th>Responsável</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="6" class="dtt-empty">Nada agendado nos próximos dias</td></tr>`}</tbody>
+      </table>
+    `;
+  })();
+
+  /* === Clientes com saldo crítico === */
+  (() => {
+    const wrap = document.getElementById('tblHoursLow'); if (!wrap) return;
+    const list = CLIENT_CARDS
+      .filter(c => !c.archived)
+      .map(c => ({ card:c, stats: cardHoursStats(c), co: companyById(c.companyId) }))
+      .filter(x => x.stats.credited > 0 && (x.stats.lowAlert || x.stats.negative))
+      .filter(x => matchSearch(x.co?.fantasia))
+      .sort((a,b) => a.stats.balance - b.stats.balance)
+      .slice(0,10);
+    const rows = list.map(x => {
+      const cls = x.stats.negative ? 'overdue' : '';
+      return `
+        <tr class="${cls}" onclick="openClientCardModal('${x.card.id}')" style="cursor:pointer">
+          <td><b>${x.co ? x.co.fantasia : '—'}</b></td>
+          <td style="font-family:var(--font-mono);font-size:11px">${fmtH(x.stats.contracted)}</td>
+          <td style="font-family:var(--font-mono);font-size:11px;color:var(--amber)">${fmtH(x.stats.debited)}</td>
+          <td style="font-family:var(--font-mono);font-size:11px;color:${x.stats.negative?'var(--burgundy)':'var(--ink)'};font-weight:700">${x.stats.balance < 0 ? '−' : ''}${fmtH(Math.abs(x.stats.balance))}</td>
+          <td><span class="dtt-pill" style="background:${x.stats.negative?'var(--burgundy-bg)':'var(--amber-bg)'};color:${x.stats.negative?'var(--burgundy)':'var(--amber)'}">${x.stats.negative?'NEGATIVO':`${x.stats.pctRemaining}% restante`}</span></td>
+        </tr>
+      `;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="dash-table-head">
+        <h4><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Saldo de horas crítico <em>· ${list.length}</em></h4>
+      </div>
+      <table class="dash-table">
+        <thead><tr><th>Cliente</th><th>Contratado</th><th>Consumido</th><th>Saldo</th><th>Situação</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="5" class="dtt-empty">Todos os clientes com saldo saudável 🎉</td></tr>`}</tbody>
+      </table>
+    `;
+  })();
+
+  /* === Tarefas atrasadas === */
+  (() => {
+    const wrap = document.getElementById('tblOverdue'); if (!wrap) return;
+    const todayIso = dashISO(new Date());
+    const items = allItems
+      .filter(i => i.kind === 'tarefa' && i.date && i.date < todayIso && !['concluido','cancelado','reagendado','atendido'].includes(i.status))
+      .filter(i => {
+        const co = companyById(i.companyId);
+        return matchSearch(i.title) || matchSearch(co?.fantasia);
+      })
+      .sort((a,b) => (a.date||'').localeCompare(b.date||''))
+      .slice(0,12);
+    const rows = items.map(i => {
+      const co = companyById(i.companyId);
+      const cs = consultantById(i.consultantId);
+      const daysLate = Math.floor((new Date(todayIso) - new Date(i.date)) / 86400000);
+      return `
+        <tr class="overdue">
+          <td><b>${(i.title||'').replace(/</g,'&lt;')}</b></td>
+          <td>${co ? co.fantasia : '—'}</td>
+          <td>${cs ? cs.name : '—'}</td>
+          <td style="font-family:var(--font-mono);font-size:10px;color:var(--burgundy);font-weight:700">${isoToBR(i.date)}</td>
+          <td><span class="dtt-pill" style="background:var(--burgundy);color:var(--paper)">${daysLate} dia${daysLate!==1?'s':''} atrasada</span></td>
+        </tr>
+      `;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="dash-table-head">
+        <h4 style="color:var(--burgundy)"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Tarefas atrasadas <em>· ${items.length}</em></h4>
+      </div>
+      <table class="dash-table">
+        <thead><tr><th>Tarefa</th><th>Cliente</th><th>Responsável</th><th>Data prevista</th><th>Atraso</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="5" class="dtt-empty">Sem tarefas atrasadas — bom trabalho! 👏</td></tr>`}</tbody>
+      </table>
+    `;
+  })();
+}
+
+/* ---------- Mini calendário (mês atual com densidade) ---------- */
+function _renderDashV3MiniCal(allItems){
+  const root = document.getElementById('dashMiniCal'); if (!root) return;
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const firstDow = new Date(y, m, 1).getDay();
+  const dim = new Date(y, m+1, 0).getDate();
+  const todayIso = dashISO(now);
+  const counts = {};
+  allItems.filter(i => i.date && i.date.startsWith(`${y}-${pad(m+1)}`) && !['cancelado','reagendado'].includes(i.status))
+    .forEach(i => { counts[i.date] = (counts[i.date]||0) + 1; });
+  const max = Math.max(1, ...Object.values(counts));
+  const density = (n) => n === 0 ? '' : n <= max*0.33 ? 'density-1' : n <= max*0.66 ? 'density-2' : 'density-3';
+
+  let html = `<div class="mini-calendar">`;
+  ['D','S','T','Q','Q','S','S'].forEach(d => html += `<div class="mc-dow">${d}</div>`);
+  for (let i = 0; i < firstDow; i++) html += `<div class="mc-day empty"></div>`;
+  for (let d = 1; d <= dim; d++){
+    const iso = fmtDate(y, m, d);
+    const n = counts[iso] || 0;
+    const cls = [iso === todayIso ? 'today' : '', n > 0 ? 'has-events' : '', density(n)].filter(Boolean).join(' ');
+    html += `<div class="mc-day ${cls}" title="${isoToBR(iso)}${n?` — ${n} atividade(s)`:''}">${d}</div>`;
+  }
+  html += `</div>`;
+  root.innerHTML = html;
+}
+
+/* ---------- Timeline da semana ---------- */
+function _renderDashV3Timeline(allItems){
+  const root = document.getElementById('dashTimeline'); if (!root) return;
+  const now = new Date();
+  const today = new Date(now); today.setHours(0,0,0,0);
+  const days = []; for (let i = 0; i < 7; i++){ const d = new Date(today); d.setDate(d.getDate()+i); days.push(d); }
+  let html = '';
+  days.forEach(d => {
+    const iso = dashISO(d);
+    const evs = allItems.filter(i => i.date === iso && !['cancelado','reagendado'].includes(i.status))
+      .sort((a,b) => (a.timeStart||'').localeCompare(b.timeStart||''));
+    html += `
+      <div class="dt-row">
+        <div class="dt-day">
+          ${dowShortPT(d.getDay())}<br>
+          <b>${pad(d.getDate())}/${pad(d.getMonth()+1)}</b>
+          <span>${evs.length} item(ns)</span>
+        </div>
+        <div class="dt-events">
+          ${evs.length ? evs.slice(0,5).map(e => {
+            const co = companyById(e.companyId);
+            const cs = consultantById(e.consultantId);
+            const time = (e.timeStart && e.timeEnd) ? `${e.timeStart}–${e.timeEnd}` : (e.timeStart || '—');
+            return `
+              <div class="dt-event kind-${e.kind}">
+                <span class="dt-time">${time}</span>
+                <span class="dt-title">${(e.title||'').replace(/</g,'&lt;')}</span>
+                <span class="dt-meta">${co?co.fantasia.slice(0,18):'—'}${cs?` · ${cs.initials||cs.name.slice(0,3)}`:''}</span>
+              </div>
+            `;
+          }).join('') + (evs.length > 5 ? `<div style="font-size:10px;color:var(--ink-3);font-style:italic;padding:2px 8px">+ ${evs.length-5} item(ns)</div>` : '')
+          : `<div style="font-size:10.5px;color:var(--ink-3);font-style:italic;padding:6px 10px">Sem atividades</div>`}
+        </div>
+      </div>
+    `;
+  });
+  root.innerHTML = html;
+}
+
 /* ============================================
    FLUXO 2 — Envio de cronograma em PDF ao cliente
    ============================================ */
@@ -12085,13 +13803,19 @@ function offerSendScheduleToClient(scheduleId){
   const items = s.items || [];
   const trainings = items.filter(i => i.kind === 'treinamento').length;
   const tasks = items.filter(i => i.kind === 'tarefa').length;
+  const totalHoursStr = _formatHoursStr(_scheduleTotalMinutes(items));
+  const docNumber = scheduleDocumentNumber(s);
 
   const preview = `
-    <b style="color:var(--ink);font-size:12.5px">Assunto:</b> Cronograma para aprovação — ${co.fantasia}<br>
+    <b style="color:var(--ink);font-size:12.5px">Assunto:</b> Cronograma para aprovação — ${co.fantasia} · ${docNumber}<br>
     <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
     Período: ${isoToBR(s.from)} → ${isoToBR(s.to)}<br>
-    ${trainings} treinamento(s) · ${tasks} tarefa(s) · ${items.length} item(ns) no total<br>
-    <i style="color:var(--ink-3);font-size:11px">Envio apenas por mensagem (sem PDF anexo).</i>
+    ${trainings} treinamento(s) · ${tasks} tarefa(s) · ${items.length} item(ns) · ${totalHoursStr} de carga horária<br>
+    <div style="margin-top:8px;padding:7px 10px;background:var(--paper-2);border-left:3px solid var(--forest);border-radius:2px;font-size:11.5px">
+      <b style="color:var(--forest)">📎 2 anexos:</b><br>
+      • <b>${docNumber}.pdf</b> — cronograma completo para impressão/arquivo<br>
+      • <b>${docNumber}.xlsx</b> — planilha com filtros e resumo executivo
+    </div>
   `;
 
   /* Identifica destinatário: usa contato (responsável) da empresa */
@@ -12100,10 +13824,10 @@ function offerSendScheduleToClient(scheduleId){
 
   showNotifyConfirm({
     title: 'Enviar cronograma para <em>aprovação</em>',
-    subtitle: 'FLUXO 2 — MENSAGEM AO CLIENTE',
+    subtitle: `FLUXO 2 — DOCUMENTO ${docNumber}`,
     summaryIcon: '§',
     summaryTitle: `Deseja enviar este cronograma por e-mail para o cliente?`,
-    summarySub: `Será enviada uma mensagem com o resumo do cronograma para confirmação (sem PDF anexo).`,
+    summarySub: `Serão gerados e anexados automaticamente o PDF (documento oficial) e o Excel (planilha interativa). O envio pode demorar alguns segundos.`,
     recipient: {
       name: recipientName,
       role: co.fantasia + (co.razao?` · ${co.razao}`:''),
@@ -12112,29 +13836,140 @@ function offerSendScheduleToClient(scheduleId){
       initials: (recipientName||'??').slice(0,2).toUpperCase(),
     },
     preview,
-    confirmLabel: 'Enviar mensagem',
+    confirmLabel: 'Gerar anexos e enviar',
     onConfirm: async () => {
-      const subject = `Cronograma para aprovação — ${co.fantasia}`;
+      const filenameBase = `${docNumber}-${(co.fantasia||'cliente').replace(/[^a-z0-9]/gi,'-').toLowerCase()}`;
+      const attachments = [];
+
+      /* 1) PDF */
+      try {
+        toast('info','Gerando PDF...', 'Renderizando documento oficial. Aguarde.');
+        const pdfBase64 = await generateScheduleAsBase64PDF(s, co, c);
+        attachments.push({
+          filename: `${filenameBase}.pdf`,
+          content: pdfBase64,
+          encoding: 'base64',
+          contentType: 'application/pdf',
+        });
+      } catch (e){
+        console.error('Falha PDF:', e);
+        toast('error','Falha ao gerar PDF', e.message || 'Erro inesperado');
+        return;
+      }
+
+      /* 2) Excel */
+      try {
+        toast('info','Gerando Excel...', 'Montando planilha com filtros e resumo.');
+        const xlsxBase64 = await generateScheduleAsBase64XLSX(s, co, c);
+        attachments.push({
+          filename: `${filenameBase}.xlsx`,
+          content: xlsxBase64,
+          encoding: 'base64',
+          contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+      } catch (e){
+        console.error('Falha XLSX:', e);
+        /* Não-fatal: envia só o PDF, mas avisa o usuário. */
+        toast('warn','Excel não gerado', `${e.message || 'erro'} — enviando apenas o PDF.`);
+      }
+
+      /* 3) Envio */
+      const subject = `Cronograma para aprovação — ${co.fantasia} · ${docNumber}`;
       const html = buildScheduleEmail(s, co, c);
-      const text = `Olá ${recipientName},\n\nSegue para sua análise o cronograma de atividades.\n\nPeríodo: ${isoToBR(s.from)} → ${isoToBR(s.to)}\nTotal de itens: ${items.length}\n\nResponda este e-mail confirmando o aceite ou solicitando ajustes.\n\nAtenciosamente,\n${c?c.name:''}\n— Faktory Flow Agenda`;
+      const text =
+`Prezado(a) ${recipientName},
+
+Apresentamos o cronograma oficial de atividades elaborado para ${co.fantasia}.
+
+Documento: ${docNumber}
+Período: ${isoToBR(s.from)} → ${isoToBR(s.to)}
+Total de itens: ${items.length} (${trainings} treinamento(s), ${tasks} tarefa(s))
+Carga horária planejada: ${totalHoursStr}
+
+Anexos:
+  • ${filenameBase}.pdf   — documento oficial para impressão/arquivo
+  • ${filenameBase}.xlsx  — planilha com filtros e resumo executivo
+
+Solicitamos sua revisão. Para aprovar, basta responder este e-mail confirmando o aceite. Para solicitar ajustes, descreva-os na resposta.
+
+Atenciosamente,
+${c?c.name:''}${c?.email?` · ${c.email}`:''}
+— Faktory Flow Agenda · Central de Consultoria
+`;
+
       const result = await sendNotificationEmail({
         to: recipientEmail,
         subject, html, text,
         replyTo: c?.email || undefined,
+        attachments,
         kind: 'schedule-approval',
         relatedId: s.id,
         relatedType: 'schedule',
         recipientName,
       });
       if (result.ok){
-        toast('success','Cronograma enviado', `${recipientEmail} · mensagem entregue`);
+        const summary = attachments.length === 2 ? 'PDF + Excel anexos' : 'PDF anexo';
+        toast('success','Cronograma enviado', `${recipientEmail} · ${summary}`);
         s.lastSentToClientAt = nowISO();
         s.lastSentToClientBy = CURRENT_USER?.id || null;
-        pushHistory(s, 'cronograma enviado por e-mail', `para ${recipientEmail}`);
+        s.lastSentDocNumber  = docNumber;
+        pushHistory(s, 'cronograma enviado por e-mail', `${docNumber} para ${recipientEmail} · ${attachments.length} anexo(s)`);
         persist();
       }
     },
   });
+}
+
+/* Gera (e memoriza) um número de documento estável para o cronograma.
+   Formato: CRON-{YYYY}-{SUFFIX} onde SUFFIX = últimos 6 chars do id em uppercase. */
+function scheduleDocumentNumber(s){
+  if (!s) return 'CRON-0000-XXXXXX';
+  if (s.docNumber) return s.docNumber;
+  const year = (s.confirmedAt ? new Date(s.confirmedAt) : (s.createdAtISO ? new Date(s.createdAtISO) : new Date())).getFullYear();
+  const suffix = (s.id || '').replace(/[^a-z0-9]/gi, '').toUpperCase().slice(-6) || Math.random().toString(36).slice(2, 8).toUpperCase();
+  s.docNumber = `CRON-${year}-${suffix}`;
+  return s.docNumber;
+}
+
+/* Soma a duração em minutos de todos os itens com timeStart/timeEnd. */
+function _scheduleTotalMinutes(items){
+  let totalMinutes = 0;
+  items.forEach(i => {
+    if (i.timeStart && i.timeEnd){
+      const ms = (parseInt(i.timeStart.slice(0,2))*60 + parseInt(i.timeStart.slice(3)));
+      const me = (parseInt(i.timeEnd.slice(0,2))*60 + parseInt(i.timeEnd.slice(3)));
+      if (me > ms) totalMinutes += (me - ms);
+    }
+  });
+  return totalMinutes;
+}
+function _formatHoursStr(totalMinutes){
+  if (!totalMinutes) return '0h';
+  const h = Math.floor(totalMinutes/60);
+  const m = totalMinutes % 60;
+  return m ? `${h}h ${m}min` : `${h}h`;
+}
+
+/* Carregador lazy do ExcelJS — mesma estratégia do html2pdf. */
+async function ensureExcelJS(){
+  if (typeof ExcelJS !== 'undefined') return true;
+  const tryLoad = (src) => new Promise((resolve, reject) => {
+    const sc = document.createElement('script');
+    sc.src = src;
+    sc.onload  = () => resolve(true);
+    sc.onerror = () => reject(new Error('falhou carregar ' + src));
+    document.head.appendChild(sc);
+  });
+  const candidates = [
+    'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js',
+    'https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js',
+  ];
+  for (const src of candidates){
+    try { await tryLoad(src); if (typeof ExcelJS !== 'undefined') return true; }
+    catch(e){ /* tenta o próximo */ }
+  }
+  return typeof ExcelJS !== 'undefined';
 }
 
 /* Geração de PDF do cronograma — usa html2pdf bundle */
@@ -12175,32 +14010,28 @@ async function generateScheduleAsBase64PDF(s, co, c){
   const ready = await ensureHtml2Pdf();
   if (!ready) throw new Error('Não foi possível carregar a biblioteca html2pdf (CDN bloqueado?)');
 
-  const items = (s.items || []).slice();
-  const trainings   = items.filter(i => i.kind === 'treinamento');
-  const tasks       = items.filter(i => i.kind === 'tarefa');
-  const atend       = items.filter(i => i.kind === 'atendimento');
+  /* Itens ordenados por data + horário */
+  const items = (s.items || []).slice()
+    .sort((a,b) => (a.date||'9999').localeCompare(b.date||'9999') || (a.timeStart||'').localeCompare(b.timeStart||''));
+  const trainings = items.filter(i => i.kind === 'treinamento');
+  const tasks     = items.filter(i => i.kind === 'tarefa');
+  const atend     = items.filter(i => i.kind === 'atendimento');
 
-  /* Datas mais cedo/tarde efetivamente preenchidas */
   const dated = items.filter(i => i.date).map(i => i.date).sort();
   const minDate = dated[0] || s.from;
   const maxDate = dated[dated.length-1] || s.to;
 
-  /* Total de tempo planejado */
-  let totalMinutes = 0;
-  items.forEach(i => {
-    if (i.timeStart && i.timeEnd){
-      const ms = (parseInt(i.timeStart.slice(0,2))*60 + parseInt(i.timeStart.slice(3)));
-      const me = (parseInt(i.timeEnd.slice(0,2))*60 + parseInt(i.timeEnd.slice(3)));
-      if (me > ms) totalMinutes += (me - ms);
-    }
-  });
-  const totalHoursStr = totalMinutes ? `${Math.floor(totalMinutes/60)}h${totalMinutes%60?` ${totalMinutes%60}min`:''}` : '—';
+  const totalMinutes = _scheduleTotalMinutes(items);
+  const totalHoursStr = _formatHoursStr(totalMinutes);
+  const docNumber = scheduleDocumentNumber(s);
+  const emittedDate = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  const emittedTime = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
 
   const esc = str => String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const escMulti = str => esc(str).replace(/\n/g,'<br>');
 
-  /* Bloco de item (cada item renderizado em card horizontal, agrupado por tipo) */
-  const renderItemCard = (it) => {
+  /* Renderiza uma única linha (tr) da tabela principal de itens */
+  const renderItemRow = (it, idx) => {
     const cs = consultantById(it.responsibleId) || c;
     const stMeta = statusById(it.status || 'provisorio') || { label: it.status || 'Provisório' };
     const statusCol = pdfStatusColor(it.status || 'provisorio');
@@ -12210,220 +14041,274 @@ async function generateScheduleAsBase64PDF(s, co, c){
     const accentBg  = it.kind === 'treinamento' ? '#e7efe8'
                     : it.kind === 'tarefa'      ? '#dee1ef'
                     : '#f7e9d3';
-    const icon = it.kind === 'treinamento' ? '✦' : it.kind === 'tarefa' ? '☰' : '●';
-    const kindLabel = it.kind === 'treinamento' ? 'Treinamento'
+    const kindLabel = it.kind === 'treinamento' ? 'Treino'
                     : it.kind === 'tarefa'      ? 'Tarefa'
-                    : 'Atendimento';
+                    : 'Atend.';
 
-    let dateBlock = '';
-    if (it.date){
-      const d = parseISO(it.date);
-      dateBlock = `
-        <div style="background:#fff;border:1px solid #ddd5c4;border-radius:4px;padding:8px 11px;text-align:center;min-width:64px">
-          <div style="font-size:24px;font-weight:600;color:#14171f;line-height:1;font-family:Georgia,serif">${pad(d.getDate())}/${pad(d.getMonth()+1)}</div>
-          <div style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;margin-top:3px">${dowShortPT(d.getDay())} ${d.getFullYear()}</div>
-        </div>`;
-    } else {
-      dateBlock = `
-        <div style="background:#f1d6d9;border:1px solid #8a2638;border-radius:4px;padding:8px 11px;text-align:center;min-width:64px">
-          <div style="font-size:14px;font-weight:600;color:#8a2638;line-height:1.2;font-family:Georgia,serif">Sem<br>data</div>
-        </div>`;
+    let durationStr = '—';
+    if (it.timeStart && it.timeEnd){
+      const ms = (parseInt(it.timeStart.slice(0,2))*60 + parseInt(it.timeStart.slice(3)));
+      const me = (parseInt(it.timeEnd.slice(0,2))*60 + parseInt(it.timeEnd.slice(3)));
+      if (me > ms){
+        const mins = me - ms;
+        durationStr = mins >= 60 ? `${Math.floor(mins/60)}h${mins%60?` ${mins%60}min`:''}` : `${mins}min`;
+      }
     }
 
-    const timeBlock = (it.timeStart && it.timeEnd)
-      ? `<span style="font-family:'Courier New',monospace;font-size:13px;font-weight:600;color:#14171f">${esc(it.timeStart)} — ${esc(it.timeEnd)}</span>`
+    let dateCell;
+    if (it.date){
+      const d = parseISO(it.date);
+      dateCell = `
+        <div style="font-family:Georgia,serif;font-size:14px;font-weight:600;color:#14171f;line-height:1">${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}</div>
+        <div style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.08em;text-transform:uppercase;margin-top:3px">${dowShortPT(d.getDay())}</div>`;
+    } else {
+      dateCell = `<div style="font-family:Georgia,serif;font-size:11px;color:#8a2638;font-style:italic">sem data</div>`;
+    }
+
+    const timeCell = (it.timeStart && it.timeEnd)
+      ? `<span style="font-family:'Courier New',monospace;font-size:11px;font-weight:600;color:#14171f">${esc(it.timeStart)}</span><br><span style="font-family:'Courier New',monospace;font-size:10px;color:#6b7184">${esc(it.timeEnd)}</span>`
       : it.timeStart
-        ? `<span style="font-family:'Courier New',monospace;font-size:13px;font-weight:600;color:#14171f">a partir de ${esc(it.timeStart)}</span>`
-        : `<span style="font-size:11px;color:#8a2638;font-style:italic">horário não definido</span>`;
+        ? `<span style="font-family:'Courier New',monospace;font-size:11px;font-weight:600;color:#14171f">${esc(it.timeStart)}</span>`
+        : `<span style="font-size:10.5px;color:#8a2638;font-style:italic">indef.</span>`;
 
+    const zebra = idx % 2 === 0 ? '#ffffff' : '#faf9f5';
     return `
-      <tr><td style="padding:0 0 12px 0">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid ${accentCol};border-radius:3px">
-          <tr>
-            <td style="padding:14px 16px;vertical-align:top;width:84px">
-              ${dateBlock}
-            </td>
-            <td style="padding:14px 16px;vertical-align:top">
-              <div style="display:inline-block;padding:3px 9px;background:${accentBg};color:${accentCol};border:1px solid ${accentCol};border-radius:10px;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px">${icon}&nbsp;&nbsp;${kindLabel}</div>
-              <div style="font-family:Georgia,serif;font-size:16px;font-weight:600;color:#14171f;line-height:1.25;margin-bottom:4px">${esc(it.title || 'Sem título')}</div>
-              <div style="font-size:11.5px;color:#4a4f5e;line-height:1.55">
-                ${timeBlock}
-                ${cs ? ` &nbsp;·&nbsp; <span style="font-size:11.5px;color:#4a4f5e">Responsável: <b style="color:#14171f">${esc(cs.name)}</b>${cs.email?` <span style="font-family:'Courier New',monospace;font-size:10px;color:#6b7184">(${esc(cs.email)})</span>`:''}</span>` : ''}
-              </div>
-              ${it.priority && it.kind === 'tarefa' ? `<div style="margin-top:6px"><span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:8px;background:#f7e9d3;color:#b8632a">Prioridade ${esc((it.priority||'media'))}</span></div>` : ''}
-              ${it.desc ? `<div style="margin-top:8px;font-size:11.5px;color:#4a4f5e;line-height:1.5;padding:8px 10px;background:#faf6ec;border-left:2px solid #d4a574">${escMulti(it.desc)}</div>` : ''}
-              ${it.resources ? `<div style="margin-top:6px;font-size:11px;color:#4a4f5e"><b style="text-transform:uppercase;font-size:9.5px;letter-spacing:.12em;color:#6b7184">Recursos:</b> ${escMulti(it.resources)}</div>` : ''}
-              ${(it.checklist && it.checklist.length) ? `
-                <div style="margin-top:8px;font-size:11.5px;color:#4a4f5e">
-                  <div style="text-transform:uppercase;font-size:9.5px;letter-spacing:.12em;color:#6b7184;font-weight:700;margin-bottom:4px">Checklist (${it.checklist.length})</div>
-                  <ul style="margin:0;padding-left:18px;font-size:11.5px;color:#2a2e3a">${it.checklist.map(step => `<li style="margin:2px 0">${esc(step)}</li>`).join('')}</ul>
-                </div>` : ''}
-            </td>
-            <td style="padding:14px 16px;vertical-align:top;width:120px;text-align:right">
-              <span style="display:inline-block;padding:5px 11px;background:${statusCol.bg};color:${statusCol.fg};border:1px solid ${statusCol.border};border-radius:11px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-family:Arial,sans-serif">${esc(stMeta.label)}</span>
-            </td>
-          </tr>
-        </table>
-      </td></tr>`;
+      <tr style="background:${zebra}">
+        <td style="padding:8px 8px;border-bottom:1px solid #ebe5d8;border-left:3px solid ${accentCol};vertical-align:middle;text-align:center;width:78px">${dateCell}</td>
+        <td style="padding:8px 8px;border-bottom:1px solid #ebe5d8;vertical-align:middle;text-align:center;width:58px">${timeCell}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #ebe5d8;vertical-align:middle">
+          <div style="font-family:Georgia,serif;font-size:12.5px;font-weight:600;color:#14171f;line-height:1.3">${esc(it.title || 'Sem título')}</div>
+          ${it.desc ? `<div style="margin-top:3px;font-size:10px;color:#4a4f5e;line-height:1.4">${escMulti(String(it.desc).slice(0,220))}${it.desc.length > 220 ? '…' : ''}</div>` : ''}
+        </td>
+        <td style="padding:8px 8px;border-bottom:1px solid #ebe5d8;vertical-align:middle;text-align:center;width:62px">
+          <span style="display:inline-block;padding:3px 7px;background:${accentBg};color:${accentCol};border:1px solid ${accentCol};border-radius:8px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:Arial,sans-serif">${kindLabel}</span>
+        </td>
+        <td style="padding:8px 8px;border-bottom:1px solid #ebe5d8;vertical-align:middle;width:110px">
+          <div style="font-size:11px;color:#14171f;font-weight:600;line-height:1.3">${cs ? esc(cs.name) : '<i style="color:#6b7184;font-weight:400">—</i>'}</div>
+          ${cs && cs.email ? `<div style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;margin-top:2px">${esc(cs.email)}</div>` : ''}
+        </td>
+        <td style="padding:8px 8px;border-bottom:1px solid #ebe5d8;vertical-align:middle;text-align:center;width:54px;font-family:'Courier New',monospace;font-size:10.5px;color:#14171f;font-weight:600">${durationStr}</td>
+        <td style="padding:8px 8px;border-bottom:1px solid #ebe5d8;vertical-align:middle;text-align:center;width:88px">
+          <span style="display:inline-block;padding:3px 8px;background:${statusCol.bg};color:${statusCol.fg};border:1px solid ${statusCol.border};border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:Arial,sans-serif">${esc(stMeta.label)}</span>
+        </td>
+      </tr>
+    `;
   };
 
-  const renderGroup = (label, color, bgColor, icon, arr) => {
-    if (!arr.length) return '';
-    return `
-      <tr><td style="padding:8px 0 4px 0">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div style="width:34px;height:34px;border-radius:50%;background:${bgColor};color:${color};display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid ${color};font-family:Arial,sans-serif">${icon}</div>
-          <div>
-            <div style="font-family:Georgia,serif;font-size:18px;font-weight:500;color:#14171f;letter-spacing:-.01em;line-height:1">${label}</div>
-            <div style="font-family:'Courier New',monospace;font-size:10px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">${arr.length} item(ns)</div>
-          </div>
-        </div>
-        <table width="100%" cellpadding="0" cellspacing="0">${arr.map(renderItemCard).join('')}</table>
-      </td></tr>`;
-  };
+  /* Observações automáticas — coletadas dos itens. */
+  const observationsList = [];
+  const itensSemData = items.filter(i => !i.date);
+  if (itensSemData.length) observationsList.push(`<b>${itensSemData.length} item(ns)</b> ainda sem data definida — serão agendados conforme disponibilidade.`);
+  const tarefasAlta = tasks.filter(i => i.priority === 'alta');
+  if (tarefasAlta.length) observationsList.push(`<b>${tarefasAlta.length} tarefa(s) de prioridade ALTA</b> identificada(s) — atenção prioritária.`);
+  const treinosResources = trainings.filter(i => i.resources);
+  if (treinosResources.length) observationsList.push(`<b>${treinosResources.length} treinamento(s)</b> exigem preparação prévia de recursos (sala, equipamentos, materiais).`);
+  const checklistTotal = items.reduce((sum, i) => sum + ((i.checklist||[]).length), 0);
+  if (checklistTotal) observationsList.push(`Total de <b>${checklistTotal} etapas</b> de checklist distribuídas entre os itens deste cronograma.`);
+  if (s.notes) observationsList.push(escMulti(s.notes));
 
-  /* Status summary chips */
+  /* Distribuição por status (chips) */
   const stCounts = {};
   items.forEach(it => { stCounts[it.status||'provisorio'] = (stCounts[it.status||'provisorio']||0) + 1; });
   const stChips = Object.entries(stCounts).map(([st, n]) => {
     const sm = statusById(st) || { label: st };
     const cc = pdfStatusColor(st);
-    return `<span style="display:inline-block;padding:4px 11px;background:${cc.bg};color:${cc.fg};border:1px solid ${cc.border};border-radius:11px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:Arial,sans-serif;margin-right:4px">${esc(sm.label)} · ${n}</span>`;
+    return `<span style="display:inline-block;padding:4px 11px;background:${cc.bg};color:${cc.fg};border:1px solid ${cc.border};border-radius:11px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:Arial,sans-serif;margin-right:4px;margin-bottom:4px">${esc(sm.label)} · ${n}</span>`;
   }).join('');
+
+  /* Email/telefone de contato (rodapé) — usa do consultor + empresa quando disponível */
+  const contactLine = [
+    c?.email ? `${esc(c.email)}` : null,
+    c?.phone ? `${esc(c.phone)}` : null,
+  ].filter(Boolean).join(' · ');
 
   const html = `
     <div id="pdfRoot" style="width:794px;background:#fff;color:#14171f;font-family:Georgia,'Times New Roman',serif;padding:0;box-sizing:border-box;font-size:13px;line-height:1.45">
 
-      <!-- HEADER COM FAIXA -->
+      <!-- ============ CABEÇALHO (faixa escura com identidade + nº doc) ============ -->
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#14171f;color:#f4efe6">
         <tr>
-          <td style="padding:28px 36px;vertical-align:middle">
-            <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.24em;color:#d4a574;margin-bottom:6px">FAKTORY FLOW AGENDA</div>
-            <div style="font-family:Georgia,serif;font-size:30px;font-weight:400;letter-spacing:-.02em;color:#f4efe6;line-height:1.1">Cronograma <em style="font-style:italic;color:#d4a574;font-weight:300">de atividades</em></div>
-            <div style="font-size:12px;color:#d0c6b1;margin-top:6px">Documento oficial para análise e aprovação do cliente</div>
+          <td style="padding:26px 36px 22px;vertical-align:middle">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="vertical-align:middle;padding-right:14px">
+                  <div style="width:46px;height:46px;border:1.5px solid #d4a574;display:inline-block;position:relative;text-align:center;line-height:46px;font-family:Georgia,serif;font-size:18px;color:#d4a574;font-weight:500">F</div>
+                </td>
+                <td style="vertical-align:middle">
+                  <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.26em;color:#d4a574;margin-bottom:4px">FAKTORY FLOW AGENDA</div>
+                  <div style="font-family:Georgia,serif;font-size:26px;font-weight:400;letter-spacing:-.02em;color:#f4efe6;line-height:1.1">Cronograma <em style="font-style:italic;color:#d4a574;font-weight:300">de atividades</em></div>
+                </td>
+              </tr>
+            </table>
+            <div style="font-size:11.5px;color:#d0c6b1;margin-top:8px">Documento oficial — apresentado para análise e aprovação do cliente.</div>
           </td>
-          <td style="padding:28px 36px;vertical-align:middle;text-align:right;width:200px;border-left:1px solid rgba(244,239,230,.1)">
-            <div style="font-family:'Courier New',monospace;font-size:9px;color:rgba(244,239,230,.6);letter-spacing:.16em;text-transform:uppercase">Emitido em</div>
-            <div style="font-family:Georgia,serif;font-size:15px;color:#f4efe6;font-weight:500;margin-top:4px">${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}</div>
-            <div style="font-family:'Courier New',monospace;font-size:11px;color:#d4a574;margin-top:2px">${new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</div>
+          <td style="padding:26px 36px 22px;vertical-align:middle;text-align:right;width:230px;border-left:1px solid rgba(244,239,230,.12)">
+            <div style="font-family:'Courier New',monospace;font-size:8.5px;color:rgba(244,239,230,.6);letter-spacing:.18em;text-transform:uppercase">Documento</div>
+            <div style="font-family:'Courier New',monospace;font-size:14px;color:#d4a574;font-weight:600;margin-top:3px;letter-spacing:.06em">${esc(docNumber)}</div>
+            <div style="font-family:'Courier New',monospace;font-size:8.5px;color:rgba(244,239,230,.6);letter-spacing:.18em;text-transform:uppercase;margin-top:10px">Emitido em</div>
+            <div style="font-family:Georgia,serif;font-size:13.5px;color:#f4efe6;font-weight:500;margin-top:3px">${esc(emittedDate)}</div>
+            <div style="font-family:'Courier New',monospace;font-size:10.5px;color:#d4a574;margin-top:1px">${esc(emittedTime)}</div>
           </td>
         </tr>
       </table>
 
-      <!-- CONTEÚDO -->
-      <div style="padding:30px 36px;background:#fff">
+      <!-- ============ CORPO ============ -->
+      <div style="padding:26px 32px 6px;background:#fff">
 
-        <!-- CLIENTE / EMPRESA -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px">
+        <!-- BLOCO CLIENTE -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px">
           <tr>
-            <td style="padding:18px 20px;background:linear-gradient(180deg,#f4efe6 0%,#ebe5d8 100%);border:1px solid #ddd5c4;border-radius:4px">
-              <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#6b7184;margin-bottom:6px;font-weight:700">Cliente</div>
-              <div style="font-family:Georgia,serif;font-size:26px;font-weight:500;color:#14171f;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px">${esc(co.fantasia || 'Empresa não identificada')}</div>
-              ${co.razao && co.razao !== co.fantasia ? `<div style="font-size:12px;color:#4a4f5e;font-style:italic;margin-bottom:6px">${esc(co.razao)}</div>` : ''}
-              <table width="100%" cellpadding="0" cellspacing="0" style="font-size:11.5px;margin-top:10px">
-                ${co.cnpj?`<tr><td style="padding:3px 0;width:120px;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">CNPJ</td><td style="padding:3px 0;font-family:'Courier New',monospace;color:#14171f;font-size:12px">${esc(co.cnpj)}</td></tr>`:''}
-                ${co.responsavel?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Responsável</td><td style="padding:3px 0;color:#14171f;font-weight:600">${esc(co.responsavel)}</td></tr>`:''}
-                ${co.contato?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">E-mail</td><td style="padding:3px 0;font-family:'Courier New',monospace;color:#14171f;font-size:11.5px">${esc(co.contato)}</td></tr>`:''}
-                ${co.projeto?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Projeto</td><td style="padding:3px 0;color:#14171f"><span style="display:inline-block;padding:3px 10px;background:#f0e1c8;color:#b8895a;border:1px solid #d4a574;border-radius:10px;font-size:11px;font-weight:600">${esc(co.projeto)}</span></td></tr>`:''}
+            <td style="padding:16px 18px;background:linear-gradient(180deg,#f4efe6 0%,#ebe5d8 100%);border:1px solid #ddd5c4;border-left:4px solid #b8895a;border-radius:3px">
+              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px;font-weight:700">Cliente · Destinatário</div>
+              <div style="font-family:Georgia,serif;font-size:23px;font-weight:500;color:#14171f;letter-spacing:-.02em;line-height:1.1;margin-bottom:4px">${esc(co.fantasia || 'Empresa não identificada')}</div>
+              ${co.razao && co.razao !== co.fantasia ? `<div style="font-size:11.5px;color:#4a4f5e;font-style:italic;margin-bottom:8px">${esc(co.razao)}</div>` : '<div style="height:6px"></div>'}
+              <table width="100%" cellpadding="0" cellspacing="0" style="font-size:11px;margin-top:6px">
+                <tr>
+                  ${co.cnpj ? `<td style="padding:2px 0;width:50%"><span style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;font-weight:700">CNPJ&nbsp;</span><span style="font-family:'Courier New',monospace;color:#14171f;font-size:11px">${esc(co.cnpj)}</span></td>` : '<td></td>'}
+                  ${co.responsavel ? `<td style="padding:2px 0;width:50%"><span style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Responsável&nbsp;</span><span style="color:#14171f;font-weight:600">${esc(co.responsavel)}</span></td>` : '<td></td>'}
+                </tr>
+                <tr>
+                  ${co.contato ? `<td style="padding:2px 0"><span style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;font-weight:700">E-mail&nbsp;</span><span style="font-family:'Courier New',monospace;color:#14171f;font-size:11px">${esc(co.contato)}</span></td>` : '<td></td>'}
+                  ${co.projeto ? `<td style="padding:2px 0"><span style="font-family:'Courier New',monospace;font-size:9px;color:#6b7184;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Projeto&nbsp;</span><span style="color:#14171f;font-weight:600">${esc(co.projeto)}</span></td>` : '<td></td>'}
+                </tr>
               </table>
             </td>
           </tr>
         </table>
 
-        <!-- CONSULTOR + PERÍODO em 2 colunas -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px">
+        <!-- 2 COLUNAS: CONSULTOR / PERÍODO -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px">
           <tr>
-            <td style="vertical-align:top;width:50%;padding-right:8px">
-              <div style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid #2d5f3f;border-radius:3px;padding:14px 16px;height:100%">
-                <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Consultor responsável</div>
+            <td style="vertical-align:top;width:50%;padding-right:7px">
+              <div style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid #2d5f3f;border-radius:3px;padding:13px 16px">
+                <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Consultor responsável</div>
                 ${c ? `
-                  <div style="font-family:Georgia,serif;font-size:17px;font-weight:600;color:#14171f;line-height:1.2">${esc(c.name)}</div>
-                  ${c.role || c.specialty ? `<div style="font-size:11.5px;color:#4a4f5e;font-style:italic;margin-top:2px">${esc(c.role || c.specialty)}</div>` : ''}
-                  ${c.email ? `<div style="font-family:'Courier New',monospace;font-size:11px;color:#2d5f3f;margin-top:6px;padding:4px 8px;background:#e7efe8;border:1px solid #2d5f3f;border-radius:10px;display:inline-block">${esc(c.email)}</div>` : ''}
+                  <div style="font-family:Georgia,serif;font-size:16px;font-weight:600;color:#14171f;line-height:1.2">${esc(c.name)}</div>
+                  ${c.role || c.specialty ? `<div style="font-size:11px;color:#4a4f5e;font-style:italic;margin-top:2px">${esc(c.role || c.specialty)}</div>` : ''}
+                  ${c.email ? `<div style="font-family:'Courier New',monospace;font-size:10.5px;color:#2d5f3f;margin-top:6px;padding:3px 8px;background:#e7efe8;border:1px solid #2d5f3f;border-radius:10px;display:inline-block">${esc(c.email)}</div>` : ''}
                 ` : '<div style="font-size:13px;color:#8a2638;font-style:italic">Consultor não definido</div>'}
               </div>
             </td>
-            <td style="vertical-align:top;width:50%;padding-left:8px">
-              <div style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid #b8895a;border-radius:3px;padding:14px 16px;height:100%">
-                <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Período do cronograma</div>
-                <div style="font-family:Georgia,serif;font-size:15px;font-weight:600;color:#14171f;line-height:1.3">
-                  <span style="display:inline-block;padding:3px 8px;background:#f4efe6;border:1px solid #ddd5c4;border-radius:4px;font-family:'Courier New',monospace;font-size:13px">${esc(isoToBR(s.from))}</span>
-                  <span style="color:#b8895a;margin:0 6px">→</span>
-                  <span style="display:inline-block;padding:3px 8px;background:#f4efe6;border:1px solid #ddd5c4;border-radius:4px;font-family:'Courier New',monospace;font-size:13px">${esc(isoToBR(s.to))}</span>
+            <td style="vertical-align:top;width:50%;padding-left:7px">
+              <div style="background:#fff;border:1px solid #ddd5c4;border-left:4px solid #b8895a;border-radius:3px;padding:13px 16px">
+                <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Período do cronograma</div>
+                <div style="font-family:Georgia,serif;font-size:14px;font-weight:600;color:#14171f;line-height:1.3">
+                  <span style="display:inline-block;padding:2px 7px;background:#f4efe6;border:1px solid #ddd5c4;border-radius:3px;font-family:'Courier New',monospace;font-size:12px">${esc(isoToBR(s.from))}</span>
+                  <span style="color:#b8895a;margin:0 5px">→</span>
+                  <span style="display:inline-block;padding:2px 7px;background:#f4efe6;border:1px solid #ddd5c4;border-radius:3px;font-family:'Courier New',monospace;font-size:12px">${esc(isoToBR(s.to))}</span>
                 </div>
-                ${minDate && minDate !== s.from ? `<div style="font-size:11px;color:#6b7184;margin-top:6px;font-style:italic">Atividades agendadas: ${esc(isoToBR(minDate))} até ${esc(isoToBR(maxDate))}</div>` : ''}
-                <div style="margin-top:8px;font-size:11px;color:#4a4f5e">Tempo total planejado: <b>${totalHoursStr}</b></div>
+                ${minDate && minDate !== s.from ? `<div style="font-size:10.5px;color:#6b7184;margin-top:6px;font-style:italic">Atividades: ${esc(isoToBR(minDate))} → ${esc(isoToBR(maxDate))}</div>` : ''}
+                <div style="margin-top:6px;font-size:11px;color:#4a4f5e">Carga horária planejada: <b style="font-family:Georgia,serif">${totalHoursStr}</b></div>
               </div>
             </td>
           </tr>
         </table>
 
-        <!-- KPIs / RESUMO -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;border:1px solid #ddd5c4;background:#fafafa;border-radius:3px">
+        <!-- ============ RESUMO EXECUTIVO ============ -->
+        <div style="margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #b8895a">
+          <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:2px">Seção 1</div>
+          <div style="font-family:Georgia,serif;font-size:19px;font-weight:500;color:#14171f;letter-spacing:-.015em">Resumo <em style="font-style:italic;color:#b8895a;font-weight:400">executivo</em></div>
+        </div>
+
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px;border:1px solid #ddd5c4;background:#fafafa;border-radius:3px">
           <tr>
-            <td style="padding:14px 16px;text-align:center;border-right:1px solid #ddd5c4;width:25%">
-              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#14171f;line-height:1">${pad(items.length)}</div>
-              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Itens totais</div>
+            <td style="padding:13px 14px;text-align:center;border-right:1px solid #ddd5c4;width:20%">
+              <div style="font-family:Georgia,serif;font-size:24px;font-weight:500;color:#14171f;line-height:1">${pad(items.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Sessões</div>
             </td>
-            <td style="padding:14px 16px;text-align:center;border-right:1px solid #ddd5c4;width:25%">
-              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#2d5f3f;line-height:1">${pad(trainings.length)}</div>
-              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Treinamentos</div>
+            <td style="padding:13px 14px;text-align:center;border-right:1px solid #ddd5c4;width:20%">
+              <div style="font-family:Georgia,serif;font-size:24px;font-weight:500;color:#2d5f3f;line-height:1">${pad(trainings.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Treinamentos</div>
             </td>
-            <td style="padding:14px 16px;text-align:center;border-right:1px solid #ddd5c4;width:25%">
-              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#2f3a78;line-height:1">${pad(tasks.length)}</div>
-              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Tarefas</div>
+            <td style="padding:13px 14px;text-align:center;border-right:1px solid #ddd5c4;width:20%">
+              <div style="font-family:Georgia,serif;font-size:24px;font-weight:500;color:#2f3a78;line-height:1">${pad(tasks.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Tarefas</div>
             </td>
-            <td style="padding:14px 16px;text-align:center;width:25%">
-              <div style="font-family:Georgia,serif;font-size:28px;font-weight:500;color:#b8632a;line-height:1">${pad(atend.length)}</div>
-              <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Atendimentos</div>
+            <td style="padding:13px 14px;text-align:center;border-right:1px solid #ddd5c4;width:20%">
+              <div style="font-family:Georgia,serif;font-size:24px;font-weight:500;color:#b8632a;line-height:1">${pad(atend.length)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Atendimentos</div>
+            </td>
+            <td style="padding:13px 14px;text-align:center;width:20%">
+              <div style="font-family:Georgia,serif;font-size:22px;font-weight:500;color:#14171f;line-height:1">${esc(totalHoursStr)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;margin-top:3px;font-weight:700">Carga horária</div>
             </td>
           </tr>
         </table>
 
         ${stChips ? `
-          <div style="margin-bottom:22px;padding:10px 14px;background:#faf6ec;border:1px solid #ebe5d8;border-radius:3px">
-            <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:6px">Distribuição por status</div>
-            <div style="line-height:2">${stChips}</div>
+          <div style="margin-bottom:18px;padding:9px 13px;background:#faf6ec;border:1px solid #ebe5d8;border-radius:3px">
+            <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:5px">Distribuição por status</div>
+            <div style="line-height:1.9">${stChips}</div>
           </div>` : ''}
 
-        <!-- DETALHAMENTO -->
-        <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid #b8895a">
-          <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:2px">SEÇÃO 1</div>
-          <div style="font-family:Georgia,serif;font-size:22px;font-weight:500;color:#14171f;letter-spacing:-.015em">Detalhamento <em style="font-style:italic;color:#b8895a;font-weight:400">dos itens</em></div>
+        <!-- ============ TABELA DETALHADA ============ -->
+        <div style="margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #b8895a">
+          <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:2px">Seção 2</div>
+          <div style="font-family:Georgia,serif;font-size:19px;font-weight:500;color:#14171f;letter-spacing:-.015em">Cronograma <em style="font-style:italic;color:#b8895a;font-weight:400">detalhado</em></div>
+          <div style="font-family:'Courier New',monospace;font-size:9.5px;color:#6b7184;letter-spacing:.06em;margin-top:3px">Itens ordenados cronologicamente</div>
         </div>
 
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px">
-          ${renderGroup('Treinamentos', '#2d5f3f', '#e7efe8', '✦', trainings)}
-          ${renderGroup('Tarefas',      '#2f3a78', '#dee1ef', '☰', tasks)}
-          ${renderGroup('Atendimentos', '#b8632a', '#f7e9d3', '●', atend)}
-          ${!items.length ? `
-            <tr><td style="padding:30px;text-align:center;background:#fafafa;border:1px dashed #ddd5c4;color:#6b7184;font-style:italic">
-              Este cronograma ainda não possui itens cadastrados.
-            </td></tr>` : ''}
-        </table>
+        ${items.length ? `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;border:1px solid #ddd5c4;border-radius:3px;border-collapse:collapse;font-family:Georgia,serif">
+            <thead>
+              <tr style="background:#14171f;color:#f4efe6">
+                <th style="padding:9px 8px;text-align:center;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Data</th>
+                <th style="padding:9px 8px;text-align:center;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Horário</th>
+                <th style="padding:9px 10px;text-align:left;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Atividade</th>
+                <th style="padding:9px 8px;text-align:center;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Tipo</th>
+                <th style="padding:9px 8px;text-align:left;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Responsável</th>
+                <th style="padding:9px 8px;text-align:center;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Duração</th>
+                <th style="padding:9px 8px;text-align:center;font-family:'Courier New',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #b8895a">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map((it, idx) => renderItemRow(it, idx)).join('')}
+            </tbody>
+          </table>
+        ` : `
+          <div style="padding:30px;text-align:center;background:#fafafa;border:1px dashed #ddd5c4;color:#6b7184;font-style:italic;border-radius:3px">
+            Este cronograma ainda não possui itens cadastrados.
+          </div>
+        `}
 
-        <!-- APROVAÇÃO -->
-        <div style="margin-top:30px;padding:22px 26px;background:linear-gradient(135deg,#f4efe6 0%,#fff 100%);border:1px solid #b8895a;border-radius:4px;text-align:center">
-          <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:8px">Aprovação do cliente</div>
-          <div style="font-family:Georgia,serif;font-size:17px;color:#14171f;line-height:1.5;margin-bottom:10px">
-            Para <b>aprovar</b> este cronograma, responda o e-mail confirmando o aceite.<br>
+        <!-- ============ OBSERVAÇÕES ============ -->
+        ${observationsList.length ? `
+          <div style="margin-top:24px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #b8895a">
+            <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:2px">Seção 3</div>
+            <div style="font-family:Georgia,serif;font-size:19px;font-weight:500;color:#14171f;letter-spacing:-.015em">Observações <em style="font-style:italic;color:#b8895a;font-weight:400">e instruções</em></div>
+          </div>
+          <div style="padding:14px 18px;background:#faf6ec;border:1px solid #ebe5d8;border-left:3px solid #d4a574;border-radius:3px;margin-top:10px">
+            <ul style="margin:0;padding-left:18px;font-size:12px;color:#2a2e3a;line-height:1.65">
+              ${observationsList.map(o => `<li style="margin:3px 0">${o}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- ============ APROVAÇÃO ============ -->
+        <div style="margin-top:24px;padding:18px 22px;background:linear-gradient(135deg,#f4efe6 0%,#fff 100%);border:1px solid #b8895a;border-radius:3px;text-align:center">
+          <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:6px">Aprovação do cliente</div>
+          <div style="font-family:Georgia,serif;font-size:15px;color:#14171f;line-height:1.5;margin-bottom:8px">
+            Para <b>aprovar</b> este cronograma, responda este e-mail confirmando o aceite.<br>
             Para solicitar ajustes, descreva-os na resposta.
           </div>
-          <div style="display:inline-block;padding:10px 24px;background:#2d5f3f;color:#fff;font-family:Arial,sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px">
+          <div style="display:inline-block;padding:7px 18px;background:#2d5f3f;color:#fff;font-family:Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px">
             Resposta esperada por e-mail
           </div>
         </div>
 
       </div>
 
-      <!-- FOOTER -->
-      <table width="100%" cellpadding="0" cellspacing="0" style="background:#14171f;color:#d0c6b1">
+      <!-- ============ RODAPÉ ============ -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#14171f;color:#d0c6b1;margin-top:18px">
         <tr>
-          <td style="padding:14px 36px;font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase">
-            Faktory Flow Agenda · Central de Consultoria
+          <td style="padding:13px 32px;vertical-align:middle">
+            <div style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#d4a574">Faktory Flow Agenda</div>
+            <div style="font-family:Georgia,serif;font-size:11px;color:#d0c6b1;margin-top:2px">Central de Consultoria · Documento confidencial</div>
+            ${contactLine ? `<div style="font-family:'Courier New',monospace;font-size:9.5px;color:rgba(208,198,177,.7);margin-top:3px">Contato: ${contactLine}</div>` : ''}
           </td>
-          <td style="padding:14px 36px;text-align:right;font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.1em;color:rgba(208,198,177,.6)">
-            Documento gerado automaticamente · ${esc(s.id||'')}
+          <td style="padding:13px 32px;vertical-align:middle;text-align:right;font-family:'Courier New',monospace;font-size:9px;color:rgba(208,198,177,.6);letter-spacing:.1em">
+            ${esc(docNumber)}<br>
+            <span style="color:rgba(208,198,177,.4)">Gerado em ${esc(emittedDate)} ${esc(emittedTime)}</span>
           </td>
         </tr>
       </table>
@@ -12444,9 +14329,10 @@ async function generateScheduleAsBase64PDF(s, co, c){
   await new Promise(r => setTimeout(r, 120));
 
   try {
-    const blob = await html2pdf().set({
-      margin: [10, 8, 10, 8],   /* top, right, bottom, left em mm */
-      filename: 'cronograma.pdf',
+    /* Constrói via worker para conseguir o handle do jsPDF e adicionar numeração de páginas */
+    const worker = html2pdf().set({
+      margin: [10, 8, 14, 8],   /* top, right, bottom, left em mm — bottom maior pra paginação caber */
+      filename: `${docNumber}.pdf`,
       image: { type: 'jpeg', quality: 0.97 },
       html2canvas: {
         scale: 2,
@@ -12459,9 +14345,32 @@ async function generateScheduleAsBase64PDF(s, co, c){
         scrollY: 0,
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' },
-    }).from(container.querySelector('#pdfRoot') || container).outputPdf('blob');
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'thead'] },
+    }).from(container.querySelector('#pdfRoot') || container).toPdf();
 
+    /* Obtém o jsPDF e adiciona "Página X de Y · docNumber" no rodapé de cada página */
+    const pdf = await worker.get('pdf');
+    const total = pdf.getNumberOfPages();
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    for (let i = 1; i <= total; i++){
+      pdf.setPage(i);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(120, 120, 120);
+      /* Linha discreta acima do número */
+      pdf.setDrawColor(220, 215, 200);
+      pdf.setLineWidth(0.15);
+      pdf.line(8, pageH - 8.5, pageW - 8, pageH - 8.5);
+      /* Lado esquerdo: número do documento */
+      pdf.text(`Documento ${docNumber}`, 8, pageH - 4, { align: 'left' });
+      /* Lado direito: paginação */
+      pdf.text(`Página ${i} de ${total}`, pageW - 8, pageH - 4, { align: 'right' });
+      /* Centro: empresa */
+      pdf.text(`${(co.fantasia||'').slice(0, 80)}`, pageW / 2, pageH - 4, { align: 'center' });
+    }
+
+    const blob = pdf.output('blob');
     if (!blob || blob.size < 1000){
       throw new Error('PDF gerado vazio (size: ' + (blob?blob.size:0) + ' bytes)');
     }
@@ -12482,6 +14391,386 @@ async function generateScheduleAsBase64PDF(s, co, c){
     setTimeout(() => container.remove(), 200);
   }
 }
+
+/* ============================================
+   GERAÇÃO DE EXCEL (.xlsx) — ExcelJS
+   Estrutura: 2 abas
+     - "Cronograma": tabela principal com cores por tipo/status, freeze, autofilter, proteção
+     - "Resumo":     resumo executivo, dados do cliente, KPIs e distribuição por status
+   ============================================ */
+async function generateScheduleAsBase64XLSX(s, co, c){
+  const ready = await ensureExcelJS();
+  if (!ready) throw new Error('Não foi possível carregar a biblioteca ExcelJS (CDN bloqueado?)');
+
+  const items = (s.items || []).slice()
+    .sort((a,b) => (a.date||'').localeCompare(b.date||'') || (a.timeStart||'').localeCompare(b.timeStart||''));
+
+  const docNumber = scheduleDocumentNumber(s);
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator  = 'Faktory Flow Agenda';
+  wb.created  = new Date();
+  wb.modified = new Date();
+  wb.title    = `Cronograma — ${co.fantasia}`;
+  wb.company  = co.fantasia;
+  wb.subject  = docNumber;
+
+  /* ============ Sheet 1: Cronograma ============ */
+  const ws = wb.addWorksheet('Cronograma', {
+    pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left:0.4, right:0.4, top:0.5, bottom:0.5, header:0.3, footer:0.3 } },
+    views: [{ state: 'frozen', ySplit: 4, xSplit: 0 }],
+    headerFooter: {
+      oddHeader: `&L&"Calibri,Bold"&14Faktory Flow Agenda&R&10Documento ${docNumber}`,
+      oddFooter: `&L&10Cliente: ${co.fantasia}&C&10Página &P de &N&R&10${new Date().toLocaleDateString('pt-BR')}`,
+    },
+  });
+
+  /* Bloco-título no topo da planilha (linhas 1-3) */
+  ws.mergeCells('A1:J1');
+  const titleCell = ws.getCell('A1');
+  titleCell.value = `Cronograma de Atividades — ${co.fantasia}`;
+  titleCell.font = { name: 'Calibri', size: 18, bold: true, color: { argb: 'FFF4EFE6' } };
+  titleCell.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF14171F' } };
+  ws.getRow(1).height = 34;
+
+  ws.mergeCells('A2:J2');
+  const subCell = ws.getCell('A2');
+  subCell.value = `Documento ${docNumber} · Período ${isoToBR(s.from)} → ${isoToBR(s.to)} · Emitido em ${new Date().toLocaleDateString('pt-BR')}${c ? ` · Consultor responsável: ${c.name}` : ''}`;
+  subCell.font = { name: 'Calibri', size: 10, italic: true, color: { argb: 'FF6B7184' } };
+  subCell.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  subCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4EFE6' } };
+  ws.getRow(2).height = 22;
+
+  /* Linha em branco antes do cabeçalho */
+  ws.getRow(3).height = 6;
+
+  /* Cabeçalho da tabela (linha 4) */
+  ws.columns = [
+    { header: 'Data',          key: 'date',        width: 13 },
+    { header: 'Dia',           key: 'dow',         width: 10 },
+    { header: 'Horário',       key: 'time',        width: 16 },
+    { header: 'Duração',       key: 'duration',    width: 11 },
+    { header: 'Tipo',          key: 'kind',        width: 15 },
+    { header: 'Atividade',     key: 'title',       width: 42 },
+    { header: 'Responsável',   key: 'responsavel', width: 24 },
+    { header: 'Status',        key: 'status',      width: 15 },
+    { header: 'Prioridade',    key: 'priority',    width: 12 },
+    { header: 'Descrição',     key: 'desc',        width: 40 },
+  ];
+
+  /* O ExcelJS coloca o header em linha 1 com `ws.columns`, mas como usei merges nas linhas 1-2,
+     vou empurrar manualmente: remove a linha 1 falsa do columns e adiciona header na linha 4. */
+  ws.spliceRows(1, 1); /* remove a row de header padrão criada automaticamente */
+  /* Re-adiciona o título (foi removido junto) */
+  ws.spliceRows(1, 0, ['']); /* placeholder */
+  ws.spliceRows(2, 0, ['']);
+  ws.spliceRows(3, 0, ['']);
+
+  /* Recria os títulos */
+  ws.unMergeCells('A1:J1'); ws.unMergeCells('A2:J2');
+  ws.mergeCells('A1:J1');
+  ws.getCell('A1').value = `Cronograma de Atividades — ${co.fantasia}`;
+  ws.getCell('A1').font = { name: 'Calibri', size: 18, bold: true, color: { argb: 'FFF4EFE6' } };
+  ws.getCell('A1').alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  ws.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF14171F' } };
+  ws.getRow(1).height = 34;
+
+  ws.mergeCells('A2:J2');
+  ws.getCell('A2').value = `Documento ${docNumber} · Período ${isoToBR(s.from)} → ${isoToBR(s.to)} · Emitido em ${new Date().toLocaleDateString('pt-BR')}${c ? ` · Consultor responsável: ${c.name}` : ''}`;
+  ws.getCell('A2').font = { name: 'Calibri', size: 10, italic: true, color: { argb: 'FF6B7184' } };
+  ws.getCell('A2').alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  ws.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4EFE6' } };
+  ws.getRow(2).height = 22;
+  ws.getRow(3).height = 6;
+
+  /* Header da tabela na linha 4 */
+  const headerLabels = ['Data','Dia','Horário','Duração','Tipo','Atividade','Responsável','Status','Prioridade','Descrição'];
+  const headerRow = ws.getRow(4);
+  headerLabels.forEach((label, idx) => { headerRow.getCell(idx+1).value = label; });
+  headerRow.height = 26;
+  headerRow.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFF4EFE6' } };
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+  headerRow.eachCell((cell) => {
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2A2E3A' } };
+    cell.border = {
+      top:    { style: 'medium', color: { argb: 'FF14171F' } },
+      bottom: { style: 'medium', color: { argb: 'FFB8895A' } },
+      left:   { style: 'thin',   color: { argb: 'FF555555' } },
+      right:  { style: 'thin',   color: { argb: 'FF555555' } },
+    };
+  });
+
+  const typeColors = {
+    treinamento: { bg: 'FFE7EFE8', fg: 'FF2D5F3F' },
+    tarefa:      { bg: 'FFDEE1EF', fg: 'FF2F3A78' },
+    atendimento: { bg: 'FFF7E9D3', fg: 'FFB8632A' },
+  };
+  const statusColorMap = {
+    confirmado:  { bg: 'FFE7EFE8', fg: 'FF2D5F3F' },
+    provisorio:  { bg: 'FFF7E9D3', fg: 'FFB8632A' },
+    'em-andamento': { bg: 'FFDEE1EF', fg: 'FF2F3A78' },
+    'em-atendimento': { bg: 'FFFCE4EC', fg: 'FFC2185B' },
+    atendido:    { bg: 'FFE7EFE8', fg: 'FF2D5F3F' },
+    concluido:   { bg: 'FFE7EFE8', fg: 'FF2D5F3F' },
+    pendente:    { bg: 'FFE3E5E9', fg: 'FF525C6B' },
+    reagendado:  { bg: 'FFDEE1EF', fg: 'FF2F3A78' },
+    cancelado:   { bg: 'FFF1D6D9', fg: 'FF8A2638' },
+  };
+
+  /* Linhas de dados */
+  items.forEach((it, idx) => {
+    const cs = consultantById(it.responsibleId) || c;
+    const stMeta = statusById(it.status || 'provisorio') || { label: it.status || 'Provisório' };
+    let durationH = 0;
+    if (it.timeStart && it.timeEnd){
+      const ms = parseInt(it.timeStart.slice(0,2))*60 + parseInt(it.timeStart.slice(3));
+      const me = parseInt(it.timeEnd.slice(0,2))*60 + parseInt(it.timeEnd.slice(3));
+      if (me > ms) durationH = Math.round(((me - ms) / 60) * 100) / 100;
+    }
+    const dateStr = it.date ? isoToBR(it.date) : '— sem data —';
+    const dowStr  = it.date ? dowShortPT(parseISO(it.date).getDay()) : '';
+    const timeStr = (it.timeStart && it.timeEnd) ? `${it.timeStart} – ${it.timeEnd}` : (it.timeStart || '');
+    const kindLabel = ({ treinamento:'Treinamento', tarefa:'Tarefa', atendimento:'Atendimento' })[it.kind] || (it.kind || '');
+
+    const row = ws.addRow([
+      dateStr, dowStr, timeStr, durationH || '', kindLabel,
+      it.title || '(sem título)', cs ? cs.name : '',
+      stMeta.label, (it.priority || ''), (it.desc || ''),
+    ]);
+    row.height = 24;
+    row.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+
+    /* Zebra */
+    const zebra = (idx % 2 === 0) ? 'FFFFFFFF' : 'FFFAF9F5';
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebra } };
+      cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF14171F' } };
+      cell.border = {
+        top:    { style: 'thin', color: { argb: 'FFE0DCD0' } },
+        bottom: { style: 'thin', color: { argb: 'FFE0DCD0' } },
+        left:   { style: 'thin', color: { argb: 'FFE0DCD0' } },
+        right:  { style: 'thin', color: { argb: 'FFE0DCD0' } },
+      };
+    });
+
+    /* Realces */
+    const dateCell = row.getCell(1);
+    dateCell.font = { name: 'Consolas', size: 10, color: { argb: 'FF14171F' } };
+    dateCell.alignment = { vertical: 'middle', horizontal: 'center' };
+    if (!it.date){
+      dateCell.font = { name: 'Calibri', size: 10, italic: true, color: { argb: 'FF8A2638' } };
+    }
+    row.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
+    row.getCell(3).font = { name: 'Consolas', size: 10, color: { argb: 'FF14171F' } };
+    row.getCell(3).alignment = { vertical: 'middle', horizontal: 'center' };
+    if (durationH){
+      row.getCell(4).numFmt = '0.0 "h"';
+    }
+    row.getCell(4).alignment = { vertical: 'middle', horizontal: 'center' };
+
+    /* Tipo (col 5) — colorido */
+    const kindCell = row.getCell(5);
+    const kc = typeColors[it.kind] || { bg: 'FFE3E5E9', fg: 'FF525C6B' };
+    kindCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: kc.bg } };
+    kindCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: kc.fg } };
+    kindCell.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    /* Atividade (col 6) em negrito */
+    row.getCell(6).font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF14171F' } };
+
+    /* Status (col 8) — colorido */
+    const statusCell = row.getCell(8);
+    const sc2 = statusColorMap[it.status || 'provisorio'] || statusColorMap.provisorio;
+    statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sc2.bg } };
+    statusCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: sc2.fg } };
+    statusCell.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    /* Prioridade (col 9) */
+    if (it.priority){
+      const pc = (it.priority === 'alta')   ? { bg:'FFF1D6D9', fg:'FF8A2638' }
+              : (it.priority === 'baixa')   ? { bg:'FFE7EFE8', fg:'FF2D5F3F' }
+              :                                 { bg:'FFF7E9D3', fg:'FFB8632A' };
+      const pCell = row.getCell(9);
+      pCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: pc.bg } };
+      pCell.font = { name: 'Calibri', size: 9, bold: true, color: { argb: pc.fg } };
+      pCell.value = String(it.priority).toUpperCase();
+      pCell.alignment = { vertical: 'middle', horizontal: 'center' };
+    }
+  });
+
+  if (!items.length){
+    const empty = ws.addRow(['(Sem itens neste cronograma)', '','','','','','','','','']);
+    empty.height = 24;
+    ws.mergeCells(`A${empty.number}:J${empty.number}`);
+    empty.getCell(1).font = { italic: true, color: { argb: 'FF6B7184' }, size: 11 };
+    empty.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+  }
+
+  /* AutoFilter sobre a faixa do header */
+  const lastDataRow = Math.max(4, 4 + items.length);
+  ws.autoFilter = { from: { row: 4, column: 1 }, to: { row: lastDataRow, column: 10 } };
+
+  /* Formatação condicional: destaca datas próximas (próximos 7 dias) na coluna Data */
+  ws.addConditionalFormatting({
+    ref: `A5:A${lastDataRow}`,
+    rules: [
+      { type: 'expression', formulae: [`AND(LEN(A5)=10, DATEVALUE(MID(A5,7,4)&"-"&MID(A5,4,2)&"-"&LEFT(A5,2))-TODAY()>=0, DATEVALUE(MID(A5,7,4)&"-"&MID(A5,4,2)&"-"&LEFT(A5,2))-TODAY()<=7)`],
+        style: { font: { bold: true, color: { argb: 'FF8A2638' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF4E0' } } }, priority: 1 },
+    ],
+  });
+
+  /* Proteção: bloqueia edição mas permite filtros/seleção */
+  ws.protect('', {
+    selectLockedCells:   true,
+    selectUnlockedCells: true,
+    sort:                true,
+    autoFilter:          true,
+    formatColumns:       true,
+    formatRows:          true,
+    insertColumns:       false,
+    insertRows:          false,
+    deleteColumns:       false,
+    deleteRows:          false,
+  });
+
+  /* ============ Sheet 2: Resumo Executivo ============ */
+  const wr = wb.addWorksheet('Resumo Executivo', {
+    pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left:0.5, right:0.5, top:0.5, bottom:0.5 } },
+    views: [{ showGridLines: false }],
+  });
+  wr.columns = [ { width: 26 }, { width: 36 }, { width: 18 }, { width: 16 } ];
+
+  /* Título */
+  wr.mergeCells('A1:D1');
+  const rt = wr.getCell('A1');
+  rt.value = 'Resumo Executivo do Cronograma';
+  rt.font = { name: 'Calibri', size: 20, bold: true, color: { argb: 'FFF4EFE6' } };
+  rt.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  rt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF14171F' } };
+  wr.getRow(1).height = 40;
+
+  wr.mergeCells('A2:D2');
+  const rs = wr.getCell('A2');
+  rs.value = `Documento ${docNumber} · Emitido em ${new Date().toLocaleDateString('pt-BR')} · ${items.length} item(ns)`;
+  rs.font = { name: 'Calibri', size: 10, italic: true, color: { argb: 'FF6B7184' } };
+  rs.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+  rs.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF4EFE6' } };
+  wr.getRow(2).height = 22;
+
+  let row = 4;
+  const sectionHeader = (label) => {
+    wr.mergeCells(`A${row}:D${row}`);
+    const cell = wr.getCell(`A${row}`);
+    cell.value = label;
+    cell.font = { name: 'Calibri', size: 12, bold: true, color: { argb: 'FFF4EFE6' } };
+    cell.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB8895A' } };
+    wr.getRow(row).height = 24;
+    row++;
+  };
+  const kv = (label, value, opts={}) => {
+    const r0 = wr.getRow(row);
+    r0.getCell(1).value = label;
+    r0.getCell(2).value = value || '';
+    r0.getCell(1).font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF6B7184' } };
+    r0.getCell(2).font = opts.bold ? { name: 'Calibri', size: 12, bold: true, color: { argb: 'FF14171F' } } : { name: 'Calibri', size: 11, color: { argb: 'FF14171F' } };
+    r0.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+    r0.getCell(2).alignment = { vertical: 'middle', horizontal: 'left' };
+    r0.height = 20;
+    /* borda inferior fina */
+    [1,2,3,4].forEach(i => { r0.getCell(i).border = { bottom: { style: 'hair', color: { argb: 'FFE0DCD0' } } }; });
+    row++;
+  };
+
+  sectionHeader('Cliente');
+  kv('Razão social', co.razao || co.fantasia);
+  kv('Nome fantasia', co.fantasia, { bold: true });
+  if (co.cnpj)         kv('CNPJ', co.cnpj);
+  if (co.responsavel)  kv('Responsável', co.responsavel);
+  if (co.contato)      kv('E-mail', co.contato);
+  if (co.projeto)      kv('Projeto', co.projeto);
+  row++;
+
+  sectionHeader('Consultor Responsável');
+  if (c){
+    kv('Nome', c.name, { bold: true });
+    if (c.role || c.specialty) kv('Cargo / Especialidade', c.role || c.specialty);
+    if (c.email) kv('E-mail', c.email);
+  } else {
+    kv('Status', 'Sem consultor atribuído');
+  }
+  row++;
+
+  sectionHeader('Cronograma');
+  kv('Número do documento', docNumber, { bold: true });
+  kv('Período', `${isoToBR(s.from)} → ${isoToBR(s.to)}`);
+  kv('Status do cronograma', (s.status || 'rascunho').toUpperCase().replace('-',' '));
+  kv('Emitido em', new Date().toLocaleString('pt-BR'));
+  row++;
+
+  const trainings = items.filter(i => i.kind === 'treinamento').length;
+  const tasks     = items.filter(i => i.kind === 'tarefa').length;
+  const atend     = items.filter(i => i.kind === 'atendimento').length;
+  const totalMin  = _scheduleTotalMinutes(items);
+  const totalH    = Math.round((totalMin / 60) * 100) / 100;
+
+  sectionHeader('Indicadores');
+  kv('Total de itens', items.length, { bold: true });
+  kv('Treinamentos', `${trainings} (${items.length?Math.round(100*trainings/items.length):0}%)`);
+  kv('Tarefas', `${tasks} (${items.length?Math.round(100*tasks/items.length):0}%)`);
+  kv('Atendimentos', `${atend} (${items.length?Math.round(100*atend/items.length):0}%)`);
+  kv('Carga horária total', `${totalH} h  (${_formatHoursStr(totalMin)})`, { bold: true });
+  row++;
+
+  /* Distribuição por status */
+  const stCounts = {};
+  items.forEach(it => { stCounts[it.status||'provisorio'] = (stCounts[it.status||'provisorio']||0) + 1; });
+  if (Object.keys(stCounts).length){
+    sectionHeader('Distribuição por Status');
+    Object.entries(stCounts).forEach(([st, n]) => {
+      const sm = statusById(st) || { label: st };
+      kv(sm.label, `${n} item(ns) — ${items.length?Math.round(100*n/items.length):0}%`);
+    });
+  }
+
+  /* Proteção da aba de resumo */
+  wr.protect('', { selectLockedCells: true, selectUnlockedCells: true });
+
+  /* Converte para base64 */
+  const buffer = await wb.xlsx.writeBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+/* Helper para teste manual no console — salva XLSX local */
+window.downloadScheduleXLSX = async (scheduleId) => {
+  const s = SCHEDULES.find(x => x.id === scheduleId);
+  if (!s){ toast('error','Cronograma não encontrado'); return; }
+  const co = companyById(s.companyId);
+  const c  = consultantById(s.consultantId);
+  toast('info','Gerando Excel...','Aguarde.');
+  try {
+    const base64 = await generateScheduleAsBase64XLSX(s, co, c);
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cronograma-${(co.fantasia||'cliente').replace(/[^a-z0-9]/gi,'-').toLowerCase()}.xlsx`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('success','Excel gerado', `${(blob.size/1024).toFixed(1)} KB`);
+  } catch(e){
+    console.error(e);
+    toast('error','Falha ao gerar Excel', e.message || String(e));
+  }
+};
 
 /* Helper exposto para teste manual no console:
    downloadSchedulePDF('schedule-id') — salva PDF local pra debug visual */
@@ -12512,33 +14801,108 @@ window.downloadSchedulePDF = async (scheduleId) => {
 
 function buildScheduleEmail(s, co, c){
   const items = s.items || [];
-  const esc = str => (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const trainings = items.filter(i => i.kind === 'treinamento').length;
+  const tasksCount = items.filter(i => i.kind === 'tarefa').length;
+  const atendCount = items.filter(i => i.kind === 'atendimento').length;
+  const totalMin = _scheduleTotalMinutes(items);
+  const totalHoursStr = _formatHoursStr(totalMin);
+  const docNumber = scheduleDocumentNumber(s);
+  const greetingName = co.responsavel || co.fantasia || 'Cliente';
+  const esc = str => (str==null?'':String(str)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,serif;color:#14171f">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px"><tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4">
-      <tr><td style="padding:24px 30px;border-bottom:1px solid #ddd5c4;background:linear-gradient(180deg,#ebe5d8 0%,#fff 100%)">
-        <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;margin-bottom:6px">Faktory Flow Agenda</div>
-        <h1 style="font-size:26px;font-weight:400;letter-spacing:-.025em;margin:0">Cronograma para <em style="font-style:italic;color:#b8895a">aprovação</em></h1>
-      </td></tr>
-      <tr><td style="padding:22px 30px;font-size:14px;line-height:1.6;color:#2a2e3a">
-        Olá ${co.responsavel?`<b>${esc(co.responsavel)}</b>`:`<b>${esc(co.fantasia)}</b>`},<br><br>
-        Segue em <b>anexo (PDF)</b> o cronograma de atividades para sua análise e aprovação.
-      </td></tr>
-      <tr><td style="padding:14px 30px;background:#f4efe6;border-top:1px solid #ddd5c4;border-bottom:1px solid #ddd5c4">
-        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px">
-          <tr><td style="padding:5px 0;color:#6b7184;width:120px;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Cliente</td><td style="padding:5px 0;font-weight:600">${esc(co.fantasia)}</td></tr>
-          <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Período</td><td style="padding:5px 0;font-family:monospace">${isoToBR(s.from)} → ${isoToBR(s.to)}</td></tr>
-          <tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Itens</td><td style="padding:5px 0">${items.length} item(ns) no cronograma</td></tr>
-          ${c?`<tr><td style="padding:5px 0;color:#6b7184;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:700">Consultor</td><td style="padding:5px 0">${esc(c.name)}${c.email?` · <a href="mailto:${esc(c.email)}" style="color:#b8895a">${esc(c.email)}</a>`:''}</td></tr>`:''}
+<html><head><meta charset="utf-8">
+<title>Cronograma — ${esc(co.fantasia)}</title>
+</head>
+<body style="margin:0;padding:0;background:#f4efe6;font-family:Georgia,'Times New Roman',serif;color:#14171f">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;background:#f4efe6"><tr><td align="center">
+    <table width="640" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd5c4;border-radius:3px;overflow:hidden">
+
+      <!-- ============ Header ============ -->
+      <tr><td style="padding:26px 32px 22px;background:#14171f;color:#f4efe6">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="vertical-align:middle">
+              <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:.22em;color:#d4a574;margin-bottom:5px">FAKTORY FLOW AGENDA</div>
+              <h1 style="font-family:Georgia,serif;font-size:24px;font-weight:400;letter-spacing:-.02em;margin:0;color:#f4efe6;line-height:1.15">Cronograma de atividades<br><em style="font-style:italic;color:#d4a574;font-weight:300;font-size:18px">para sua análise</em></h1>
+            </td>
+            <td style="vertical-align:middle;text-align:right;width:180px;border-left:1px solid rgba(244,239,230,.12);padding-left:18px">
+              <div style="font-family:'Courier New',monospace;font-size:8.5px;color:rgba(244,239,230,.6);letter-spacing:.18em;text-transform:uppercase">Documento</div>
+              <div style="font-family:'Courier New',monospace;font-size:12.5px;color:#d4a574;font-weight:600;margin-top:3px;letter-spacing:.05em">${esc(docNumber)}</div>
+              <div style="font-family:'Courier New',monospace;font-size:8.5px;color:rgba(244,239,230,.5);letter-spacing:.12em;margin-top:8px">${new Date().toLocaleDateString('pt-BR')}</div>
+            </td>
+          </tr>
         </table>
       </td></tr>
-      <tr><td style="padding:22px 30px;text-align:center">
-        <a href="mailto:${esc(c?.email||'')}?subject=Aprovado%20-%20Cronograma%20${encodeURIComponent(co.fantasia)}" style="display:inline-block;background:#2d5f3f;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.04em">Responder confirmando aprovação</a>
-        <div style="margin-top:12px;font-size:11.5px;color:#6b7184">Ou descreva ajustes desejados na resposta.</div>
+
+      <!-- ============ Saudação ============ -->
+      <tr><td style="padding:24px 32px 8px;font-family:Georgia,serif;font-size:15px;line-height:1.65;color:#2a2e3a">
+        <p style="margin:0 0 12px">Prezado(a) <b style="color:#14171f">${esc(greetingName)}</b>,</p>
+        <p style="margin:0 0 12px">É com satisfação que apresentamos o <b>cronograma oficial de atividades</b> elaborado para <b>${esc(co.fantasia)}</b>. Este documento consolida o planejamento de treinamentos, tarefas e atendimentos previstos para o período em análise.</p>
+        <p style="margin:0 0 12px">Solicitamos sua gentil revisão dos itens descritos. Caso esteja tudo de acordo, basta <b>responder este e-mail confirmando a aprovação</b>. Se houver ajustes a sugerir, descreva-os na resposta — estaremos à disposição para refiná-lo até atendermos plenamente sua expectativa.</p>
       </td></tr>
-      <tr><td style="padding:14px;background:#14171f;color:#d0c6b1;text-align:center;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda · documento anexo em PDF</td></tr>
+
+      <!-- ============ Resumo Executivo ============ -->
+      <tr><td style="padding:6px 32px 0">
+        <div style="background:#f4efe6;border:1px solid #ddd5c4;border-left:3px solid #b8895a;border-radius:3px;padding:14px 16px">
+          <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:8px">Resumo do cronograma</div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12.5px">
+            <tr><td style="padding:3px 0;color:#6b7184;width:110px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Cliente</td><td style="padding:3px 0;font-weight:600;color:#14171f">${esc(co.fantasia)}</td></tr>
+            <tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Período</td><td style="padding:3px 0;font-family:'Courier New',monospace;font-size:12px;color:#14171f">${isoToBR(s.from)} <span style="color:#b8895a">→</span> ${isoToBR(s.to)}</td></tr>
+            <tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Itens totais</td><td style="padding:3px 0;color:#14171f"><b>${items.length}</b> sessão(ões) — ${trainings} treinamento(s), ${tasksCount} tarefa(s), ${atendCount} atendimento(s)</td></tr>
+            <tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Carga horária</td><td style="padding:3px 0;color:#14171f"><b>${esc(totalHoursStr)}</b> planejadas</td></tr>
+            ${c?`<tr><td style="padding:3px 0;color:#6b7184;font-family:'Courier New',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Consultor</td><td style="padding:3px 0;color:#14171f">${esc(c.name)}${c.email?` · <a href="mailto:${esc(c.email)}" style="color:#b8895a;text-decoration:none">${esc(c.email)}</a>`:''}</td></tr>`:''}
+          </table>
+        </div>
+      </td></tr>
+
+      <!-- ============ Anexos ============ -->
+      <tr><td style="padding:18px 32px 8px">
+        <div style="font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:10px">Documentos anexos</div>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="vertical-align:top;width:50%;padding-right:6px">
+              <div style="background:#fff;border:1px solid #ddd5c4;border-left:3px solid #8a2638;border-radius:3px;padding:12px 14px">
+                <div style="display:inline-block;background:#f1d6d9;color:#8a2638;font-family:Arial,sans-serif;font-size:9px;letter-spacing:.14em;font-weight:700;padding:2px 8px;border-radius:8px;text-transform:uppercase;margin-bottom:6px">PDF</div>
+                <div style="font-family:Georgia,serif;font-size:13.5px;font-weight:600;color:#14171f;line-height:1.25">Cronograma completo</div>
+                <div style="font-size:11px;color:#4a4f5e;line-height:1.5;margin-top:4px">Documento oficial para impressão e arquivo, com resumo executivo, tabela detalhada e instruções de aprovação.</div>
+              </div>
+            </td>
+            <td style="vertical-align:top;width:50%;padding-left:6px">
+              <div style="background:#fff;border:1px solid #ddd5c4;border-left:3px solid #2d5f3f;border-radius:3px;padding:12px 14px">
+                <div style="display:inline-block;background:#e7efe8;color:#2d5f3f;font-family:Arial,sans-serif;font-size:9px;letter-spacing:.14em;font-weight:700;padding:2px 8px;border-radius:8px;text-transform:uppercase;margin-bottom:6px">XLSX</div>
+                <div style="font-family:Georgia,serif;font-size:13.5px;font-weight:600;color:#14171f;line-height:1.25">Planilha interativa</div>
+                <div style="font-size:11px;color:#4a4f5e;line-height:1.5;margin-top:4px">Versão em Excel com filtros e duas abas (Cronograma + Resumo Executivo), pronta para análise e acompanhamento.</div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div style="margin-top:10px;font-size:11.5px;color:#6b7184;font-style:italic;text-align:center">Os dois arquivos contêm a mesma informação — escolha o formato mais conveniente para você.</div>
+      </td></tr>
+
+      <!-- ============ CTA ============ -->
+      <tr><td style="padding:24px 32px 6px;text-align:center">
+        <a href="mailto:${esc(c?.email||'')}?subject=Aprovado%20-%20Cronograma%20${encodeURIComponent(docNumber)}%20-%20${encodeURIComponent(co.fantasia)}&body=${encodeURIComponent('Confirmo a aprovação do cronograma referente ao documento '+docNumber+'.')}" style="display:inline-block;background:#2d5f3f;color:#fff;padding:13px 28px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;font-family:Arial,sans-serif;border-radius:3px;text-transform:uppercase">Aprovar este cronograma</a>
+        <div style="margin-top:10px;font-size:11.5px;color:#6b7184">Ou descreva ajustes desejados na resposta deste e-mail.</div>
+      </td></tr>
+
+      <!-- ============ Assinatura ============ -->
+      <tr><td style="padding:20px 32px 24px;border-top:1px solid #ebe5d8">
+        <div style="font-family:Georgia,serif;font-size:13px;color:#2a2e3a;line-height:1.55">
+          Atenciosamente,<br>
+          ${c?`<b style="color:#14171f;font-size:14px">${esc(c.name)}</b>${c.role||c.specialty?`<br><span style="font-style:italic;color:#4a4f5e;font-size:11.5px">${esc(c.role||c.specialty)}</span>`:''}${c.email?`<br><a href="mailto:${esc(c.email)}" style="color:#b8895a;text-decoration:none;font-family:'Courier New',monospace;font-size:11.5px">${esc(c.email)}</a>`:''}${c.phone?` <span style="color:#6b7184;font-family:'Courier New',monospace;font-size:11px">· ${esc(c.phone)}</span>`:''}`:'<b style="color:#14171f">Equipe Faktory Flow</b>'}
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px dashed #ebe5d8;font-family:'Courier New',monospace;font-size:9.5px;color:#6b7184;letter-spacing:.04em;line-height:1.6">
+          <b style="color:#b8895a;letter-spacing:.18em">FAKTORY FLOW AGENDA</b><br>
+          Central de Consultoria · Documento confidencial<br>
+          Este e-mail e seus anexos são destinados exclusivamente ao destinatário identificado.
+        </div>
+      </td></tr>
+
+      <!-- ============ Rodapé ============ -->
+      <tr><td style="padding:12px 32px;background:#14171f;color:#d0c6b1;text-align:center;font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase">
+        ${esc(docNumber)} · Faktory Flow Agenda · ${new Date().toLocaleDateString('pt-BR')}
+      </td></tr>
     </table>
   </td></tr></table>
 </body></html>`;

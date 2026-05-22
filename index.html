@@ -9466,10 +9466,14 @@ window.ccAddItem = (kind, companyId) => {
   /* Cria registro novo já vinculado a esta empresa */
   state.rgEditingId = null;
   openRegistroModal(null, kind);
-  /* pré-preenche empresa */
+  /* pré-preenche empresa e dispara 'change' para que os hooks dependentes
+     (pauta automática, lista de tarefas vinculáveis a atendimento) reajam. */
   setTimeout(() => {
     const co = document.getElementById('rgCompany');
-    if (co) co.value = companyId;
+    if (co){
+      co.value = companyId;
+      co.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   }, 100);
   /* sobrescreve save para também atualizar o card */
   const orig = document.getElementById('rgSaveBtn').onclick;

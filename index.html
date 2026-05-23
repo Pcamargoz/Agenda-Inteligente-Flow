@@ -2817,6 +2817,726 @@
   .user-chip .avatar{width:24px;height:24px;font-size:10px}
   .user-chip span{font-size:11.5px;font-weight:600}
   .user-chip small{font-family:var(--font-mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.06em}
+
+  /* ============================================
+     ENCERRAMENTO — Aba do card do cliente
+     ============================================ */
+  .enc-wrap{ padding:18px 22px 28px; display:flex; flex-direction:column; gap:18px; }
+  .enc-cover{
+    position:relative; overflow:hidden;
+    background:linear-gradient(135deg, rgba(20,23,31,.94), rgba(42,46,58,.94));
+    color:var(--paper); border-radius:14px; padding:22px 26px;
+    box-shadow:0 18px 40px -22px rgba(20,23,31,.5), 0 0 0 1px rgba(255,255,255,.06) inset;
+  }
+  .enc-cover::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(45% 60% at 90% 20%, rgba(184,137,90,.28), transparent 65%),
+      radial-gradient(40% 50% at 10% 100%, rgba(45,95,63,.20), transparent 65%);
+  }
+  .enc-cover > *{ position:relative; }
+  .enc-cover-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--champagne-3);
+  }
+  .enc-dot{
+    width:7px;height:7px;border-radius:50%;background:currentColor;
+    box-shadow:0 0 0 3px color-mix(in srgb, currentColor 22%, transparent);
+  }
+  .enc-cover h2{
+    font-family:var(--font-display); font-weight:400; font-size:28px;
+    margin:8px 0 6px; letter-spacing:-.01em;
+  }
+  .enc-cover h2 em{ font-style:italic; color:var(--champagne-2); }
+  .enc-cover p{ color:rgba(244,239,230,.72); max-width:560px; font-size:13px; }
+  .enc-cover-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .enc-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:9px 14px; border-radius:8px;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    color:var(--paper); font-family:var(--font-mono); font-size:11px;
+    font-weight:700; letter-spacing:.12em; text-transform:uppercase; cursor:pointer;
+    transition:all .18s ease;
+  }
+  .enc-btn:hover{ background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3); }
+  .enc-btn.primary{ background:var(--champagne-2); color:var(--ink); border-color:var(--champagne-2); }
+  .enc-btn.primary:hover{ background:var(--champagne); border-color:var(--champagne); }
+  .enc-btn.ghost{ background:transparent; color:var(--ink-3); border-color:var(--line-2); }
+  .enc-btn.ghost:hover{ background:var(--paper-2); color:var(--ink); border-color:var(--ink); }
+
+  .enc-grid{
+    display:grid; grid-template-columns:1.1fr .9fr 1.4fr; gap:14px;
+  }
+  .enc-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; box-shadow:var(--shadow-sm);
+  }
+  .enc-card-head{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2);
+    padding-bottom:10px; border-bottom:1px solid var(--line); margin-bottom:12px;
+  }
+  .enc-card-head em{ font-style:normal; color:var(--ink-4); font-weight:500; }
+  .enc-card-ic{
+    width:24px; height:24px; border-radius:50%;
+    background:var(--champagne-4); color:var(--champagne);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:13px; font-weight:700;
+  }
+  .enc-summary dl{ display:grid; grid-template-columns:auto 1fr; gap:6px 14px; margin:0; }
+  .enc-summary dt{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+    padding-top:2px;
+  }
+  .enc-summary dd{ margin:0; color:var(--ink); font-size:13px; }
+  .enc-summary dd small{ color:var(--ink-3); font-size:11px; }
+  .enc-stats .enc-stat-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:8px;
+  }
+  .enc-stats .enc-stat-grid > div{
+    background:var(--paper-2); border-radius:8px; padding:10px 12px; text-align:center;
+  }
+  .enc-stats .enc-stat-grid b{
+    display:block; font-family:var(--font-display); font-size:22px; color:var(--ink); font-weight:500;
+  }
+  .enc-stats .enc-stat-grid span{
+    display:block; font-family:var(--font-mono); font-size:9px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-top:2px;
+  }
+  .enc-notes textarea{
+    width:100%; min-height:140px; resize:vertical;
+    border:1px solid var(--line-2); border-radius:8px; padding:10px 12px;
+    font-family:var(--font-body); font-size:13px; color:var(--ink);
+    background:var(--paper); line-height:1.5; transition:border-color .15s ease;
+  }
+  .enc-notes textarea:focus{ outline:none; border-color:var(--ink); }
+  .enc-notes-foot{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px;
+  }
+  .enc-notes-status{
+    font-family:var(--font-mono); font-size:10px; color:var(--ink-3);
+    letter-spacing:.08em;
+  }
+
+  /* ---------- TIMELINE ---------- */
+  .enc-timeline-card .enc-card-head{ flex-wrap:wrap; }
+  .enc-tl-legend{
+    display:flex; flex-wrap:wrap; gap:10px; margin-left:auto;
+    font-family:var(--font-mono); font-size:9px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .enc-tl-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .enc-tl-legend .lg{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .lg-card{background:var(--ink-3);} .lg-meeting{background:var(--amber-2);}
+  .lg-training{background:var(--forest);} .lg-task{background:var(--indigo-2);}
+  .lg-achievement{background:#10b981;} .lg-pending{background:var(--burgundy);}
+  .lg-warning{background:var(--amber);} .lg-status{background:var(--champagne);}
+  .lg-os{background:var(--rose);} .lg-schedule{background:#0ea5e9;} .lg-milestone{background:#7c3aed;}
+
+  .enc-timeline{
+    list-style:none; padding:0; margin:0;
+    position:relative;
+  }
+  .enc-tl-item{
+    display:grid; grid-template-columns:36px 1fr; gap:14px;
+    padding-bottom:14px;
+    animation:encTlFade .42s ease backwards;
+  }
+  .enc-tl-item:nth-child(1){ animation-delay:.02s; }
+  .enc-tl-item:nth-child(2){ animation-delay:.06s; }
+  .enc-tl-item:nth-child(3){ animation-delay:.10s; }
+  .enc-tl-item:nth-child(4){ animation-delay:.14s; }
+  .enc-tl-item:nth-child(5){ animation-delay:.18s; }
+  .enc-tl-item:nth-child(n+6){ animation-delay:.22s; }
+  @keyframes encTlFade{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+
+  .enc-tl-axis{
+    position:relative; display:flex; flex-direction:column; align-items:center;
+  }
+  .enc-tl-ic{
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:14px; font-weight:700;
+    background:var(--paper-2); color:var(--ink); border:2px solid var(--paper);
+    box-shadow:0 4px 10px -4px rgba(20,23,31,.32);
+    flex-shrink:0; z-index:1; transition:transform .15s ease;
+  }
+  .enc-tl-line{
+    flex:1; width:2px; background:linear-gradient(180deg, var(--line-2), transparent);
+    margin-top:4px;
+  }
+  .enc-tl-item.tone-card    .enc-tl-ic{ background:#2a2e3a; color:#fff; }
+  .enc-tl-item.tone-meeting .enc-tl-ic{ background:var(--amber-bg); color:var(--amber); }
+  .enc-tl-item.tone-training .enc-tl-ic{ background:var(--forest-bg); color:var(--forest); }
+  .enc-tl-item.tone-task    .enc-tl-ic{ background:var(--indigo-bg); color:var(--indigo-2); }
+  .enc-tl-item.tone-achievement .enc-tl-ic{ background:#d1fae5; color:#065f46; }
+  .enc-tl-item.tone-milestone .enc-tl-ic{ background:#ede9fe; color:#7c3aed; }
+  .enc-tl-item.tone-pending .enc-tl-ic{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .enc-tl-item.tone-warning .enc-tl-ic{ background:var(--amber-bg); color:var(--amber); }
+  .enc-tl-item.tone-status  .enc-tl-ic{ background:var(--champagne-4); color:var(--champagne); }
+  .enc-tl-item.tone-os      .enc-tl-ic{ background:var(--rose-bg); color:var(--rose); }
+  .enc-tl-item.tone-schedule .enc-tl-ic{ background:#e0f2fe; color:#0369a1; }
+
+  .enc-tl-card{
+    background:rgba(255,255,255,.7);
+    border:1px solid var(--line); border-radius:10px;
+    padding:0; overflow:hidden;
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .enc-tl-card:hover{ border-color:var(--line-3); box-shadow:0 6px 14px -8px rgba(20,23,31,.18); }
+  .enc-tl-card:hover .enc-tl-ic{ transform:scale(1.06); }
+  .enc-tl-card summary{
+    display:grid; grid-template-columns:auto 1fr auto auto; gap:10px;
+    align-items:center; padding:10px 14px; cursor:pointer;
+    list-style:none;
+  }
+  .enc-tl-card summary::-webkit-details-marker{ display:none; }
+  .enc-tl-when{
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.08em; color:var(--ink-3); text-transform:uppercase;
+    min-width:128px;
+  }
+  .enc-tl-title{ font-weight:600; color:var(--ink); font-size:13px; }
+  .enc-tl-sub{
+    font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3);
+    text-align:right;
+  }
+  .enc-tl-chev{
+    width:22px; height:22px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:var(--ink-4); transition:transform .2s ease, color .15s ease;
+  }
+  .enc-tl-card[open] .enc-tl-chev{ transform:rotate(180deg); color:var(--ink); }
+  .enc-tl-detail{
+    padding:0 14px 14px 14px;
+    border-top:1px dashed var(--line-2);
+    margin-top:0; padding-top:10px;
+    font-size:12px; color:var(--ink-2); line-height:1.55;
+    background:var(--paper-2);
+  }
+  .enc-tl-empty{ color:var(--ink-4); font-style:italic; }
+  .enc-tl-empty-state{
+    padding:32px 18px; text-align:center; color:var(--ink-3);
+    background:var(--paper-2); border-radius:10px; font-style:italic;
+  }
+
+  /* Responsivo da aba Encerramento */
+  @media (max-width: 1000px){
+    .enc-grid{ grid-template-columns:1fr 1fr; }
+    .enc-notes{ grid-column:1 / -1; }
+  }
+  @media (max-width: 720px){
+    .enc-grid{ grid-template-columns:1fr; }
+    .enc-tl-card summary{ grid-template-columns:1fr auto; }
+    .enc-tl-when{ grid-column:1 / -1; min-width:0; }
+    .enc-tl-sub{ display:none; }
+  }
+
+  /* Estilo do contador da aba Encerramento (símbolo § em vez de número) */
+  .cc-tab[data-cct="encerramento"] .cc-tab-count{
+    background:var(--champagne); color:var(--paper);
+    font-family:var(--font-display); font-size:11px; font-weight:700;
+  }
+  .cc-tab[data-cct="encerramento"].active .cc-tab-count{
+    background:var(--ink); color:var(--paper);
+  }
+
+  /* ============================================
+     PAINEL DO CONSULTOR — view dedicada
+     Glassmorphism premium + transições suaves
+     ============================================ */
+  #view-consultor{ padding:0; }
+  .cons-stage{
+    position:relative;
+    min-height:calc(100vh - 120px);
+    padding:32px 36px 60px;
+    opacity:0; transform:translateY(8px);
+    transition:opacity .42s ease, transform .42s ease;
+  }
+  .cons-stage.in{ opacity:1; transform:none; }
+  .cons-stage::before{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(60% 50% at 12% 0%, rgba(184,137,90,.14), transparent 65%),
+      radial-gradient(45% 40% at 92% 8%, rgba(45,95,63,.10), transparent 60%),
+      radial-gradient(45% 40% at 50% 100%, rgba(47,58,120,.08), transparent 60%);
+  }
+  .cons-stage > *{ position:relative; z-index:1; }
+
+  /* ---------- SELECT SCREEN ---------- */
+  .cons-select-stage{ padding:40px 36px 60px; }
+  .cons-select-hero{ max-width:920px; margin:0 auto 32px; text-align:center; }
+  .cons-select-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--champagne);
+    background:var(--champagne-4); border:1px solid var(--champagne);
+    padding:6px 14px; border-radius:20px;
+  }
+  .cons-dot{
+    width:7px; height:7px; border-radius:50%; background:currentColor;
+    box-shadow:0 0 0 3px color-mix(in srgb, currentColor 22%, transparent);
+    animation:consPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes consPulse{ 50%{ transform:scale(1.18); opacity:.7; } }
+  .cons-select-hero h1{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(34px, 4vw, 52px); line-height:1.05;
+    color:var(--ink); margin:18px 0 12px; letter-spacing:-.01em;
+  }
+  .cons-select-hero h1 em{ font-style:italic; color:var(--champagne); }
+  .cons-select-hero p{ color:var(--ink-3); font-size:15px; max-width:560px; margin:0 auto; }
+
+  .cons-pick-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:18px; max-width:1180px; margin:0 auto;
+  }
+  .cons-pick-card{
+    text-align:left; display:flex; flex-direction:column; gap:10px;
+    padding:24px 22px 18px;
+    background:rgba(255,255,255,.55);
+    backdrop-filter:saturate(1.1) blur(14px);
+    -webkit-backdrop-filter:saturate(1.1) blur(14px);
+    border:1px solid rgba(255,255,255,.65);
+    border-radius:18px;
+    box-shadow:0 1px 0 rgba(255,255,255,.8) inset, 0 18px 40px -22px rgba(20,23,31,.22), 0 2px 8px rgba(20,23,31,.05);
+    cursor:pointer; transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    position:relative; overflow:hidden;
+  }
+  .cons-pick-card::after{
+    content:""; position:absolute; inset:-1px; border-radius:18px; pointer-events:none;
+    background:linear-gradient(135deg, rgba(184,137,90,.0) 40%, rgba(184,137,90,.25) 100%);
+    opacity:0; transition:opacity .22s ease;
+  }
+  .cons-pick-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 28px 60px -22px rgba(20,23,31,.32), 0 4px 14px rgba(184,137,90,.18);
+    border-color:rgba(184,137,90,.55);
+  }
+  .cons-pick-card:hover::after{ opacity:1; }
+  .cons-pick-avatar{
+    width:64px; height:64px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:22px; font-weight:500; color:#fff;
+    box-shadow:0 8px 22px -10px rgba(20,23,31,.45), 0 0 0 3px rgba(255,255,255,.6);
+  }
+  .cons-pick-avatar.c1{ background:linear-gradient(135deg,#b8895a,#8a5e35); }
+  .cons-pick-avatar.c2{ background:linear-gradient(135deg,#2d5f3f,#1c4128); }
+  .cons-pick-avatar.c3{ background:linear-gradient(135deg,#8a2638,#5f1925); }
+  .cons-pick-avatar.c4{ background:linear-gradient(135deg,#2f3a78,#1c2350); }
+  .cons-pick-avatar.c5{ background:linear-gradient(135deg,#b8632a,#7d401a); }
+  .cons-pick-name{
+    font-family:var(--font-display); font-size:20px; line-height:1.2;
+    color:var(--ink); font-weight:500;
+  }
+  .cons-pick-role{
+    font-family:var(--font-mono); font-size:10.5px; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--champagne);
+  }
+  .cons-pick-email{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); word-break:break-all; }
+  .cons-pick-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px; }
+  .cps{
+    background:rgba(255,255,255,.65); border:1px solid var(--line);
+    border-radius:10px; padding:8px 6px; text-align:center;
+  }
+  .cps b{ display:block; font-family:var(--font-display); font-size:18px; color:var(--ink); }
+  .cps span{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:2px; }
+  .cps.cps-livre b{ color:var(--forest); }
+  .cps.cps-provisionado b{ color:var(--amber-2); }
+  .cps.cps-agendado b{ color:var(--burgundy); }
+  .cons-pick-cta{
+    margin-top:auto; padding-top:12px; border-top:1px dashed var(--line-2);
+    display:flex; align-items:center; justify-content:space-between;
+    font-family:var(--font-mono); font-size:10.5px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink);
+  }
+
+  .cons-empty-stage{ display:flex; align-items:center; justify-content:center; }
+  .cons-empty-card{
+    background:rgba(255,255,255,.7); border:1px solid var(--line-2);
+    border-radius:20px; padding:40px 48px; text-align:center; max-width:420px;
+    box-shadow:var(--shadow-md);
+  }
+  .cons-empty-ic{
+    width:72px; height:72px; border-radius:50%; margin:0 auto 16px;
+    background:var(--champagne-4); color:var(--champagne);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cons-empty-card h2{ font-family:var(--font-display); font-weight:500; color:var(--ink); }
+  .cons-empty-card p{ color:var(--ink-3); margin:8px 0 18px; }
+
+  /* ---------- DASHBOARD ---------- */
+  .cons-dash-stage{ padding:24px 28px 60px; }
+  .cons-hero{
+    background:rgba(255,255,255,.66);
+    backdrop-filter:saturate(1.1) blur(16px);
+    -webkit-backdrop-filter:saturate(1.1) blur(16px);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:18px; padding:22px 24px;
+    box-shadow:0 1px 0 rgba(255,255,255,.9) inset, var(--shadow-md);
+    position:relative;
+  }
+  .cons-back{
+    position:absolute; top:14px; right:14px;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:18px;
+    background:transparent; border:1px solid var(--line-2);
+    font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+    transition:all .18s ease;
+  }
+  .cons-back:hover{ color:var(--ink); border-color:var(--ink); background:var(--paper); }
+  .cons-hero-main{ display:flex; gap:18px; align-items:center; padding-right:140px; }
+  .cons-hero-avatar{
+    width:78px; height:78px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:26px; font-weight:500; color:#fff;
+    flex-shrink:0;
+    box-shadow:0 12px 32px -12px rgba(20,23,31,.4), 0 0 0 4px rgba(255,255,255,.6);
+  }
+  .cons-hero-avatar.c1{ background:linear-gradient(135deg,#b8895a,#8a5e35); }
+  .cons-hero-avatar.c2{ background:linear-gradient(135deg,#2d5f3f,#1c4128); }
+  .cons-hero-avatar.c3{ background:linear-gradient(135deg,#8a2638,#5f1925); }
+  .cons-hero-avatar.c4{ background:linear-gradient(135deg,#2f3a78,#1c2350); }
+  .cons-hero-avatar.c5{ background:linear-gradient(135deg,#b8632a,#7d401a); }
+  .cons-hero-info{ flex:1; min-width:0; }
+  .cons-hero-eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-mono); font-size:9.5px; font-weight:600;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--champagne); margin-bottom:6px;
+  }
+  .cons-hero-info h1{
+    font-family:var(--font-display); font-weight:400;
+    font-size:clamp(26px, 3vw, 36px); line-height:1.1; color:var(--ink); letter-spacing:-.01em;
+  }
+  .cons-hero-info p{ margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
+  .cons-chip{
+    display:inline-flex; align-items:center; padding:4px 10px; border-radius:16px;
+    background:var(--champagne-4); border:1px solid var(--champagne);
+    color:var(--ink-2); font-size:10.5px; font-weight:600;
+    letter-spacing:.04em; text-transform:uppercase;
+  }
+  .cons-chip.soft{ background:var(--paper-2); border-color:var(--line-2); color:var(--ink-3); }
+  .cons-chip.mono{ font-family:var(--font-mono); text-transform:none; letter-spacing:0; font-weight:500; background:transparent; }
+
+  .cons-hero-metrics{
+    margin-top:18px; display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+  }
+  .cons-metric{
+    background:rgba(255,255,255,.6); border:1px solid var(--line);
+    border-radius:14px; padding:14px 16px;
+    display:flex; flex-direction:column; gap:4px;
+    position:relative; overflow:hidden;
+    transition:border-color .18s ease, transform .18s ease;
+  }
+  .cons-metric:hover{ transform:translateY(-2px); border-color:var(--line-2); }
+  .cm-ic{
+    position:absolute; top:10px; right:12px; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:13px; font-weight:700;
+    background:var(--paper-2); color:var(--ink-3);
+  }
+  .cm-val{
+    font-family:var(--font-display); font-size:26px; line-height:1; color:var(--ink); font-weight:500;
+    display:flex; align-items:baseline; gap:4px;
+  }
+  .cm-sep{ font-size:14px; color:var(--ink-4); font-family:var(--font-mono); }
+  .cm-lbl{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:600;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .cons-metric.m-pend.is-on .cm-ic{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .cons-metric.m-overdue.is-on .cm-ic{ background:var(--amber-bg); color:var(--amber); }
+  .cons-metric.m-today.is-livre .cm-ic{ background:var(--forest-bg); color:var(--forest); }
+  .cons-metric.m-today.is-provisionado .cm-ic{ background:var(--amber-bg); color:var(--amber); }
+  .cons-metric.m-today.is-agendado .cm-ic{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .cons-metric.m-month .cm-ic{ background:var(--champagne-4); color:var(--champagne); font-family:var(--font-display); }
+
+  /* ---------- TABS ---------- */
+  .cons-tabs{
+    display:flex; gap:4px; margin:20px 0 0; padding:4px;
+    background:rgba(255,255,255,.55); border:1px solid var(--line);
+    border-radius:14px; backdrop-filter:blur(10px);
+    width:fit-content;
+  }
+  .cons-tab{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:9px 16px; border-radius:10px;
+    font-family:var(--font-mono); font-size:11px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+    background:transparent; border:none; cursor:pointer;
+    transition:all .22s ease;
+  }
+  .cons-tab:hover{ color:var(--ink); background:rgba(255,255,255,.45); }
+  .cons-tab.active{
+    color:var(--ink); background:var(--paper);
+    box-shadow:0 2px 8px -2px rgba(20,23,31,.18);
+  }
+  .cons-tab-pill{
+    display:inline-flex; min-width:22px; padding:2px 7px; border-radius:11px;
+    background:var(--paper-2); color:var(--ink-3); font-size:10px; justify-content:center;
+  }
+  .cons-tab.active .cons-tab-pill{ background:var(--ink); color:var(--paper); }
+  .cons-tab-pill.is-on{ background:var(--burgundy); color:var(--paper); }
+
+  .cons-tabbody{
+    margin-top:16px;
+    animation:consFadeIn .32s ease;
+  }
+  @keyframes consFadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+
+  /* ---------- PENDÊNCIAS ---------- */
+  .cons-pend-wrap{ display:flex; flex-direction:column; gap:18px; }
+  .cons-pend-summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .cps-card{
+    background:rgba(255,255,255,.6); border:1px solid var(--line);
+    border-radius:12px; padding:14px 18px;
+    display:flex; align-items:center; justify-content:space-between;
+    transition:border-color .18s ease;
+  }
+  .cps-card span{ font-family:var(--font-mono); font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); }
+  .cps-card b{ font-family:var(--font-display); font-size:24px; color:var(--ink); }
+  .cps-overdue.is-on{ border-color:var(--burgundy); background:linear-gradient(135deg,var(--burgundy-bg),rgba(255,255,255,.65)); }
+  .cps-overdue.is-on b{ color:var(--burgundy); }
+  .cps-nodate.is-on{ border-color:var(--indigo-2); background:linear-gradient(135deg,var(--indigo-bg),rgba(255,255,255,.65)); }
+  .cps-nodate.is-on b{ color:var(--indigo-2); }
+  .cps-upcoming.is-on{ border-color:var(--forest); background:linear-gradient(135deg,var(--forest-bg),rgba(255,255,255,.65)); }
+  .cps-upcoming.is-on b{ color:var(--forest); }
+
+  .cons-pend-group{
+    background:rgba(255,255,255,.55); border:1px solid var(--line);
+    border-radius:14px; padding:16px 18px;
+    backdrop-filter:blur(10px);
+  }
+  .cpg-head{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2);
+    padding-bottom:12px; border-bottom:1px solid var(--line);
+    margin-bottom:12px;
+  }
+  .cpg-head em{ font-style:normal; color:var(--ink-4); font-weight:500; }
+  .cpg-ic{
+    width:24px; height:24px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--paper-2); color:var(--ink-3);
+    font-size:12px; font-weight:700;
+  }
+  .g-overdue .cpg-ic{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .g-nodate .cpg-ic{ background:var(--indigo-bg); color:var(--indigo-2); }
+  .g-upcoming .cpg-ic{ background:var(--forest-bg); color:var(--forest); }
+  .cpg-rows{ display:flex; flex-direction:column; gap:8px; }
+
+  .cons-pend-row{
+    display:grid; grid-template-columns:120px 1fr auto auto; gap:14px; align-items:center;
+    padding:12px 14px; border-radius:10px;
+    background:rgba(255,255,255,.7); border:1px solid var(--line);
+    transition:all .18s ease;
+  }
+  .cons-pend-row:hover{ border-color:var(--line-3); transform:translateX(2px); box-shadow:0 4px 12px -6px rgba(20,23,31,.18); }
+  .cp-kind{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase;
+    padding:5px 10px; border-radius:14px; text-align:center;
+    background:var(--paper-2); color:var(--ink-3); border:1px solid var(--line);
+  }
+  .cp-kind.k-tarefa{ background:var(--indigo-bg); color:var(--indigo-2); border-color:transparent; }
+  .cp-kind.k-treinamento{ background:var(--forest-bg); color:var(--forest); border-color:transparent; }
+  .cp-kind.k-atendimento{ background:var(--amber-bg); color:var(--amber); border-color:transparent; }
+  .cp-kind.k-fail{ background:var(--burgundy-bg); color:var(--burgundy); border-color:transparent; }
+  .cp-main{ min-width:0; }
+  .cp-title{ font-weight:600; color:var(--ink); margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cp-meta{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    font-size:11px; color:var(--ink-3);
+  }
+  .cp-company{ font-weight:600; color:var(--ink-2); }
+  .cp-status{ font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+  .cp-pri{ font-family:var(--font-mono); font-size:9px; font-weight:700; letter-spacing:.12em; padding:2px 7px; border-radius:10px; background:var(--paper-2); color:var(--ink-3); }
+  .cp-pri.pri-alta, .cp-pri.pri-high{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .cp-pri.pri-media, .cp-pri.pri-medium{ background:var(--amber-bg); color:var(--amber); }
+  .cp-pri.pri-baixa, .cp-pri.pri-low{ background:var(--forest-bg); color:var(--forest); }
+  .cp-flag{ font-family:var(--font-mono); font-size:9px; font-weight:700; letter-spacing:.14em; padding:2px 7px; border-radius:10px; background:var(--burgundy); color:var(--paper); }
+  .cp-date{ text-align:right; font-family:var(--font-mono); font-size:11.5px; min-width:90px; }
+  .cp-date b{ display:block; color:var(--ink); }
+  .cp-time{ display:block; font-size:10px; color:var(--ink-3); margin-top:2px; }
+  .cp-nodate{ font-style:italic; color:var(--indigo-2); font-size:10.5px; }
+  .cp-actions{ display:flex; gap:6px; }
+  .cp-btn{
+    width:30px; height:30px; border-radius:8px;
+    border:1px solid var(--line-2); background:var(--paper);
+    color:var(--ink-2); display:inline-flex; align-items:center; justify-content:center;
+    transition:all .15s ease; cursor:pointer;
+  }
+  .cp-btn:hover{ border-color:var(--ink); color:var(--ink); background:var(--paper-2); }
+  .cons-pend-row.is-overdue{ border-left:3px solid var(--burgundy); }
+  .cons-pend-row.is-flagged{ background:linear-gradient(90deg, var(--burgundy-bg) 0%, rgba(255,255,255,.7) 14%); }
+
+  .cons-empty{
+    position:relative;
+    background:rgba(255,255,255,.6); border:1px solid var(--line);
+    border-radius:16px; padding:40px 24px; text-align:center;
+    color:var(--ink-3); overflow:hidden;
+  }
+  .cons-empty svg{ color:var(--forest); margin-bottom:8px; }
+  .cons-empty h3{ font-family:var(--font-display); font-weight:500; color:var(--ink); }
+  .cons-empty p{ margin-top:6px; }
+  .cons-empty-glow{ position:absolute; inset:auto; width:260px; height:260px; left:50%; top:50%; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle, var(--forest-bg) 0%, transparent 70%); opacity:.45; pointer-events:none; }
+
+  /* ---------- AGENDA / CALENDÁRIO ---------- */
+  .cons-agenda-wrap{
+    display:grid; grid-template-columns:1fr 340px; gap:16px;
+  }
+  .cons-cal{
+    background:rgba(255,255,255,.6); border:1px solid var(--line);
+    border-radius:14px; padding:16px 18px; backdrop-filter:blur(10px);
+  }
+  .cons-cal-head{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    margin-bottom:14px; flex-wrap:wrap;
+  }
+  .cch-nav{ display:flex; gap:6px; }
+  .cch-btn{
+    width:32px; height:32px; border-radius:8px;
+    border:1px solid var(--line-2); background:var(--paper); color:var(--ink-2);
+    display:inline-flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .cch-btn:hover{ border-color:var(--ink); color:var(--ink); }
+  .cch-today{
+    width:auto; padding:0 12px;
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase;
+  }
+  .cons-cal-head h3{
+    font-family:var(--font-display); font-weight:500; font-size:22px; color:var(--ink); letter-spacing:-.01em;
+  }
+  .cons-cal-legend{ display:flex; gap:12px; flex-wrap:wrap; }
+  .ccl{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .ccl .dot{ width:8px; height:8px; border-radius:50%; }
+  .ccl-livre .dot{ background:var(--forest); }
+  .ccl-provisionado .dot{ background:var(--amber-2); }
+  .ccl-agendado .dot{ background:var(--burgundy); }
+
+  .cons-cal-dow{
+    display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-4);
+    padding:0 2px 8px; border-bottom:1px solid var(--line); margin-bottom:8px;
+    text-align:center;
+  }
+  .cons-cal-grid{
+    display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;
+  }
+  .cdc{
+    position:relative; aspect-ratio:1; border:1px solid var(--line);
+    background:var(--paper); border-radius:10px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:6px; transition:all .18s ease;
+    overflow:hidden;
+  }
+  .cdc:hover{ transform:translateY(-2px); border-color:var(--ink); box-shadow:0 6px 14px -8px rgba(20,23,31,.32); }
+  .cdc.empty{ visibility:hidden; pointer-events:none; }
+  .cdc.is-weekend{ background:var(--paper-2); }
+  .cdc-num{
+    font-family:var(--font-display); font-size:18px; font-weight:500; color:var(--ink);
+  }
+  .cdc-pill{
+    width:30px; height:4px; border-radius:2px; background:transparent; margin-top:6px;
+  }
+  .cdc-count{
+    position:absolute; top:4px; right:5px;
+    font-family:var(--font-mono); font-size:9px; font-weight:700;
+    color:var(--ink-3); background:var(--paper-3);
+    padding:1px 5px; border-radius:8px; line-height:1.4;
+  }
+  .cdc.s-livre .cdc-pill{ background:var(--forest); }
+  .cdc.s-provisionado{ background:linear-gradient(180deg, rgba(240,220,196,.55), var(--paper)); border-color:var(--amber-2); }
+  .cdc.s-provisionado .cdc-pill{ background:var(--amber-2); }
+  .cdc.s-agendado{ background:linear-gradient(180deg, rgba(240,212,216,.6), var(--paper)); border-color:var(--burgundy); }
+  .cdc.s-agendado .cdc-pill{ background:var(--burgundy); }
+  .cdc.s-agendado .cdc-num{ color:var(--burgundy); font-weight:600; }
+  .cdc.s-provisionado .cdc-num{ color:var(--amber); font-weight:600; }
+  .cdc.is-today{ outline:2px solid var(--ink); outline-offset:-2px; }
+  .cdc.is-today .cdc-num::after{
+    content:""; display:block; width:5px; height:5px; border-radius:50%; background:var(--ink); margin:2px auto 0;
+  }
+  .cdc.is-selected{ border-color:var(--ink); box-shadow:0 0 0 3px rgba(20,23,31,.12); transform:translateY(-2px); }
+
+  /* Painel lateral do dia */
+  .cons-day-panel{
+    background:rgba(255,255,255,.66); border:1px solid var(--line);
+    border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:14px;
+    backdrop-filter:blur(12px);
+    height:fit-content; position:sticky; top:16px;
+  }
+  .cdp-eyebrow{ font-family:var(--font-mono); font-size:9.5px; font-weight:700; letter-spacing:.18em; color:var(--ink-3); }
+  .cdp-head h4{ font-family:var(--font-display); font-weight:500; font-size:20px; color:var(--ink); letter-spacing:-.01em; margin-top:2px; }
+  .cdp-status{
+    margin-top:8px; display:inline-flex; align-items:center; gap:8px;
+    padding:5px 12px; border-radius:14px;
+    font-family:var(--font-mono); font-size:10.5px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+  }
+  .cdp-status .cdp-dot{ width:8px; height:8px; border-radius:50%; }
+  .cdp-status.s-livre{ background:var(--forest-bg); color:var(--forest); } .cdp-status.s-livre .cdp-dot{ background:var(--forest); }
+  .cdp-status.s-provisionado{ background:var(--amber-bg); color:var(--amber); } .cdp-status.s-provisionado .cdp-dot{ background:var(--amber-2); }
+  .cdp-status.s-agendado{ background:var(--burgundy-bg); color:var(--burgundy); } .cdp-status.s-agendado .cdp-dot{ background:var(--burgundy); }
+
+  .cdp-stats{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
+    padding:10px; background:var(--paper); border-radius:10px; border:1px solid var(--line);
+  }
+  .cdp-stats > div{ text-align:center; }
+  .cdp-stats b{ display:block; font-family:var(--font-display); font-size:18px; color:var(--ink); }
+  .cdp-stats span{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:2px; }
+
+  .cdp-list{ display:flex; flex-direction:column; gap:6px; max-height:420px; overflow-y:auto; padding-right:2px; }
+  .cdp-ev{
+    display:grid; grid-template-columns:60px 1fr auto; gap:10px; align-items:center;
+    padding:10px; background:var(--paper); border:1px solid var(--line); border-radius:10px;
+    transition:all .15s ease;
+  }
+  .cdp-ev:hover{ border-color:var(--ink); transform:translateX(2px); }
+  .cdp-ev-time{ text-align:center; font-family:var(--font-mono); }
+  .cdp-ev-time b{ display:block; font-size:13px; color:var(--ink); }
+  .cdp-ev-time span{ font-size:10px; color:var(--ink-3); }
+  .cdp-ev-title{ font-weight:600; color:var(--ink); font-size:13px; }
+  .cdp-ev-meta{ font-size:11px; color:var(--ink-3); margin-top:2px; }
+  .cdp-ev.is-confirmed{ border-left:3px solid var(--burgundy); }
+  .cdp-ev.is-provisional{ border-left:3px solid var(--amber-2); }
+  .cdp-ev-go{
+    width:26px; height:26px; border-radius:50%; border:1px solid var(--line-2);
+    background:var(--paper); color:var(--ink-3); display:inline-flex; align-items:center; justify-content:center;
+    transition:all .15s ease;
+  }
+  .cdp-ev-go:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .cdp-empty{ padding:18px 12px; text-align:center; color:var(--ink-3); font-style:italic; font-size:12px; }
+
+  /* Responsivo */
+  @media (max-width: 980px){
+    .cons-agenda-wrap{ grid-template-columns:1fr; }
+    .cons-day-panel{ position:static; }
+    .cons-hero-metrics{ grid-template-columns:repeat(2,1fr); }
+    .cons-hero-main{ padding-right:0; flex-wrap:wrap; }
+    .cons-back{ position:static; margin-bottom:10px; }
+    .cons-pend-row{ grid-template-columns:1fr; }
+    .cp-date{ text-align:left; }
+  }
+  @media (max-width: 640px){
+    .cons-stage, .cons-select-stage, .cons-dash-stage{ padding:20px 14px 40px; }
+    .cons-pick-grid{ grid-template-columns:1fr; }
+    .cons-hero-metrics{ grid-template-columns:1fr 1fr; }
+    .cons-pend-summary{ grid-template-columns:1fr; }
+    .cdc-num{ font-size:14px; }
+  }
 </style>
 </head>
 <body>
@@ -2853,6 +3573,11 @@
       <div class="sb-item" data-view="registros">
         <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
         <span>Atend. / Treino / Tarefas</span>
+      </div>
+      <div class="sb-item" data-view="consultor">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 22a8 8 0 0116 0"/></svg>
+        <span>Painel do Consultor</span>
+        <span class="sb-badge" id="sbConsBadge">—</span>
       </div>
 
       <div class="sb-section">Configuração</div>
@@ -3270,6 +3995,11 @@
       <div class="sub-view" id="cad-tabelas"></div>
     </section>
 
+    <!-- ============ PAINEL DO CONSULTOR ============ -->
+    <section class="view" id="view-consultor">
+      <div id="consBody"></div>
+    </section>
+
   </main>
 </div>
 
@@ -3616,10 +4346,10 @@
       <div class="cc-tab active" data-cct="all">Visão geral <span class="cc-tab-count" id="cctAll">0</span></div>
       <div class="cc-tab" data-cct="atendimento">Atendimentos <span class="cc-tab-count" id="cctAtend">0</span></div>
       <div class="cc-tab" data-cct="treinamento">Treinamentos <span class="cc-tab-count" id="cctTrain">0</span></div>
-      <div class="cc-tab" data-cct="tarefa">Tarefas <span class="cc-tab-count" id="cctTask">0</span></div>
       <div class="cc-tab" data-cct="pendencias">Pendências <span class="cc-tab-count" id="cctPend">0</span></div>
       <div class="cc-tab" data-cct="cronogramas">Cronogramas <span class="cc-tab-count" id="cctSched">0</span></div>
       <div class="cc-tab" data-cct="hours">Saldo de Horas <span class="cc-tab-count" id="cctHours">0h</span></div>
+      <div class="cc-tab" data-cct="encerramento">Encerramento <span class="cc-tab-count" id="cctEnc">§</span></div>
     </div>
     <div class="modal-body" id="ccBody" style="max-height:60vh;overflow-y:auto;padding:0"></div>
     <div class="modal-foot">
@@ -4176,6 +4906,7 @@ const VIEW_META = {
   cronogramas:  { crumb:'Operação · Cronogramas',    title:'Cronogramas <em>por empresa</em>',      actions:`<button class="btn btn-primary" id="btnCroNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo cronograma</button>` },
   registros:    { crumb:'Operação · Registros',      title:'Atendimentos · <em>Treinamentos · Tarefas</em>', actions:'' },
   cadastros:    { crumb:'Configuração · Cadastros',  title:'Cadastros <em>do sistema</em>',         actions:'' },
+  consultor:    { crumb:'Operação · Painel do Consultor', title:'Painel <em>do Consultor</em>',     actions:'' },
 };
 
 function switchView(v){
@@ -4207,6 +4938,7 @@ function renderAll(){
   if (state.view === 'cronogramas') renderCronogramas();
   if (state.view === 'registros')   { renderRegFilters(); renderRegistros(); }
   if (state.view === 'cadastros')   renderCadastros();
+  if (state.view === 'consultor')   renderConsultorView();
   updateSyncTime();
   if (_bootDone) persist();
 }
@@ -9973,6 +10705,9 @@ function renderClientCardModal(){
   if (!card) return;
   const co = companyById(card.companyId);
   if (!co) return;
+  /* Aba "Tarefas" foi removida — tarefas avulsas agora são controladas em "Pendências"
+     e tarefas vinculadas a treinamentos aparecem dentro do próprio treinamento. */
+  if (state.ccTab === 'tarefa') state.ccTab = 'pendencias';
   const items = getCardItems(card.companyId);
   const tAtend = items.filter(i => i.kind === 'atendimento').length;
   const tTrain = items.filter(i => i.kind === 'treinamento').length;
@@ -10027,11 +10762,18 @@ function renderClientCardModal(){
   document.getElementById('cctAll').textContent = items.length;
   document.getElementById('cctAtend').textContent = tAtend;
   document.getElementById('cctTrain').textContent = tTrain;
-  document.getElementById('cctTask').textContent = tTask;
+  const cctTaskEl = document.getElementById('cctTask');
+  if (cctTaskEl) cctTaskEl.textContent = tTask;
   const cctSchedEl = document.getElementById('cctSched');
   if (cctSchedEl) cctSchedEl.textContent = companySchedules.length;
-  /* Contagem de pendências = itens marcados como pendência OU tarefas/treinamentos não-concluídos vindos para pendências */
-  const pendCount = items.filter(i => (i.raw && i.raw.inPendencias === true)).length;
+  /* Pendências agora englobam:
+     - itens explicitamente marcados como pendência (inPendencias === true), E
+     - toda tarefa avulsa (kind === 'tarefa'), já que a aba "Tarefas" foi removida e
+       o fluxo de tarefa avulsa virou uma pendência. */
+  const isStandaloneTarefa = (i) => i.kind === 'tarefa';
+  const isInPendenciasFlag = (i) => !!(i.raw && i.raw.inPendencias === true);
+  const isPendItem = (i) => isInPendenciasFlag(i) || isStandaloneTarefa(i);
+  const pendCount = items.filter(isPendItem).length;
   const cctPendEl = document.getElementById('cctPend');
   if (cctPendEl){
     cctPendEl.textContent = pendCount;
@@ -10066,8 +10808,10 @@ function renderClientCardModal(){
   });
 
   /* Body */
-  /* Itens em Pendências NÃO aparecem nas abas normais (apenas na aba "pendencias") */
-  const isInPendencias = (i) => !!(i.raw && i.raw.inPendencias === true);
+  /* Itens em Pendências NÃO aparecem nas abas normais (apenas na aba "pendencias").
+     Tarefas avulsas (kind='tarefa') também só aparecem em Pendências — a aba
+     dedicada de Tarefas foi removida. */
+  const isInPendencias = isPendItem;
   const filter = (kind) => {
     if (state.ccTab === 'pendencias') return [];
     const base = state.ccTab === 'all' ? items.filter(i => i.kind === kind) : items.filter(i => i.kind === state.ccTab);
@@ -10090,7 +10834,9 @@ function renderClientCardModal(){
       </div>`;
   };
 
-  /* Seção dedicada de Pendências */
+  /* Seção dedicada de Pendências.
+     Engloba itens marcados como pendência + toda tarefa avulsa.
+     Permite criar nova tarefa avulsa (= pendência) direto daqui. */
   const renderPendenciasSection = () => {
     if (state.ccTab !== 'all' && state.ccTab !== 'pendencias') return '';
     const pendItems = items.filter(isInPendencias);
@@ -10099,11 +10845,16 @@ function renderClientCardModal(){
       <div class="cc-section">
         <div class="cc-section-head">
           <h4><span style="display:inline-block;width:22px;height:22px;background:var(--burgundy-bg);color:var(--burgundy);border-radius:50%;text-align:center;line-height:22px;margin-right:8px;font-size:11px">!</span> Pendências <em>· ${pendItems.length}</em></h4>
-          ${pendItems.length?`<span style="font-family:var(--font-mono);font-size:10px;color:var(--burgundy);letter-spacing:.1em;text-transform:uppercase;font-weight:700">${pendItems.length} item(ns) a resolver</span>`:''}
+          <div style="display:flex;gap:10px;align-items:center;margin-left:auto">
+            ${pendItems.length?`<span style="font-family:var(--font-mono);font-size:10px;color:var(--burgundy);letter-spacing:.1em;text-transform:uppercase;font-weight:700">${pendItems.length} item(ns) a resolver</span>`:''}
+            <button class="btn btn-xs btn-primary" onclick="ccAddPendencia('${card.companyId}')" title="Criar tarefa avulsa (pendência)">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Nova pendência
+            </button>
+          </div>
         </div>
         ${pendItems.length
           ? pendItems.map(it => renderCcItem(it, card)).join('')
-          : `<div class="cc-add-bar"><span>Nenhuma pendência — tudo em dia</span></div>`}
+          : `<div class="cc-add-bar"><span>Nenhuma pendência — tudo em dia</span><button class="btn btn-xs" onclick="ccAddPendencia('${card.companyId}')">Criar tarefa avulsa</button></div>`}
       </div>`;
   };
 
@@ -10244,14 +10995,16 @@ function renderClientCardModal(){
     `;
   };
 
+  const isEncerramento = state.ccTab === 'encerramento';
   document.getElementById('ccBody').innerHTML = `
     ${renderHoursTab()}
-    ${state.ccTab !== 'hours' ? renderSchedulesSection() : ''}
-    ${state.ccTab !== 'hours' ? renderPendenciasSection() : ''}
-    ${state.ccTab !== 'hours' ? renderSection('atendimento','Atendimentos','●') : ''}
-    ${state.ccTab !== 'hours' ? renderSection('treinamento','Treinamentos','✦') : ''}
-    ${state.ccTab !== 'hours' ? renderSection('tarefa','Tarefas','☰') : ''}
+    ${isEncerramento ? renderEncerramentoTab(card, co, items, companySchedules) : ''}
+    ${state.ccTab !== 'hours' && !isEncerramento ? renderSchedulesSection() : ''}
+    ${state.ccTab !== 'hours' && !isEncerramento ? renderPendenciasSection() : ''}
+    ${state.ccTab !== 'hours' && !isEncerramento ? renderSection('atendimento','Atendimentos','●') : ''}
+    ${state.ccTab !== 'hours' && !isEncerramento ? renderSection('treinamento','Treinamentos','✦') : ''}
   `;
+  if (isEncerramento) wireEncerramentoTab(card);
 
   /* CICLO DE VIDA AUTOMÁTICO:
      - Todos treinamentos do card decididos (realizados ou não-realizados) → move card para "concluida"
@@ -12064,7 +12817,41 @@ renderCcItem = function(it, card){
         </button>
       </div>
     </div>
+    ${it.kind === 'treinamento' ? renderCcTrainingTasks(it, raw) : ''}
   `;
+};
+
+/* Cria uma "pendência" (tarefa avulsa) já vinculada à empresa do card.
+   Substitui o antigo fluxo de "Adicionar tarefa" — toda tarefa avulsa
+   agora vive na aba Pendências. */
+window.ccAddPendencia = (companyId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  state.rgEditingId = null;
+  openRegistroModal(null, 'tarefa');
+  setTimeout(() => {
+    const co = document.getElementById('rgCompany');
+    if (co){
+      co.value = companyId;
+      co.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }, 100);
+  const saveBtn = document.getElementById('rgSaveBtn');
+  if (!saveBtn) return;
+  const orig = saveBtn.onclick;
+  saveBtn.onclick = () => {
+    orig && orig();
+    /* Marca o registro recém-criado como pendência para refletir o uso pretendido. */
+    setTimeout(() => {
+      const recent = [...RECORDS].reverse().find(r => r.companyId === companyId && r.kind === 'tarefa');
+      if (recent){
+        recent.inPendencias = true;
+        if (typeof pushHistory === 'function') pushHistory(recent, 'criada como pendência (tarefa avulsa)', '');
+        persist();
+      }
+      renderClientCardModal();
+      renderClientKanban();
+    }, 120);
+  };
 };
 
 /* Abre o registro de atendimento vinculado a partir de uma tarefa do card.
@@ -15560,6 +16347,1015 @@ renderAll = function(){
   _origRenderAllV5.apply(this, arguments);
   updateSidebarNotifCount();
 };
+
+/* ============================================
+   ENCERRAMENTO — Aba do card cliente
+   Timeline visual + gerador de documento (PDF/Word)
+   ============================================ */
+
+/* Constrói a timeline cronológica unificada a partir de:
+   - card.history (mudanças de status, criação, etc.)
+   - RECORDS da empresa (atendimentos, treinamentos, tarefas)
+   - EVENTS da empresa
+   - SCHEDULES da empresa
+   - ORDERS_SERVICE vinculadas a itens da empresa */
+function buildClientTimeline(card, co){
+  const tl = [];
+  const cid = card.companyId;
+  const recs = RECORDS.filter(r => r.companyId === cid);
+  const evs  = EVENTS.filter(e => e.companyId === cid);
+  const schs = SCHEDULES.filter(s => s.companyId === cid);
+
+  /* Card */
+  tl.push({
+    ts: card.createdAt || nowISO(),
+    type:'card', icon:'§', tone:'card',
+    title:'Card do cliente criado', subtitle: co.fantasia,
+    detail: card.detail || 'Início da jornada no Faktory Flow.',
+  });
+  (card.history||[]).forEach(h => {
+    tl.push({
+      ts:h.at, type:'status', icon:'⇄', tone:'status',
+      title: h.action, subtitle: h.detail || '',
+      detail: `Registrado por ${h.userName||'sistema'}`,
+    });
+  });
+  /* Cronogramas */
+  schs.forEach(s => {
+    if (s.createdAtISO){
+      tl.push({
+        ts:s.createdAtISO, type:'schedule', icon:'§', tone:'schedule',
+        title:`Cronograma criado · ${isoToBR(s.from)} → ${isoToBR(s.to)}`,
+        subtitle:`${(s.items||[]).length} item(ns) — status ${s.status||'rascunho'}`,
+        detail:'Sequência planejada para o cliente.',
+      });
+    }
+    if (s.confirmedAt){
+      tl.push({
+        ts:s.confirmedAt, type:'milestone', icon:'✓', tone:'milestone',
+        title:'Cronograma confirmado',
+        subtitle:`${isoToBR(s.from)} → ${isoToBR(s.to)}`,
+        detail:'Cliente aprovou o cronograma e os itens passaram para execução.',
+      });
+    }
+  });
+  /* Records (atendimentos / treinamentos / tarefas) */
+  recs.forEach(r => {
+    const consult = consultantById(r.consultantId);
+    const dt = r.date ? `${isoToBR(r.date)}${r.timeStart?` ${r.timeStart}`:''}` : 'sem data';
+    const tone = r.kind === 'treinamento' ? 'training'
+              : r.kind === 'atendimento' ? 'meeting'
+              : 'task';
+    const icon = r.kind === 'treinamento' ? '✦' : r.kind === 'atendimento' ? '●' : '☰';
+    tl.push({
+      ts: r.createdAt || r.date || nowISO(),
+      type: r.kind, icon, tone,
+      title: `${r.kind.charAt(0).toUpperCase()+r.kind.slice(1)} criado · ${r.title||'sem título'}`,
+      subtitle: `${dt}${consult?` · ${consult.name}`:''}`,
+      detail: r.desc || '',
+    });
+    if (r.realizationStatus === 'realizado' && r.realizedAt){
+      tl.push({
+        ts: r.realizedAt, type:'achievement', icon:'✓', tone:'achievement',
+        title:`${r.kind === 'treinamento' ? 'Treinamento' : 'Atendimento'} realizado · ${r.title||''}`,
+        subtitle: consult?consult.name:'',
+        detail:'Marco concluído com sucesso.',
+      });
+    }
+    if (r.realizationStatus === 'nao-realizado' && r.notRealizedAt){
+      tl.push({
+        ts: r.notRealizedAt, type:'warning', icon:'⚠', tone:'warning',
+        title:`Não realizado · ${r.title||''}`,
+        subtitle: r.canceledReason || 'sem motivo',
+        detail:`Marcado como não realizado por ${consult?consult.name:'consultor'}.`,
+      });
+    }
+    if (r.inPendencias){
+      tl.push({
+        ts: r.updatedAt || r.createdAt || nowISO(),
+        type:'pending', icon:'!', tone:'pending',
+        title:`Pendência registrada · ${r.title||''}`,
+        subtitle: r.priority ? `Prioridade ${r.priority.toUpperCase()}` : 'sem prioridade definida',
+        detail: r.desc || 'Item enviado para a aba Pendências.',
+      });
+    }
+    /* Sub-eventos de tarefa do treinamento (checklist) */
+    if (Array.isArray(r.checklist)){
+      r.checklist.forEach((s,i) => {
+        if (s.doneAt){
+          tl.push({
+            ts:s.doneAt, type:'achievement', icon:'✓', tone:'achievement',
+            title:`Tarefa concluída · ${s.text||`#${i+1}`}`,
+            subtitle:`do treino "${r.title||''}"`, detail:'',
+          });
+        }
+        if (s.notRealizedAt){
+          tl.push({
+            ts:s.notRealizedAt, type:'warning', icon:'⚠', tone:'warning',
+            title:`Tarefa não realizada · ${s.text||`#${i+1}`}`,
+            subtitle: s.notRealizedReason || 'sem motivo',
+            detail:`Vinculada ao treinamento "${r.title||''}".`,
+          });
+        }
+      });
+    }
+  });
+  /* Eventos da agenda (que não são records) */
+  evs.forEach(e => {
+    const consult = consultantById(e.consultantId);
+    const tone = e.status === 'cancelado' ? 'warning'
+              : e.status === 'confirmado' || e.status === 'atendido' || e.status === 'concluido' ? 'meeting'
+              : 'schedule';
+    const icon = e.status === 'cancelado' ? '✕' : '●';
+    tl.push({
+      ts: e.date + 'T' + (e.timeStart || '00:00') + ':00',
+      type:'event', icon, tone,
+      title:`Reunião · ${e.title||'sem título'}`,
+      subtitle:`${isoToBR(e.date)} ${e.timeStart||''}${e.timeEnd?`–${e.timeEnd}`:''}${consult?` · ${consult.name}`:''}`,
+      detail:`Status: ${(statusById(e.status)||{}).label||e.status}`,
+    });
+  });
+  /* OS */
+  ORDERS_SERVICE.filter(o => {
+    /* infere companyId pela origem */
+    if (o.companyId === cid) return true;
+    const linked = o.itemSrc === 'record' ? RECORDS.find(r => r.id === o.itemId) : EVENTS.find(e => e.id === o.itemId);
+    return linked && linked.companyId === cid;
+  }).forEach(o => {
+    if (o.createdAt){
+      tl.push({
+        ts:o.createdAt, type:'os', icon:'§', tone:'os',
+        title:`OS ${o.number||o.id?.slice(-6)||''} criada`,
+        subtitle:`Status ${o.status||'rascunho'}`,
+        detail: o.subject || '',
+      });
+    }
+    if (o.signedAt){
+      tl.push({
+        ts:o.signedAt, type:'milestone', icon:'✓', tone:'milestone',
+        title:`OS ${o.number||o.id?.slice(-6)||''} assinada`,
+        subtitle:'Validada pelo cliente',
+        detail:'Documento entregue.',
+      });
+    }
+  });
+
+  /* Ordenar cronologicamente decrescente para timeline visual.
+     Para o documento, será revertido. */
+  tl.sort((a,b) => (b.ts||'').localeCompare(a.ts||''));
+  return tl;
+}
+
+/* HTML da aba Encerramento */
+function renderEncerramentoTab(card, co, items, companySchedules){
+  const timeline = buildClientTimeline(card, co);
+  const consult = consultantById(card.consultantId) || consultantById((items[0]||{}).consultantId);
+
+  const periodo = (() => {
+    const dates = [];
+    if (card.createdAt) dates.push(card.createdAt);
+    items.forEach(i => { if (i.date) dates.push(i.date); });
+    if (!dates.length) return 'Sem datas registradas';
+    dates.sort();
+    return `${isoToBR((dates[0]||'').slice(0,10))} → ${isoToBR((dates[dates.length-1]||'').slice(0,10))}`;
+  })();
+
+  const trReal = items.filter(i => i.kind === 'treinamento' && (i.raw && (i.raw.realizationStatus === 'realizado' || ['atendido','concluido'].includes(i.status))));
+  const pend = items.filter(i => (i.raw && i.raw.inPendencias) || i.kind === 'tarefa' || (i.kind === 'treinamento' && i.raw && i.raw.realizationStatus === 'nao-realizado'));
+
+  const finalNotesVal = (card.finalNotes || '').replace(/</g,'&lt;');
+
+  const timelineHTML = timeline.length ? `
+    <ul class="enc-timeline">
+      ${timeline.map((t,i) => `
+        <li class="enc-tl-item tone-${t.tone}">
+          <div class="enc-tl-axis">
+            <span class="enc-tl-ic">${t.icon}</span>
+            ${i < timeline.length-1 ? '<span class="enc-tl-line"></span>' : ''}
+          </div>
+          <details class="enc-tl-card">
+            <summary>
+              <span class="enc-tl-when">${fmtDateTime(t.ts)}</span>
+              <span class="enc-tl-title">${t.title||''}</span>
+              ${t.subtitle?`<span class="enc-tl-sub">${t.subtitle}</span>`:''}
+              <span class="enc-tl-chev"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></span>
+            </summary>
+            ${t.detail ? `<div class="enc-tl-detail">${t.detail.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>` : '<div class="enc-tl-detail enc-tl-empty">Sem detalhes adicionais.</div>'}
+          </details>
+        </li>`).join('')}
+    </ul>` : `<div class="enc-tl-empty-state">Nenhum evento ainda nesta jornada.</div>`;
+
+  return `
+    <div class="enc-wrap">
+      <div class="enc-cover">
+        <div class="enc-cover-eyebrow"><span class="enc-dot"></span> Encerramento de atendimento</div>
+        <h2>Documento de <em>handover</em></h2>
+        <p>Compile a jornada completa do cliente — pronto para entregar ao time de suporte com um clique.</p>
+        <div class="enc-cover-actions">
+          <button type="button" class="enc-btn primary" onclick="generateEncerramentoPDF('${card.id}')">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3"/></svg>
+            Exportar PDF
+          </button>
+          <button type="button" class="enc-btn" onclick="generateEncerramentoDOC('${card.id}')">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+            Baixar Word
+          </button>
+          <button type="button" class="enc-btn" onclick="previewEncerramentoDoc('${card.id}')">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Pré-visualizar
+          </button>
+        </div>
+      </div>
+
+      <div class="enc-grid">
+        <section class="enc-card enc-summary">
+          <div class="enc-card-head"><span class="enc-card-ic">i</span> Resumo do cliente</div>
+          <dl>
+            <dt>Cliente</dt><dd>${co.fantasia||'—'}${co.razao?` <small>· ${co.razao}</small>`:''}</dd>
+            <dt>Segmento</dt><dd>${co.projeto || co.segmento || '—'}</dd>
+            <dt>Consultor responsável</dt><dd>${consult?`${consult.name}${consult.role?` <small>· ${consult.role}</small>`:''}`:'—'}</dd>
+            <dt>Período de atendimento</dt><dd>${periodo}</dd>
+            <dt>Contato</dt><dd>${co.contato||'—'}</dd>
+          </dl>
+        </section>
+
+        <section class="enc-card enc-stats">
+          <div class="enc-card-head"><span class="enc-card-ic">#</span> Marcos rápidos</div>
+          <div class="enc-stat-grid">
+            <div><b>${pad(trReal.length)}</b><span>Treinos realizados</span></div>
+            <div><b>${pad(pend.length)}</b><span>Pendências em aberto</span></div>
+            <div><b>${pad(timeline.length)}</b><span>Eventos na jornada</span></div>
+            <div><b>${pad(companySchedules.length)}</b><span>Cronogramas</span></div>
+          </div>
+        </section>
+
+        <section class="enc-card enc-notes">
+          <div class="enc-card-head"><span class="enc-card-ic">✎</span> Observações finais para o suporte</div>
+          <textarea id="encFinalNotes" placeholder="Considerações importantes para que o time de suporte continue o atendimento sem perda de contexto: peculiaridades do cliente, decisões pendentes, expectativas, contatos preferidos, etc.">${finalNotesVal}</textarea>
+          <div class="enc-notes-foot">
+            <span id="encNotesStatus" class="enc-notes-status">Salvo automaticamente ao digitar</span>
+            <button type="button" class="enc-btn ghost" onclick="saveEncerramentoNotes('${card.id}',true)">Salvar agora</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="enc-card enc-timeline-card">
+        <div class="enc-card-head">
+          <span class="enc-card-ic">⌛</span> Linha do tempo · <em>${timeline.length} evento(s)</em>
+          <div class="enc-tl-legend">
+            <span><i class="lg lg-card"></i>Card</span>
+            <span><i class="lg lg-meeting"></i>Reunião</span>
+            <span><i class="lg lg-training"></i>Treino</span>
+            <span><i class="lg lg-task"></i>Tarefa</span>
+            <span><i class="lg lg-achievement"></i>Marco</span>
+            <span><i class="lg lg-pending"></i>Pendência</span>
+            <span><i class="lg lg-warning"></i>Alerta</span>
+            <span><i class="lg lg-status"></i>Status</span>
+            <span><i class="lg lg-os"></i>OS</span>
+          </div>
+        </div>
+        ${timelineHTML}
+      </section>
+    </div>
+  `;
+}
+
+/* Wire: salva observações finais (debounced) */
+function wireEncerramentoTab(card){
+  const ta = document.getElementById('encFinalNotes');
+  if (!ta) return;
+  let t = null;
+  ta.addEventListener('input', () => {
+    const status = document.getElementById('encNotesStatus');
+    if (status) status.textContent = 'Salvando…';
+    clearTimeout(t);
+    t = setTimeout(() => {
+      card.finalNotes = ta.value;
+      if (typeof pushHistory === 'function') pushHistory(card, 'observações finais atualizadas', '');
+      persist();
+      if (status) status.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+    }, 600);
+  });
+}
+window.saveEncerramentoNotes = (cardId, manual) => {
+  const card = CLIENT_CARDS.find(x => x.id === cardId);
+  if (!card) return;
+  const ta = document.getElementById('encFinalNotes');
+  if (ta){
+    card.finalNotes = ta.value;
+    pushHistory(card, 'observações finais salvas', '');
+    persist();
+    if (manual) toast('success','Observações salvas');
+    const status = document.getElementById('encNotesStatus');
+    if (status) status.textContent = `Salvo às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+  }
+};
+
+/* ----- Construção do HTML do documento de encerramento ----- */
+function _buildEncerramentoDocHTML(card){
+  const co = companyById(card.companyId);
+  if (!co) return '';
+  const items = getCardItems(card.companyId);
+  const consult = consultantById(card.consultantId) || consultantById((items[0]||{}).consultantId);
+  const companySchedules = SCHEDULES.filter(s => s.companyId === card.companyId);
+
+  const trReal = items.filter(i => i.kind === 'treinamento' && (i.raw && (i.raw.realizationStatus === 'realizado' || ['atendido','concluido'].includes(i.status))));
+  const trAll  = items.filter(i => i.kind === 'treinamento');
+  const pend = items.filter(i => (i.raw && i.raw.inPendencias) || i.kind === 'tarefa' || (i.kind === 'treinamento' && i.raw && i.raw.realizationStatus === 'nao-realizado'));
+
+  const dates = [];
+  if (card.createdAt) dates.push(card.createdAt);
+  items.forEach(i => { if (i.date) dates.push(i.date); });
+  dates.sort();
+  const periodo = dates.length ? `${isoToBR((dates[0]||'').slice(0,10))} → ${isoToBR((dates[dates.length-1]||'').slice(0,10))}` : '—';
+
+  /* Narrativa automática da jornada — texto coeso a partir dos dados */
+  const journey = (() => {
+    const partes = [];
+    partes.push(`A jornada do cliente <b>${co.fantasia}</b> teve início em <b>${fmtDateTime(card.createdAt||nowISO())}</b>, sob responsabilidade do consultor <b>${consult?consult.name:'(sem consultor atribuído)'}</b>.`);
+    if (companySchedules.length){
+      const conf = companySchedules.filter(s => s.confirmedAt).length;
+      partes.push(`Foram desenhados <b>${companySchedules.length}</b> cronograma(s) ao longo do período, dos quais <b>${conf}</b> foram confirmados pelo cliente.`);
+    }
+    if (trAll.length){
+      partes.push(`No total, <b>${trAll.length}</b> treinamento(s) foram planejados e <b>${trReal.length}</b> efetivamente realizado(s).`);
+    }
+    const atend = items.filter(i => i.kind === 'atendimento').length;
+    if (atend){
+      partes.push(`Houve <b>${atend}</b> atendimento(s) registrado(s) durante a relação.`);
+    }
+    if (pend.length){
+      partes.push(`Permanecem <b>${pend.length}</b> pendência(s) em aberto — listadas adiante para acompanhamento do suporte.`);
+    } else {
+      partes.push(`No fechamento, não há pendências em aberto.`);
+    }
+    return partes.join(' ');
+  })();
+
+  const trRows = trAll.length ? trAll.map(t => {
+    const s = (t.raw && t.raw.realizationStatus) || t.status;
+    const stLabel = s === 'realizado' ? 'Realizado' : s === 'nao-realizado' ? 'Não realizado' : ((statusById(t.status)||{}).label || t.status || '—');
+    const cn = consultantById(t.consultantId);
+    return `<tr>
+      <td><b>${t.title||'(sem título)'}</b></td>
+      <td>${t.date?isoToBR(t.date):'—'}${t.timeStart?` <small>${t.timeStart}${t.timeEnd?`–${t.timeEnd}`:''}</small>`:''}</td>
+      <td>${cn?cn.name:'—'}</td>
+      <td><span class="doc-pill doc-pill-${s==='realizado'?'ok':s==='nao-realizado'?'bad':'neutral'}">${stLabel}</span></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="4" class="doc-empty">Nenhum treinamento registrado.</td></tr>`;
+
+  const pendRows = pend.length ? pend.map(p => {
+    const r = p.raw || {};
+    const cn = consultantById(p.consultantId);
+    const pri = r.priority || p.priority || '';
+    return `<tr>
+      <td><b>${p.title||'(sem título)'}</b><br><small>${cn?cn.name:'—'}</small></td>
+      <td>${p.kind === 'tarefa' ? 'Tarefa' : p.kind === 'treinamento' ? 'Treino não realizado' : (p.kind||'—')}</td>
+      <td>${pri?`<span class="doc-pill doc-pill-pri-${pri.toLowerCase()}">${pri.toUpperCase()}</span>`:'—'}</td>
+      <td>${(r.desc||r.canceledReason||r.notRealizedReason||'').replace(/</g,'&lt;') || '—'}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="4" class="doc-empty">Nenhuma pendência em aberto.</td></tr>`;
+
+  const timeline = buildClientTimeline(card, co).slice().reverse(); /* cronológico crescente para o documento */
+  const tlRows = timeline.length ? timeline.map(t => `
+    <tr>
+      <td><small>${fmtDateTime(t.ts)}</small></td>
+      <td><b>${t.title||''}</b>${t.subtitle?`<br><small>${t.subtitle}</small>`:''}</td>
+      <td><small>${t.detail||''}</small></td>
+    </tr>`).join('') : `<tr><td colspan="3" class="doc-empty">Sem eventos registrados.</td></tr>`;
+
+  const finalNotes = (card.finalNotes||'').trim()
+    ? (card.finalNotes||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')
+    : '<i style="color:#777">Nenhuma observação registrada pelo consultor.</i>';
+
+  return `
+    <div class="enc-doc-page">
+      <div class="enc-doc-head">
+        <div>
+          <div class="enc-doc-eyebrow">Documento de encerramento · handover</div>
+          <h1>${co.fantasia}</h1>
+          <div class="enc-doc-sub">${co.razao||''}${co.cnpj?` · CNPJ ${co.cnpj}`:''}</div>
+        </div>
+        <div class="enc-doc-meta">
+          <div><span>Gerado em</span><b>${fmtDateTime(nowISO())}</b></div>
+          <div><span>Consultor</span><b>${consult?consult.name:'—'}</b></div>
+          <div><span>Período</span><b>${periodo}</b></div>
+        </div>
+      </div>
+
+      <section class="enc-doc-section">
+        <h2>1 · Resumo do cliente</h2>
+        <table class="doc-table">
+          <tr><th>Cliente</th><td>${co.fantasia}</td></tr>
+          <tr><th>Razão social</th><td>${co.razao||'—'}</td></tr>
+          <tr><th>CNPJ</th><td>${co.cnpj||'—'}</td></tr>
+          <tr><th>Segmento</th><td>${co.projeto || co.segmento || '—'}</td></tr>
+          <tr><th>Consultor responsável</th><td>${consult?`${consult.name}${consult.role?` — ${consult.role}`:''}${consult.email?` (${consult.email})`:''}`:'—'}</td></tr>
+          <tr><th>Período de atendimento</th><td>${periodo}</td></tr>
+          <tr><th>Contato</th><td>${co.contato||'—'}</td></tr>
+        </table>
+      </section>
+
+      <section class="enc-doc-section">
+        <h2>2 · Jornada do cliente</h2>
+        <p class="doc-prose">${journey}</p>
+      </section>
+
+      <section class="enc-doc-section">
+        <h2>3 · Treinamentos realizados</h2>
+        <table class="doc-table doc-rows">
+          <thead><tr><th>Treinamento</th><th>Data</th><th>Consultor</th><th>Status</th></tr></thead>
+          <tbody>${trRows}</tbody>
+        </table>
+      </section>
+
+      <section class="enc-doc-section">
+        <h2>4 · Pendências</h2>
+        <table class="doc-table doc-rows">
+          <thead><tr><th>Item</th><th>Tipo</th><th>Prioridade</th><th>Observações</th></tr></thead>
+          <tbody>${pendRows}</tbody>
+        </table>
+      </section>
+
+      <section class="enc-doc-section">
+        <h2>5 · Observações finais</h2>
+        <div class="doc-notes">${finalNotes}</div>
+      </section>
+
+      <section class="enc-doc-section enc-doc-section-tl">
+        <h2>6 · Linha do tempo completa</h2>
+        <table class="doc-table doc-rows">
+          <thead><tr><th>Quando</th><th>Evento</th><th>Detalhes</th></tr></thead>
+          <tbody>${tlRows}</tbody>
+        </table>
+      </section>
+
+      <footer class="enc-doc-foot">
+        <span>Faktory Flow · Documento de encerramento</span>
+        <span>${co.fantasia} · ${fmtDateTime(nowISO())}</span>
+      </footer>
+    </div>
+  `;
+}
+
+/* Pré-visualização em modal (usa o overlay genérico) */
+window.previewEncerramentoDoc = (cardId) => {
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card){ toast('error','Card não encontrado'); return; }
+  const html = _buildEncerramentoDocHTML(card);
+  let modal = document.getElementById('encDocPreview');
+  if (!modal){
+    modal = document.createElement('div');
+    modal.id = 'encDocPreview';
+    modal.className = 'overlay';
+    modal.innerHTML = `
+      <div class="modal xl">
+        <div class="modal-head">
+          <div><h3>Pré-visualização · <em>Documento de encerramento</em></h3><p>HANDOVER PARA O SUPORTE</p></div>
+          <button class="modal-close" data-close="encDocPreview">&times;</button>
+        </div>
+        <div class="modal-body" id="encDocPreviewBody" style="max-height:70vh;overflow-y:auto"></div>
+        <div class="modal-foot">
+          <button class="btn" data-close="encDocPreview">Fechar</button>
+          <div style="display:flex;gap:10px;margin-left:auto">
+            <button class="btn" id="encDocPrintBtn">Imprimir</button>
+            <button class="btn" id="encDocWordBtn">Baixar Word</button>
+            <button class="btn btn-primary" id="encDocPdfBtn">Exportar PDF</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal('encDocPreview'); });
+    modal.querySelectorAll('[data-close]').forEach(b => b.onclick = () => closeModal('encDocPreview'));
+  }
+  modal.querySelector('#encDocPreviewBody').innerHTML = html;
+  modal.querySelector('#encDocPdfBtn').onclick = () => generateEncerramentoPDF(cardId);
+  modal.querySelector('#encDocWordBtn').onclick = () => generateEncerramentoDOC(cardId);
+  modal.querySelector('#encDocPrintBtn').onclick = () => {
+    const w = window.open('', '_blank');
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Encerramento</title>${_encDocStylesheet()}</head><body>${html}</body></html>`);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 300);
+  };
+  openModal('encDocPreview');
+};
+
+/* Gera PDF com html2pdf */
+window.generateEncerramentoPDF = (cardId) => {
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card){ toast('error','Card não encontrado'); return; }
+  const co = companyById(card.companyId);
+  const html = _buildEncerramentoDocHTML(card);
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<style>${_encDocInlineCSS()}</style>${html}`;
+  wrap.style.cssText = 'position:fixed;left:-99999px;top:0;width:800px;background:#fff;';
+  document.body.appendChild(wrap);
+  if (typeof html2pdf === 'undefined'){
+    document.body.removeChild(wrap);
+    toast('error','html2pdf não carregado','Verifique sua conexão e recarregue a página.');
+    return;
+  }
+  const filename = `Encerramento_${(co?co.fantasia:'cliente').replace(/[^a-z0-9]+/gi,'_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+  toast('info','Gerando PDF…');
+  html2pdf().set({
+    margin: [12,10,12,10],
+    filename,
+    image: { type:'jpeg', quality:0.96 },
+    html2canvas: { scale:2, useCORS:true },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait' },
+    pagebreak: { mode:['avoid-all','css','legacy'] },
+  }).from(wrap).save().then(() => {
+    document.body.removeChild(wrap);
+    toast('success','PDF gerado', filename);
+  }).catch(err => {
+    document.body.removeChild(wrap);
+    console.error(err);
+    toast('error','Falha ao gerar PDF', String(err && err.message || err));
+  });
+};
+
+/* Gera .doc (Word) via blob HTML — abre no Word/LibreOffice */
+window.generateEncerramentoDOC = (cardId) => {
+  const card = CLIENT_CARDS.find(c => c.id === cardId);
+  if (!card){ toast('error','Card não encontrado'); return; }
+  const co = companyById(card.companyId);
+  const html = _buildEncerramentoDocHTML(card);
+  const docHTML = `<!doctype html><html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>Encerramento</title>${_encDocStylesheet()}</head>
+    <body>${html}</body></html>`;
+  const blob = new Blob(['﻿', docHTML], { type:'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Encerramento_${(co?co.fantasia:'cliente').replace(/[^a-z0-9]+/gi,'_')}_${new Date().toISOString().slice(0,10)}.doc`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('success','Documento Word gerado');
+};
+
+function _encDocStylesheet(){ return `<style>${_encDocInlineCSS()}</style>`; }
+function _encDocInlineCSS(){
+  return `
+    body{font-family:'Manrope',Arial,sans-serif;color:#14171f;background:#fff;margin:0;font-size:12px;line-height:1.5}
+    .enc-doc-page{padding:28px 32px;max-width:780px;margin:0 auto;background:#fff}
+    .enc-doc-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #14171f;padding-bottom:14px;margin-bottom:18px;gap:24px}
+    .enc-doc-head h1{font-family:'Fraunces','Times New Roman',serif;font-size:28px;margin:4px 0 2px;font-weight:500}
+    .enc-doc-eyebrow{font-size:9px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:#b8895a}
+    .enc-doc-sub{color:#4a4f5e;font-size:11px}
+    .enc-doc-meta{font-size:10px;text-align:right}
+    .enc-doc-meta > div{margin-bottom:4px}
+    .enc-doc-meta span{display:block;color:#6b7184;letter-spacing:.12em;text-transform:uppercase;font-size:8.5px;font-weight:600}
+    .enc-doc-meta b{font-size:11px;color:#14171f}
+    .enc-doc-section{margin-top:18px;page-break-inside:avoid}
+    .enc-doc-section-tl{page-break-before:auto}
+    .enc-doc-section h2{font-family:'Fraunces','Times New Roman',serif;font-weight:500;font-size:18px;margin:0 0 10px;padding-bottom:4px;border-bottom:1px solid #ddd5c4;color:#14171f}
+    .doc-table{width:100%;border-collapse:collapse;font-size:11px}
+    .doc-table th, .doc-table td{padding:7px 10px;text-align:left;vertical-align:top;border-bottom:1px solid #e8e2d5}
+    .doc-table th{background:#f4efe6;font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4a4f5e}
+    .doc-table.doc-rows tr:nth-child(even) td{background:#fcfaf5}
+    .doc-empty{text-align:center;color:#8b8b8b;font-style:italic;padding:14px}
+    .doc-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .doc-pill-ok{background:#d8e3d8;color:#2d5f3f}
+    .doc-pill-bad{background:#f0d4d8;color:#8a2638}
+    .doc-pill-neutral{background:#ebe5d8;color:#4a4f5e}
+    .doc-pill-pri-alta, .doc-pill-pri-high{background:#f0d4d8;color:#8a2638}
+    .doc-pill-pri-media, .doc-pill-pri-medium{background:#f0dcc4;color:#b8632a}
+    .doc-pill-pri-baixa, .doc-pill-pri-low{background:#d8e3d8;color:#2d5f3f}
+    .doc-prose{font-size:12px;color:#2a2e3a;line-height:1.7}
+    .doc-notes{font-size:12px;color:#2a2e3a;background:#fcfaf5;border-left:3px solid #b8895a;padding:12px 14px;border-radius:0 6px 6px 0;line-height:1.6}
+    .enc-doc-foot{margin-top:26px;padding-top:10px;border-top:1px solid #ddd5c4;display:flex;justify-content:space-between;font-size:9px;color:#6b7184;letter-spacing:.06em;text-transform:uppercase}
+    small{color:#6b7184;font-size:10px}
+  `;
+}
+
+/* ============================================
+   PAINEL DO CONSULTOR — view dedicada
+   ============================================ */
+state.consultorDash = state.consultorDash || {
+  selectedId: null,
+  tab: 'pendencias',
+  calYear: TODAY.getFullYear(),
+  calMonth: TODAY.getMonth(),
+  selectedISO: null,
+};
+
+window.consSelectConsultant = (id) => {
+  state.consultorDash.selectedId = id;
+  state.consultorDash.tab = 'pendencias';
+  state.consultorDash.selectedISO = null;
+  state.consultorDash.calYear = TODAY.getFullYear();
+  state.consultorDash.calMonth = TODAY.getMonth();
+  renderConsultorView();
+};
+window.consSwitchTab = (tab) => { state.consultorDash.tab = tab; renderConsultorView(); };
+window.consClearConsultant = () => { state.consultorDash.selectedId = null; renderConsultorView(); };
+window.consNavMonth = (delta) => {
+  const d = state.consultorDash;
+  if (delta === 0){ d.calYear = TODAY.getFullYear(); d.calMonth = TODAY.getMonth(); }
+  else {
+    d.calMonth += delta;
+    if (d.calMonth < 0){ d.calMonth = 11; d.calYear--; }
+    if (d.calMonth > 11){ d.calMonth = 0; d.calYear++; }
+  }
+  d.selectedISO = null;
+  renderConsultorView();
+};
+window.consSelectDay = (iso) => { state.consultorDash.selectedISO = iso; renderConsultorView(); };
+
+function _consPendenciasForConsultant(consultantId){
+  /* Junta de RECORDS + EVENTS o que for "pendência" do consultor:
+     - inPendencias === true
+     - kind === 'tarefa' (tarefa avulsa = pendência)
+     - kind === 'treinamento' com realizationStatus === 'nao-realizado' ou status cancelado
+     Exclui itens concluídos/atendidos. */
+  const out = [];
+  RECORDS.forEach(r => {
+    if (r.consultantId !== consultantId) return;
+    const isTask = r.kind === 'tarefa';
+    const isPendFlag = r.inPendencias === true;
+    const isFailedTrain = r.kind === 'treinamento' && (r.realizationStatus === 'nao-realizado' || r.status === 'cancelado');
+    if (!(isTask || isPendFlag || isFailedTrain)) return;
+    if (['concluido','atendido'].includes(r.status) && !isPendFlag && !isFailedTrain) return;
+    out.push({
+      _src:'record', id:r.id, kind:r.kind, title:r.title||'(sem título)',
+      status:r.status, priority:r.priority||null, date:r.date||null,
+      timeStart:r.timeStart||'', timeEnd:r.timeEnd||'',
+      companyId:r.companyId, raw:r,
+      flagged: isPendFlag, failedTrain: isFailedTrain,
+    });
+  });
+  return out;
+}
+
+function _consAvailability(consultantId, isoDate){
+  /* Status do dia: livre / provisionado / agendado.
+     Reaproveita consultantDayLoad para contagens. */
+  const load = consultantDayLoad(consultantId, isoDate);
+  let status = 'livre';
+  if (load.ocupadosCount > 0) status = 'agendado';
+  else if (load.provisionadosCount > 0) status = 'provisionado';
+  return { status, load };
+}
+
+function renderConsultorView(){
+  const body = document.getElementById('consBody');
+  if (!body) return;
+  const d = state.consultorDash;
+  if (!d.selectedId || !consultantById(d.selectedId)){
+    body.innerHTML = _renderConsultorSelectHTML();
+    requestAnimationFrame(() => body.querySelector('.cons-stage')?.classList.add('in'));
+    return;
+  }
+  body.innerHTML = _renderConsultorDashHTML();
+  requestAnimationFrame(() => body.querySelector('.cons-stage')?.classList.add('in'));
+}
+window.renderConsultorView = renderConsultorView;
+
+function _renderConsultorSelectHTML(){
+  if (!CONSULTANTS.length){
+    return `
+      <div class="cons-stage cons-empty-stage">
+        <div class="cons-empty-card">
+          <div class="cons-empty-ic">
+            <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" fill="none" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 22a8 8 0 0116 0"/></svg>
+          </div>
+          <h2>Nenhum consultor cadastrado</h2>
+          <p>Cadastre um consultor em <b>Cadastros</b> para abrir o painel.</p>
+          <button class="btn btn-primary" onclick="switchView('cadastros');state.cadTab='consultores';renderCadastros();">Ir para Cadastros</button>
+        </div>
+      </div>`;
+  }
+  const cards = CONSULTANTS.map(c => {
+    const todayISO = isoFromDate(TODAY);
+    const av = _consAvailability(c.id, todayISO);
+    const totalPend = _consPendenciasForConsultant(c.id).length;
+    const monthPrefix = `${TODAY.getFullYear()}-${pad(TODAY.getMonth()+1)}`;
+    const monthEvs = EVENTS.filter(e => e.consultantId === c.id && e.date.startsWith(monthPrefix)).length;
+    const role = c.role || c.specialty || 'Consultor';
+    return `
+      <button type="button" class="cons-pick-card" onclick="consSelectConsultant('${c.id}')">
+        <div class="cons-pick-avatar ${c.cls}">${c.initials}</div>
+        <div class="cons-pick-name">${c.name}</div>
+        <div class="cons-pick-role">${role}</div>
+        ${c.email?`<div class="cons-pick-email">${c.email}</div>`:''}
+        <div class="cons-pick-stats">
+          <div class="cps"><b>${totalPend}</b><span>pendências</span></div>
+          <div class="cps"><b>${monthEvs}</b><span>no mês</span></div>
+          <div class="cps cps-${av.status}"><b>${av.status==='livre'?'Livre':av.status==='provisionado'?'Prov.':'Ocup.'}</b><span>hoje</span></div>
+        </div>
+        <div class="cons-pick-cta">
+          Abrir painel
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </button>`;
+  }).join('');
+
+  return `
+    <div class="cons-stage cons-select-stage">
+      <div class="cons-select-hero">
+        <div class="cons-select-eyebrow">
+          <span class="cons-dot"></span> Painel do Consultor
+        </div>
+        <h1>Selecione um <em>consultor</em></h1>
+        <p>Visualize pendências, disponibilidade e agenda — uma central dedicada para cada profissional do time.</p>
+      </div>
+      <div class="cons-pick-grid">${cards}</div>
+    </div>`;
+}
+
+function _renderConsultorDashHTML(){
+  const d = state.consultorDash;
+  const c = consultantById(d.selectedId);
+  const role = c.role || c.specialty || 'Consultor';
+  const pendList = _consPendenciasForConsultant(c.id);
+
+  /* Métricas topo */
+  const todayISO = isoFromDate(TODAY);
+  const today = _consAvailability(c.id, todayISO);
+  const monthPrefix = `${d.calYear}-${pad(d.calMonth+1)}`;
+  let livre=0, prov=0, ag=0;
+  const daysInMonth = new Date(d.calYear, d.calMonth+1, 0).getDate();
+  for (let day=1; day<=daysInMonth; day++){
+    const iso = `${d.calYear}-${pad(d.calMonth+1)}-${pad(day)}`;
+    const s = _consAvailability(c.id, iso).status;
+    if (s === 'livre') livre++; else if (s === 'provisionado') prov++; else ag++;
+  }
+  const overdue = pendList.filter(p => p.date && p.date < todayISO && !['concluido','atendido','cancelado'].includes(p.status)).length;
+
+  const tabs = `
+    <div class="cons-tabs" role="tablist">
+      <button type="button" class="cons-tab ${d.tab==='pendencias'?'active':''}" onclick="consSwitchTab('pendencias')" role="tab">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Pendências
+        <span class="cons-tab-pill ${pendList.length?'is-on':''}">${pendList.length}</span>
+      </button>
+      <button type="button" class="cons-tab ${d.tab==='agenda'?'active':''}" onclick="consSwitchTab('agenda')" role="tab">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Agenda / Disponibilidade
+        <span class="cons-tab-pill">${ag}</span>
+      </button>
+    </div>`;
+
+  const body = d.tab === 'pendencias'
+    ? _renderConsPendenciasHTML(c, pendList, overdue)
+    : _renderConsAgendaHTML(c);
+
+  return `
+    <div class="cons-stage cons-dash-stage">
+      <div class="cons-hero">
+        <button type="button" class="cons-back" onclick="consClearConsultant()" title="Trocar consultor">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Trocar consultor
+        </button>
+        <div class="cons-hero-main">
+          <div class="cons-hero-avatar ${c.cls}">${c.initials}</div>
+          <div class="cons-hero-info">
+            <div class="cons-hero-eyebrow"><span class="cons-dot"></span> Painel do Consultor</div>
+            <h1>${c.name}</h1>
+            <p>
+              <span class="cons-chip">${role}</span>
+              ${c.specialty && c.specialty !== role ? `<span class="cons-chip soft">${c.specialty}</span>`:''}
+              ${c.email ? `<span class="cons-chip mono">${c.email}</span>`:''}
+              ${c.phone ? `<span class="cons-chip mono">${c.phone}</span>`:''}
+            </p>
+          </div>
+        </div>
+        <div class="cons-hero-metrics">
+          <div class="cons-metric m-pend ${pendList.length?'is-on':''}">
+            <div class="cm-ic">!</div>
+            <div class="cm-val">${pad(pendList.length)}</div>
+            <div class="cm-lbl">Pendências abertas</div>
+          </div>
+          <div class="cons-metric m-overdue ${overdue?'is-on':''}">
+            <div class="cm-ic">⚠</div>
+            <div class="cm-val">${pad(overdue)}</div>
+            <div class="cm-lbl">Atrasadas</div>
+          </div>
+          <div class="cons-metric m-today is-${today.status}">
+            <div class="cm-ic">${today.status==='livre'?'●':today.status==='provisionado'?'◐':'●'}</div>
+            <div class="cm-val">${today.status==='livre'?'Livre':today.status==='provisionado'?'Provisório':'Ocupado'}</div>
+            <div class="cm-lbl">Hoje · ${pad(today.load.ocupadosCount)}/${pad(today.load.provisionadosCount)}</div>
+          </div>
+          <div class="cons-metric m-month">
+            <div class="cm-ic">§</div>
+            <div class="cm-val">${pad(livre)}<span class="cm-sep">/</span>${pad(prov)}<span class="cm-sep">/</span>${pad(ag)}</div>
+            <div class="cm-lbl">Livres / Prov. / Ocup. no mês</div>
+          </div>
+        </div>
+      </div>
+      ${tabs}
+      <div class="cons-tabbody">${body}</div>
+    </div>`;
+}
+
+function _renderConsPendenciasHTML(c, pendList, overdueCount){
+  const todayISO = isoFromDate(TODAY);
+  if (!pendList.length){
+    return `
+      <div class="cons-empty">
+        <div class="cons-empty-glow"></div>
+        <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <h3>Tudo em dia</h3>
+        <p>${c.name} não tem pendências em aberto no momento.</p>
+      </div>`;
+  }
+  /* Agrupa por status: atrasadas, sem data, próximas */
+  const overdue = [], noDate = [], upcoming = [];
+  pendList.forEach(p => {
+    if (!p.date) noDate.push(p);
+    else if (p.date < todayISO) overdue.push(p);
+    else upcoming.push(p);
+  });
+  overdue.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  upcoming.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+
+  const renderRow = (p) => {
+    const co = companyById(p.companyId);
+    const stLabel = (statusById(p.status)||{}).label || p.status || '—';
+    const kindLabel = p.failedTrain ? 'Treino não realizado' : p.kind === 'tarefa' ? 'Tarefa' : p.kind === 'treinamento' ? 'Treinamento' : 'Atendimento';
+    const kindCls = p.failedTrain ? 'k-fail' : `k-${p.kind}`;
+    const dateHTML = p.date
+      ? `<b>${isoToBR(p.date)}</b>${p.timeStart?`<span class="cp-time">${p.timeStart}${p.timeEnd?`–${p.timeEnd}`:''}</span>`:''}`
+      : `<span class="cp-nodate">sem data</span>`;
+    const isOverdue = p.date && p.date < todayISO;
+    const priorityHTML = p.priority
+      ? `<span class="cp-pri pri-${(p.priority||'').toLowerCase()}">${p.priority.toUpperCase()}</span>`
+      : '';
+    return `
+      <div class="cons-pend-row ${isOverdue?'is-overdue':''} ${p.flagged?'is-flagged':''} ${p.failedTrain?'is-failed':''}">
+        <div class="cp-kind ${kindCls}">${kindLabel}</div>
+        <div class="cp-main">
+          <div class="cp-title">${p.title}</div>
+          <div class="cp-meta">
+            <span class="cp-company">${co?co.fantasia:'<i>sem empresa</i>'}</span>
+            <span class="cp-status">${stLabel}</span>
+            ${priorityHTML}
+            ${p.flagged?'<span class="cp-flag">PENDÊNCIA</span>':''}
+          </div>
+        </div>
+        <div class="cp-date">${dateHTML}</div>
+        <div class="cp-actions">
+          ${co ? `<button type="button" class="cp-btn" title="Abrir card do cliente" onclick="(function(){const card=CLIENT_CARDS.find(x=>x.companyId==='${co.id}');if(card)openClientCardModal(card.id);else openRegistroModal('${p.id}');})()">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>` : ''}
+          <button type="button" class="cp-btn" title="Editar registro" onclick="openRegistroModal('${p.id}')">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+        </div>
+      </div>`;
+  };
+
+  const section = (title, items, cls, ic) => items.length ? `
+    <div class="cons-pend-group ${cls}">
+      <div class="cpg-head"><span class="cpg-ic">${ic}</span> ${title} <em>· ${items.length}</em></div>
+      <div class="cpg-rows">${items.map(renderRow).join('')}</div>
+    </div>` : '';
+
+  return `
+    <div class="cons-pend-wrap">
+      <div class="cons-pend-summary">
+        <div class="cps-card cps-overdue ${overdue.length?'is-on':''}">
+          <span>Atrasadas</span><b>${pad(overdue.length)}</b>
+        </div>
+        <div class="cps-card cps-nodate ${noDate.length?'is-on':''}">
+          <span>Sem data</span><b>${pad(noDate.length)}</b>
+        </div>
+        <div class="cps-card cps-upcoming ${upcoming.length?'is-on':''}">
+          <span>Próximas</span><b>${pad(upcoming.length)}</b>
+        </div>
+      </div>
+      ${section('Atrasadas', overdue, 'g-overdue', '⚠')}
+      ${section('Sem data', noDate, 'g-nodate', '?')}
+      ${section('Próximas', upcoming, 'g-upcoming', '→')}
+    </div>`;
+}
+
+function _renderConsAgendaHTML(c){
+  const d = state.consultorDash;
+  const monthName = new Date(d.calYear, d.calMonth, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  const firstDow = new Date(d.calYear, d.calMonth, 1).getDay();
+  const daysInMonth = new Date(d.calYear, d.calMonth+1, 0).getDate();
+  const todayISO = isoFromDate(TODAY);
+
+  /* Conta dias por status para legenda dinâmica */
+  let livre=0, prov=0, ag=0;
+  const cells = [];
+  for (let i=0; i<firstDow; i++) cells.push(`<div class="cdc empty"></div>`);
+  for (let day=1; day<=daysInMonth; day++){
+    const iso = `${d.calYear}-${pad(d.calMonth+1)}-${pad(day)}`;
+    const av = _consAvailability(c.id, iso);
+    if (av.status === 'livre') livre++; else if (av.status === 'provisionado') prov++; else ag++;
+    const isToday = iso === todayISO;
+    const isSelected = iso === d.selectedISO;
+    const dow = new Date(d.calYear, d.calMonth, day).getDay();
+    const isWeekend = dow === 0 || dow === 6;
+    cells.push(`
+      <button type="button" class="cdc s-${av.status} ${isToday?'is-today':''} ${isSelected?'is-selected':''} ${isWeekend?'is-weekend':''}" onclick="consSelectDay('${iso}')" title="${av.status==='livre'?'Livre':av.status==='provisionado'?'Provisionado':'Agendado'} · ${av.load.ocupadosCount} confirmado(s), ${av.load.provisionadosCount} provisório(s)">
+        <span class="cdc-num">${day}</span>
+        <span class="cdc-pill"></span>
+        ${av.load.ocupadosCount+av.load.provisionadosCount>0?`<span class="cdc-count">${av.load.ocupadosCount+av.load.provisionadosCount}</span>`:''}
+      </button>`);
+  }
+  /* Painel lateral: detalhes do dia selecionado */
+  const detailISO = d.selectedISO || todayISO;
+  const detail = _consDayDetail(c.id, detailISO);
+
+  const dowLabels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  return `
+    <div class="cons-agenda-wrap">
+      <div class="cons-cal">
+        <div class="cons-cal-head">
+          <div class="cch-nav">
+            <button type="button" class="cch-btn" onclick="consNavMonth(-1)" title="Mês anterior">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="cch-btn cch-today" onclick="consNavMonth(0)">Hoje</button>
+            <button type="button" class="cch-btn" onclick="consNavMonth(1)" title="Próximo mês">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+          <h3>${monthName.charAt(0).toUpperCase()+monthName.slice(1)}</h3>
+          <div class="cons-cal-legend">
+            <span class="ccl ccl-livre"><span class="dot"></span> ${livre} livres</span>
+            <span class="ccl ccl-provisionado"><span class="dot"></span> ${prov} prov.</span>
+            <span class="ccl ccl-agendado"><span class="dot"></span> ${ag} ocup.</span>
+          </div>
+        </div>
+        <div class="cons-cal-dow">${dowLabels.map(x=>`<div>${x}</div>`).join('')}</div>
+        <div class="cons-cal-grid">${cells.join('')}</div>
+      </div>
+      <aside class="cons-day-panel">
+        <div class="cdp-head">
+          <div class="cdp-eyebrow">${detail.dayLabel}</div>
+          <h4>${detail.title}</h4>
+          <div class="cdp-status s-${detail.status}">
+            <span class="cdp-dot"></span> ${detail.statusLabel}
+          </div>
+        </div>
+        <div class="cdp-stats">
+          <div><b>${pad(detail.load.ocupadosCount)}</b><span>Confirmados</span></div>
+          <div><b>${pad(detail.load.provisionadosCount)}</b><span>Provisórios</span></div>
+          <div><b>${Math.round((detail.load.freeMin||0)/60*10)/10}h</b><span>Livre</span></div>
+        </div>
+        <div class="cdp-list">
+          ${detail.events.length ? detail.events.map(e => {
+            const co = companyById(e.companyId);
+            const st = (statusById(e.status)||{}).label || e.status;
+            const isConf = ['confirmado','em-andamento','atendido','concluido'].includes(e.status);
+            return `
+              <div class="cdp-ev ${isConf?'is-confirmed':'is-provisional'}">
+                <div class="cdp-ev-time"><b>${e.timeStart||'--:--'}</b><span>${e.timeEnd||''}</span></div>
+                <div class="cdp-ev-main">
+                  <div class="cdp-ev-title">${e.title||'(sem título)'}</div>
+                  <div class="cdp-ev-meta">${co?co.fantasia:'<i>sem empresa</i>'} · ${st}</div>
+                </div>
+                <button type="button" class="cdp-ev-go" title="Abrir evento" onclick="openEventModal('${e.id}')">
+                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </button>
+              </div>`;
+          }).join('') : `<div class="cdp-empty">Nenhum compromisso neste dia. Janela ${c.workStart||'--:--'} → ${c.workEnd||'--:--'} disponível.</div>`}
+        </div>
+      </aside>
+    </div>`;
+}
+
+function _consDayDetail(consultantId, iso){
+  const c = consultantById(consultantId);
+  const av = _consAvailability(consultantId, iso);
+  const events = EVENTS
+    .filter(e => e.consultantId === consultantId && e.date === iso && e.status !== 'cancelado' && e.status !== 'reagendado')
+    .sort((a,b) => (a.timeStart||'').localeCompare(b.timeStart||''));
+  const dt = parseISO(iso);
+  const dayLabel = dt.toLocaleDateString('pt-BR', { weekday:'long' }).toUpperCase();
+  const title = `${pad(dt.getDate())} de ${dt.toLocaleDateString('pt-BR',{ month:'long' })}`;
+  const statusLabel = av.status === 'livre' ? 'Dia livre' : av.status === 'provisionado' ? 'Dia provisionado' : 'Dia agendado';
+  return { dayLabel, title, status:av.status, statusLabel, load:av.load, events };
+}
+
+/* Helper local — converte Date em ISO yyyy-mm-dd respeitando timezone local (já existe outro
+   isoFromDate no app; este só roda se aquele não existir). */
+if (typeof window.isoFromDate !== 'function'){
+  window.isoFromDate = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+/* Sidebar badge: total de pendências do último consultor selecionado, ou total geral. */
+(function patchSidebarBadgesForConsultor(){
+  const orig = renderSidebarBadges;
+  renderSidebarBadges = function(){
+    orig && orig();
+    const el = document.getElementById('sbConsBadge');
+    if (!el) return;
+    const d = state.consultorDash;
+    if (d && d.selectedId && consultantById(d.selectedId)){
+      el.textContent = _consPendenciasForConsultant(d.selectedId).length;
+    } else {
+      let total = 0;
+      CONSULTANTS.forEach(c => { total += _consPendenciasForConsultant(c.id).length; });
+      el.textContent = total;
+    }
+  };
+})();
 
 /* ============ CARREGA DADOS SALVOS E INICIA ============ */
 const _loaded = loadPersisted();

@@ -3625,6 +3625,744 @@
   }
   .cdc.is-selected{ border-color:var(--ink); box-shadow:0 0 0 3px rgba(20,23,31,.12); transform:translateY(-2px); }
 
+  /* ---------- VISÃO GERAL (Overview) ---------- */
+  .cov-wrap{ width:100%; }
+  .cov-grid{
+    display:grid; grid-template-columns:1.3fr .8fr .9fr; gap:14px;
+    grid-auto-rows:auto;
+  }
+  .cov-card{
+    background:rgba(255,255,255,.66);
+    backdrop-filter:saturate(1.1) blur(14px);
+    -webkit-backdrop-filter:saturate(1.1) blur(14px);
+    border:1px solid rgba(255,255,255,.7); border-radius:14px;
+    padding:16px 18px; box-shadow:0 1px 0 rgba(255,255,255,.9) inset, var(--shadow-sm);
+    display:flex; flex-direction:column; gap:10px;
+    animation:consFadeIn .32s ease both;
+  }
+  .cov-card-head{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2);
+    padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .cov-card-ic{
+    width:22px; height:22px; border-radius:50%;
+    background:var(--champagne-4); color:var(--champagne);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:12px; font-weight:700;
+  }
+  .cov-today{ grid-column:span 2; }
+  .cov-status{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 14px; border-radius:18px;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+    background:var(--paper-2); color:var(--ink-3); align-self:flex-start;
+  }
+  .cov-status-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; }
+  .cov-status.s-livre{ background:var(--forest-bg); color:var(--forest); }
+  .cov-status.s-parcialmente-livre{ background:#fef3c7; color:#92400e; }
+  .cov-status.s-provisionado{ background:var(--amber-bg); color:var(--amber); }
+  .cov-status.s-agendado{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .cov-today-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:10px; background:var(--paper); border-radius:10px; border:1px solid var(--line); }
+  .cov-today-stats > div{ text-align:center; }
+  .cov-today-stats b{ display:block; font-family:var(--font-display); font-size:20px; color:var(--ink); }
+  .cov-today-stats span{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:2px; }
+  .cov-today-evs{ display:flex; flex-direction:column; gap:6px; }
+  .cov-ev{
+    display:grid; grid-template-columns:55px 1fr auto; gap:10px; align-items:center;
+    padding:8px 10px; background:var(--paper); border:1px solid var(--line); border-radius:8px;
+    transition:all .15s ease;
+  }
+  .cov-ev:hover{ border-color:var(--ink); transform:translateX(2px); }
+  .cov-ev-time{ text-align:center; font-family:var(--font-mono); }
+  .cov-ev-time b{ display:block; font-size:13px; color:var(--ink); }
+  .cov-ev-time span{ font-size:10px; color:var(--ink-3); }
+  .cov-ev-title{ font-weight:600; color:var(--ink); font-size:12.5px; }
+  .cov-ev-meta{ font-size:10.5px; color:var(--ink-3); margin-top:1px; }
+  .cov-ev-go, .cov-pend-go{
+    width:24px; height:24px; border-radius:50%; border:1px solid var(--line-2);
+    background:var(--paper); color:var(--ink-3); display:inline-flex; align-items:center; justify-content:center;
+    transition:all .15s ease; cursor:pointer;
+  }
+  .cov-ev-go:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .cov-pend-go:hover{ background:var(--forest); color:var(--paper); border-color:var(--forest); }
+  .cov-empty{ padding:18px; text-align:center; color:var(--ink-3); font-style:italic; font-size:12px; background:var(--paper-2); border-radius:8px; }
+  .cov-more{
+    align-self:flex-end; background:transparent; border:none; color:var(--champagne); cursor:pointer;
+    font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    padding:4px 0;
+  }
+  .cov-more:hover{ color:var(--ink); }
+
+  .cov-score-wrap{ display:flex; align-items:center; gap:14px; }
+  .cov-score-circle{
+    width:110px; height:110px; border-radius:50%; flex-shrink:0;
+    background: conic-gradient(var(--champagne) calc(var(--p)*1%), var(--paper-3) 0);
+    display:flex; align-items:center; justify-content:center; position:relative;
+    box-shadow:0 6px 20px -8px rgba(184,137,90,.5);
+  }
+  .cov-score-circle::before{
+    content:""; position:absolute; inset:8px; border-radius:50%; background:var(--paper);
+  }
+  .csc-val{ position:relative; font-family:var(--font-display); font-size:32px; font-weight:500; color:var(--ink); line-height:1; }
+  .csc-lbl{ position:relative; font-family:var(--font-mono); font-size:10px; color:var(--ink-3); margin-top:-4px; }
+  .cov-score-info{ flex:1; display:flex; flex-direction:column; gap:6px; }
+  .cov-score-info > div{ display:flex; flex-direction:column; }
+  .cov-score-info b{ font-family:var(--font-display); font-size:18px; color:var(--ink); }
+  .cov-score-info span{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); }
+
+  .cov-slot-list{ display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; }
+  .cov-slot{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 10px; background:var(--forest-bg); border:1px solid var(--forest); border-radius:8px;
+    transition:transform .15s ease;
+  }
+  .cov-slot:hover{ transform:translateX(2px); }
+  .cov-slot b{ font-family:var(--font-mono); color:var(--forest); font-size:12.5px; }
+  .cov-slot span{ font-family:var(--font-mono); font-size:10px; color:var(--ink-3); }
+  .cov-slot-hint{ font-size:10.5px; color:var(--ink-3); font-style:italic; margin-top:4px; }
+
+  .cov-pend{
+    display:grid; grid-template-columns:24px 1fr auto; gap:10px; align-items:center;
+    padding:8px 10px; background:var(--burgundy-bg); border:1px solid var(--burgundy); border-radius:8px;
+    margin-bottom:6px;
+  }
+  .cov-pend-ic{ width:24px; height:24px; border-radius:50%; background:var(--burgundy); color:var(--paper); display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
+  .cov-pend-title{ font-weight:600; color:var(--ink); font-size:12.5px; }
+  .cov-pend-meta{ font-size:10.5px; color:var(--burgundy); margin-top:1px; font-family:var(--font-mono); }
+
+  .cov-quick-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+  .cov-q-btn{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:14px 10px; border-radius:10px; background:var(--paper); border:1px solid var(--line);
+    cursor:pointer; transition:all .15s ease;
+    font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2);
+  }
+  .cov-q-btn:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); transform:translateY(-2px); }
+
+  /* ---------- PERFORMANCE ---------- */
+  .perf-wrap{ display:flex; flex-direction:column; gap:14px; }
+  .perf-period{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    background:rgba(255,255,255,.6); border:1px solid var(--line); border-radius:12px; padding:10px 14px;
+    font-family:var(--font-mono); font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .perf-period button{
+    padding:6px 12px; border-radius:8px; border:1px solid var(--line-2); background:var(--paper);
+    color:var(--ink-3); cursor:pointer; font-family:inherit; font-size:10px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; transition:all .15s ease;
+  }
+  .perf-period button:hover{ border-color:var(--ink); color:var(--ink); }
+  .perf-period button.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .perf-period-chip{ margin-left:auto; padding:4px 10px; background:var(--champagne-4); color:var(--champagne); border-radius:14px; }
+
+  .perf-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .perf-row-3{ grid-template-columns:repeat(3, 1fr); }
+  .perf-card{
+    background:rgba(255,255,255,.66); backdrop-filter:blur(12px);
+    border:1px solid var(--line); border-radius:14px; padding:16px 18px;
+    box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:12px;
+    animation:consFadeIn .32s ease both;
+  }
+  .perf-card-head{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2);
+    padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .perf-card-legend{
+    margin-left:auto; display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:9.5px; letter-spacing:.1em; color:var(--ink-3);
+  }
+  .perf-card-legend i{ width:10px; height:10px; border-radius:2px; display:inline-block; margin-right:4px; vertical-align:middle; }
+  .perf-ic{
+    width:22px; height:22px; border-radius:50%;
+    background:var(--champagne-4); color:var(--champagne);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:12px; font-weight:700;
+  }
+  .perf-donut-row{ display:flex; align-items:center; gap:16px; }
+  .donut-svg .donut-label{ font-family:'Fraunces',serif; font-size:26px; font-weight:500; fill:var(--ink); }
+  .donut-svg .donut-sub{ font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--ink-3); letter-spacing:.14em; text-transform:uppercase; }
+  .perf-legend{ list-style:none; padding:0; margin:0; flex:1; }
+  .perf-legend li{
+    display:grid; grid-template-columns:14px 1fr auto; gap:10px; align-items:center;
+    padding:6px 0; border-bottom:1px dashed var(--line);
+  }
+  .perf-legend li:last-child{ border:none; }
+  .perf-legend i{ width:12px; height:12px; border-radius:3px; }
+  .perf-legend span{ font-size:12px; color:var(--ink-2); }
+  .perf-legend b{ font-family:var(--font-display); font-size:16px; color:var(--ink); }
+
+  .bars-svg .bar-tick{ font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--ink-3); }
+  .bars-svg .bar-label{ font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--ink-3); letter-spacing:.06em; text-transform:uppercase; }
+
+  .perf-meta-num{ display:flex; align-items:baseline; gap:6px; }
+  .perf-meta-num b{ font-family:var(--font-display); font-size:34px; color:var(--ink); line-height:1; }
+  .perf-meta-num span{ color:var(--ink-3); font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
+  .perf-meta-bar{ height:10px; background:var(--paper-3); border-radius:5px; overflow:hidden; }
+  .perf-meta-bar > div{ height:100%; background:linear-gradient(90deg, var(--forest), var(--champagne)); transition:width .4s ease; }
+  .perf-meta-pct{ font-family:var(--font-mono); font-size:11px; color:var(--ink-3); letter-spacing:.1em; text-transform:uppercase; }
+
+  .perf-circle{
+    width:130px; height:130px; border-radius:50%;
+    background:conic-gradient(var(--forest) calc(var(--p)*1%), var(--paper-3) 0);
+    display:flex; align-items:center; justify-content:center; align-self:center; position:relative;
+    box-shadow:0 6px 20px -8px rgba(45,95,63,.4);
+  }
+  .perf-circle::before{ content:""; position:absolute; inset:10px; border-radius:50%; background:var(--paper); }
+  .perf-circle.gold{ background:conic-gradient(var(--champagne) calc(var(--p)*1%), var(--paper-3) 0); box-shadow:0 6px 20px -8px rgba(184,137,90,.5); }
+  .perf-circle span{ position:relative; font-family:var(--font-display); font-size:30px; font-weight:500; color:var(--ink); }
+  .perf-ocup-sub{ text-align:center; font-family:var(--font-mono); font-size:10px; color:var(--ink-3); letter-spacing:.1em; }
+
+  .perf-stat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .perf-stat-grid > div{ padding:10px; background:var(--paper); border:1px solid var(--line); border-radius:8px; text-align:center; }
+  .perf-stat-grid b{ display:block; font-family:var(--font-display); font-size:22px; color:var(--ink); }
+  .perf-stat-grid span{ display:block; font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:2px; }
+  .perf-stat-grid .ok b{ color:var(--forest); }
+  .perf-stat-grid .bad b{ color:var(--burgundy); }
+
+  /* ---------- PENDÊNCIAS — barra de status crítica/andamento/concluídas ---------- */
+  .cpx-status-bar{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  }
+  .cpx-stat{
+    text-align:left; padding:14px 18px; border-radius:12px;
+    background:rgba(255,255,255,.6); border:1px solid var(--line); cursor:pointer;
+    display:flex; gap:14px; align-items:center; transition:all .18s ease;
+    font-family:var(--font-body);
+  }
+  .cpx-stat:hover{ transform:translateY(-2px); box-shadow:0 6px 18px -10px rgba(20,23,31,.25); }
+  .cpx-stat.active{ border-color:var(--ink); box-shadow:0 0 0 3px rgba(20,23,31,.08); }
+  .cpx-stat-ic{
+    width:36px; height:36px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--paper-2); color:var(--ink-3);
+    font-family:var(--font-display); font-size:16px; font-weight:700;
+    flex-shrink:0;
+  }
+  .cpx-stat b{ font-family:var(--font-display); font-size:24px; color:var(--ink); line-height:1; display:block; }
+  .cpx-stat span{ font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); }
+  .cpx-stat small{ display:block; margin-left:auto; font-size:10.5px; color:var(--ink-4); max-width:160px; text-align:right; }
+  .cpx-stat.is-critical.has-on .cpx-stat-ic{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .cpx-stat.is-critical.has-on b{ color:var(--burgundy); }
+  .cpx-stat.is-progress .cpx-stat-ic{ background:var(--amber-bg); color:var(--amber); }
+  .cpx-stat.is-done .cpx-stat-ic{ background:var(--forest-bg); color:var(--forest); }
+  .cpx-stat.is-done b{ color:var(--forest); }
+
+  .cpx-filters{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;
+    background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:10px 14px;
+  }
+  .cpx-filters label{
+    display:flex; flex-direction:column; gap:4px;
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .cpx-filters select{
+    font-family:var(--font-body); font-size:12px;
+    padding:6px 10px; border-radius:6px; border:1px solid var(--line-2);
+    background:var(--paper); color:var(--ink);
+  }
+  .cpx-clear{
+    margin-left:auto; padding:8px 14px; background:transparent;
+    border:1px solid var(--line-2); color:var(--ink-3); border-radius:6px;
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; cursor:pointer;
+  }
+  .cpx-clear:hover{ color:var(--burgundy); border-color:var(--burgundy); }
+  .cp-origin{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; color:var(--champagne); text-transform:uppercase; font-weight:600; }
+  .cons-pend-row.is-done{ opacity:.7; background:var(--forest-bg); }
+  .cons-pend-row.is-done .cp-title{ text-decoration:line-through; color:var(--ink-3); }
+  .cp-btn.cp-ok:hover{ background:var(--forest); color:var(--paper); border-color:var(--forest); }
+  .cp-btn.cp-cal:hover{ background:var(--champagne); color:var(--paper); border-color:var(--champagne); }
+  .cp-btn.cp-x:hover{ background:var(--burgundy); color:var(--paper); border-color:var(--burgundy); }
+
+  /* ---------- AGENDA — view switch + semana + dia ---------- */
+  .cons-view-switch{
+    display:inline-flex; gap:4px; padding:3px; border-radius:10px;
+    background:var(--paper-2); border:1px solid var(--line);
+  }
+  .cons-view-switch button{
+    padding:6px 12px; border-radius:7px; background:transparent; border:none;
+    font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-3); cursor:pointer; transition:all .15s ease;
+  }
+  .cons-view-switch button:hover{ color:var(--ink); }
+  .cons-view-switch button.active{ background:var(--paper); color:var(--ink); box-shadow:0 2px 6px -2px rgba(20,23,31,.18); }
+  .cons-cal-legend.center{ justify-content:center; margin-bottom:10px; padding:6px 0; }
+  .ccl-parcial .dot{ background:#f59e0b; }
+  /* Status do calendário — 4 cores */
+  .cdc.s-parcialmente-livre{ background:linear-gradient(180deg, #fef3c7, var(--paper)); border-color:#f59e0b; }
+  .cdc.s-parcialmente-livre .cdc-pill{ background:#f59e0b; }
+  .cdc.s-parcialmente-livre .cdc-num{ color:#92400e; font-weight:600; }
+
+  /* Visão semana */
+  .cons-week-grid{
+    display:grid; grid-template-columns:repeat(7, 1fr); gap:8px;
+  }
+  .cwk-col{
+    background:var(--paper); border:1px solid var(--line); border-radius:10px;
+    padding:10px; min-height:200px; cursor:pointer; transition:all .15s ease;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .cwk-col:hover{ transform:translateY(-2px); border-color:var(--ink); }
+  .cwk-col.is-today{ outline:2px solid var(--ink); outline-offset:-2px; }
+  .cwk-col.is-selected{ box-shadow:0 0 0 3px rgba(20,23,31,.12); }
+  .cwk-col.s-livre{ background:linear-gradient(180deg, var(--forest-bg), var(--paper)); }
+  .cwk-col.s-parcialmente-livre{ background:linear-gradient(180deg, #fef3c7, var(--paper)); }
+  .cwk-col.s-provisionado{ background:linear-gradient(180deg, var(--amber-bg), var(--paper)); }
+  .cwk-col.s-agendado{ background:linear-gradient(180deg, var(--burgundy-bg), var(--paper)); }
+  .cwk-head{ display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; }
+  .cwk-dow{ font-family:var(--font-mono); font-size:9px; font-weight:700; letter-spacing:.14em; color:var(--ink-3); }
+  .cwk-day{ font-family:var(--font-display); font-size:22px; color:var(--ink); font-weight:500; }
+  .cwk-pill{ margin-left:auto; font-family:var(--font-mono); font-size:8.5px; font-weight:700; letter-spacing:.1em; padding:2px 6px; border-radius:8px; }
+  .cwk-pill-livre{ background:var(--forest); color:var(--paper); }
+  .cwk-pill-parcialmente-livre{ background:#f59e0b; color:var(--paper); }
+  .cwk-pill-provisionado{ background:var(--amber-2); color:var(--paper); }
+  .cwk-pill-agendado{ background:var(--burgundy); color:var(--paper); }
+  .cwk-evs{ display:flex; flex-direction:column; gap:4px; flex:1; }
+  .cwk-ev{
+    background:rgba(255,255,255,.85); border:1px solid var(--line); border-radius:6px;
+    padding:5px 7px; font-size:11px; color:var(--ink); cursor:pointer;
+    overflow:hidden;
+  }
+  .cwk-ev:hover{ border-color:var(--ink); }
+  .cwk-ev b{ font-family:var(--font-mono); font-size:10px; color:var(--ink-2); margin-right:4px; }
+  .cwk-ev small{ display:block; font-size:9.5px; color:var(--ink-3); font-family:var(--font-mono); margin-top:1px; }
+  .cwk-ev.is-confirmed{ border-left:3px solid var(--burgundy); }
+  .cwk-ev.is-provisional{ border-left:3px solid var(--amber-2); }
+  .cwk-empty{ font-size:10px; color:var(--ink-4); font-style:italic; padding:6px; text-align:center; }
+  .cwk-more{ font-size:9.5px; color:var(--ink-3); font-family:var(--font-mono); letter-spacing:.08em; text-align:center; padding:3px; }
+  .cwk-slots-mini{ display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; }
+  .cwk-slots-mini span{ font-family:var(--font-mono); font-size:8.5px; padding:2px 5px; background:var(--forest-bg); color:var(--forest); border-radius:6px; }
+
+  /* Visão dia — timeline horária */
+  .cdy-status{
+    display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:18px;
+    font-family:var(--font-mono); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    background:var(--paper-2); color:var(--ink-2); margin:0 0 14px;
+  }
+  .cdy-status em{ font-style:normal; color:var(--ink-3); font-weight:500; letter-spacing:.04em; text-transform:none; }
+  .cdy-status-dot{ width:8px; height:8px; border-radius:50%; background:currentColor; }
+  .cdy-status.s-livre{ background:var(--forest-bg); color:var(--forest); }
+  .cdy-status.s-parcialmente-livre{ background:#fef3c7; color:#92400e; }
+  .cdy-status.s-provisionado{ background:var(--amber-bg); color:var(--amber); }
+  .cdy-status.s-agendado{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .cdy-grid{ display:flex; flex-direction:column; gap:2px; }
+  .cdy-row{ display:grid; grid-template-columns:70px 1fr; gap:10px; min-height:48px; }
+  .cdy-hour{
+    font-family:var(--font-mono); font-size:10.5px; font-weight:700; letter-spacing:.08em;
+    color:var(--ink-4); padding-top:6px; text-align:right;
+  }
+  .cdy-row.in-jorn .cdy-hour{ color:var(--ink-2); }
+  .cdy-slot{
+    background:var(--paper-2); border-radius:6px; padding:6px 10px;
+    border-left:3px solid var(--paper-3);
+  }
+  .cdy-row.in-jorn .cdy-slot{ background:var(--paper); border-left-color:var(--line-2); }
+  .cdy-row.has-ev .cdy-slot{ background:transparent; border-left-color:transparent; padding:0; }
+  .cdy-free{ font-family:var(--font-mono); font-size:10px; color:var(--forest); font-style:italic; letter-spacing:.08em; }
+  .cdy-off{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-4); font-style:italic; }
+  .cdy-ev{
+    padding:10px 14px; border-radius:8px; background:var(--paper); border:1px solid var(--line);
+    cursor:pointer; transition:all .15s ease;
+  }
+  .cdy-ev:hover{ border-color:var(--ink); transform:translateX(3px); }
+  .cdy-ev.is-confirmed{ border-left:4px solid var(--burgundy); background:linear-gradient(90deg, var(--burgundy-bg), var(--paper) 20%); }
+  .cdy-ev.is-provisional{ border-left:4px solid var(--amber-2); background:linear-gradient(90deg, var(--amber-bg), var(--paper) 20%); }
+  .cdy-ev b{ font-family:var(--font-mono); font-size:11px; color:var(--ink-2); display:block; }
+  .cdy-ev span{ font-weight:600; color:var(--ink); display:block; margin-top:2px; }
+  .cdy-ev small{ display:block; font-size:10.5px; color:var(--ink-3); margin-top:2px; }
+
+  /* Painel lateral — janelas livres */
+  .cdp-section-title{
+    display:flex; align-items:center; gap:6px;
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+    margin-top:14px; padding-bottom:4px; border-bottom:1px dashed var(--line);
+  }
+  .cdp-slots{ display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; }
+  .cdp-slot{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 10px; background:var(--forest-bg); border:1px solid var(--forest); border-radius:8px;
+  }
+  .cdp-slot b{ font-family:var(--font-mono); color:var(--forest); font-size:12.5px; }
+  .cdp-slot span{ font-family:var(--font-mono); font-size:10px; color:var(--ink-3); }
+
+  /* ============ PERFORMANCE PRO (pfp-*) ============ */
+  .pfp-kpis{
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;
+    margin-bottom:14px;
+  }
+  .pfp-kpi{
+    position:relative; padding:14px 16px; border-radius:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
+    border:1px solid var(--line); box-shadow:var(--shadow-sm);
+    overflow:hidden; transition:transform .18s ease;
+    animation:consFadeIn .32s ease both;
+  }
+  .pfp-kpi:hover{ transform:translateY(-2px); }
+  .pfp-kpi-ic{
+    position:absolute; top:12px; right:12px;
+    width:30px; height:30px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:14px;
+    background:var(--paper-2); color:var(--ink-3);
+  }
+  .pfp-kpi-ocup .pfp-kpi-ic{ background:var(--forest-bg); color:var(--forest); }
+  .pfp-kpi-train .pfp-kpi-ic{ background:var(--champagne-4); color:var(--champagne); }
+  .pfp-kpi-os .pfp-kpi-ic{ background:var(--amber-bg); color:var(--amber); }
+  .pfp-kpi-hours .pfp-kpi-ic{ background:var(--indigo-bg); color:var(--indigo-2); }
+  .pfp-kpi-sat .pfp-kpi-ic{ background:var(--rose-bg); color:var(--rose); }
+  .pfp-kpi-val{
+    font-family:var(--font-display); font-weight:500; font-size:30px;
+    line-height:1; color:var(--ink); display:flex; align-items:baseline; gap:3px;
+  }
+  .pfp-kpi-sub{ font-family:var(--font-mono); font-size:13px; color:var(--ink-4); font-weight:400; }
+  .pfp-kpi-lbl{
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+    margin:6px 0 8px;
+  }
+  .pfp-kpi-bar{ height:6px; background:var(--paper-3); border-radius:3px; overflow:hidden; margin-bottom:8px; }
+  .pfp-kpi-bar > div{ height:100%; background:var(--ink); transition:width .4s ease; }
+  .pfp-delta{
+    display:inline-flex; align-items:center; gap:4px;
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.06em; padding:2px 7px; border-radius:9px;
+  }
+  .pfp-delta.is-up{ background:var(--forest-bg); color:var(--forest); }
+  .pfp-delta.is-down{ background:var(--burgundy-bg); color:var(--burgundy); }
+  .pfp-delta.is-flat{ background:var(--paper-2); color:var(--ink-3); font-weight:500; }
+
+  .pfp-gauge-wrap{ display:flex; justify-content:center; padding:6px 0; }
+  .gauge-svg .gauge-val{ font-family:'Fraunces',serif; font-size:24px; font-weight:600; fill:var(--ink); }
+  .line-svg, .heat-svg, .funnel-svg{ display:block; }
+  .heat-svg .hm-cnt{ font-family:'JetBrains Mono',monospace; font-size:9px; fill:#fff; font-weight:700; }
+  .funnel-svg .funnel-label{ font-family:'Manrope',sans-serif; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+  .funnel-svg .funnel-val{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; opacity:.9; }
+
+  @media (max-width: 1100px){
+    .pfp-kpis{ grid-template-columns:repeat(2, 1fr); }
+  }
+  @media (max-width: 640px){
+    .pfp-kpis{ grid-template-columns:1fr; }
+  }
+
+  /* ============ PENDÊNCIAS CATEGORIZADAS (pend-cat-*) ============ */
+  .pend-cat-toolbar{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+    padding:10px 12px; margin-top:12px; margin-bottom:12px;
+    background:var(--paper); border:1px solid var(--line); border-radius:10px;
+  }
+  .pend-cat-vt{
+    display:inline-flex; gap:2px; padding:3px; border-radius:8px;
+    background:var(--paper-2); border:1px solid var(--line);
+  }
+  .pend-cat-vt button{
+    padding:5px 11px; border-radius:6px; background:transparent; border:none;
+    font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--ink-3); cursor:pointer; transition:all .15s ease;
+  }
+  .pend-cat-vt button:hover{ color:var(--ink); }
+  .pend-cat-vt button.active{ background:var(--paper); color:var(--ink); box-shadow:0 2px 6px -2px rgba(20,23,31,.18); }
+  .pend-cat-toolbar label{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+    display:flex; flex-direction:column; gap:3px;
+  }
+  .pend-cat-toolbar select{
+    padding:5px 9px; border-radius:6px; border:1px solid var(--line-2);
+    background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:11.5px;
+  }
+  .pct-meta{ margin-left:auto; font-size:11px; color:var(--ink-3); }
+  .pct-meta b{ color:var(--ink); font-weight:700; }
+
+  .pend-cat-section{
+    background:rgba(255,255,255,.55); border:1px solid var(--line); border-radius:12px;
+    padding:0; margin-bottom:10px; overflow:hidden;
+    animation:consFadeIn .3s ease both;
+  }
+  .pend-cat-section[open]{ background:rgba(255,255,255,.7); }
+  .pend-cat-section > summary{
+    list-style:none; cursor:pointer; padding:12px 14px;
+    display:flex; align-items:center; gap:10px; user-select:none;
+    transition:background .15s ease;
+  }
+  .pend-cat-section > summary::-webkit-details-marker{ display:none; }
+  .pend-cat-section > summary:hover{ background:rgba(255,255,255,.5); }
+  .pcs-ic{
+    width:28px; height:28px; border-radius:8px;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--paper-2); color:var(--ink-2);
+    font-family:var(--font-display); font-size:14px; font-weight:700;
+    border:1px solid var(--line);
+  }
+  .pend-cat-section.cat-osOpen .pcs-ic{ background:var(--indigo-bg); color:var(--indigo-2); border-color:transparent; }
+  .pend-cat-section.cat-trainAction .pcs-ic{ background:var(--forest-bg); color:var(--forest); border-color:transparent; }
+  .pend-cat-section.cat-clientWaiting .pcs-ic{ background:var(--amber-bg); color:var(--amber); border-color:transparent; }
+  .pend-cat-section.cat-taskAdmin .pcs-ic{ background:var(--paper-2); color:var(--ink-2); }
+  .pend-cat-section.cat-docPending .pcs-ic{ background:var(--burgundy-bg); color:var(--burgundy); border-color:transparent; }
+  .pcs-label{ font-weight:600; color:var(--ink); font-size:13.5px; }
+  .pcs-hint{ font-size:10.5px; color:var(--ink-4); margin-left:6px; font-style:italic; }
+  .pcs-count{
+    margin-left:auto; font-family:var(--font-mono); font-size:11px;
+    background:var(--paper-2); color:var(--ink-2); padding:3px 9px; border-radius:10px;
+    border:1px solid var(--line); font-weight:700;
+  }
+  .pcs-count.has-crit{ background:var(--burgundy); color:var(--paper); border-color:transparent; animation:pendPulseBadge 1.6s ease-in-out infinite; }
+  @keyframes pendPulseBadge{ 0%,100%{ box-shadow:0 0 0 0 rgba(138,38,56,.5); } 50%{ box-shadow:0 0 0 5px rgba(138,38,56,0); } }
+
+  .pend-cat-rows{ padding:0 12px 12px; display:flex; flex-direction:column; gap:6px; }
+  .pend-cat-row{
+    display:grid; grid-template-columns:auto 1fr auto auto; gap:10px; align-items:center;
+    padding:9px 12px; background:var(--paper); border:1px solid var(--line); border-radius:9px;
+    transition:all .15s ease;
+  }
+  .pend-cat-row:hover{ border-color:var(--line-3); transform:translateX(2px); box-shadow:0 4px 12px -8px rgba(20,23,31,.16); }
+  .pend-cat-row.crit-critical{ border-left:3px solid var(--burgundy); }
+  .pend-cat-row.crit-high{ border-left:3px solid var(--amber); }
+  .pend-cat-row.crit-medium{ border-left:3px solid var(--champagne); }
+  .pend-cat-row.crit-low{ border-left:3px solid var(--forest-2); }
+  .pend-cat-row.is-pulsing{ animation:pendPulseBorder 1.6s ease-in-out infinite; }
+  @keyframes pendPulseBorder{ 0%,100%{ box-shadow:inset 3px 0 0 var(--burgundy), 0 0 0 0 rgba(138,38,56,.3); } 50%{ box-shadow:inset 3px 0 0 var(--burgundy), 0 0 0 6px rgba(138,38,56,0); } }
+
+  .pend-cat-prio{
+    width:24px; height:24px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:13px;
+  }
+  .prio-critical{ background:var(--burgundy); color:var(--paper); }
+  .prio-high{ background:var(--amber); color:var(--paper); }
+  .prio-medium{ background:var(--champagne); color:var(--paper); }
+  .prio-low{ background:var(--forest-bg); color:var(--forest); }
+
+  .pend-cat-title{ font-weight:600; color:var(--ink); font-size:13px; }
+  .pend-cat-meta{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:3px;
+    font-size:10.5px; color:var(--ink-3);
+  }
+  .pend-cat-company{ font-weight:600; color:var(--ink-2); }
+  .pend-cat-sub{
+    padding:2px 7px; border-radius:10px; font-family:var(--font-mono);
+    font-size:9px; font-weight:700; letter-spacing:.1em;
+    background:var(--paper-2); color:var(--ink-3); border:1px solid var(--line);
+  }
+  .pend-cat-sub.sub-nova{ background:var(--slate-bg); color:var(--slate); border-color:transparent; }
+  .pend-cat-sub.sub-em-andamento{ background:var(--indigo-bg); color:var(--indigo-2); border-color:transparent; }
+  .pend-cat-sub.sub-aguardando-cliente{ background:var(--amber-bg); color:var(--amber); border-color:transparent; }
+  .pend-cat-sub.sub-atrasada{ background:var(--burgundy); color:var(--paper); border-color:transparent; }
+  .pend-cat-action{ background:var(--forest-bg); color:var(--forest); padding:2px 7px; border-radius:10px; font-family:var(--font-mono); font-size:9px; font-weight:700; letter-spacing:.1em; }
+  .pend-cat-wait{ color:var(--burgundy); font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:.04em; }
+
+  .pend-cat-date{
+    text-align:right; font-family:var(--font-mono); font-size:11.5px;
+    color:var(--ink); min-width:80px;
+  }
+  .pend-cat-date b{ color:var(--ink); font-weight:700; }
+  .pend-cat-date i{ color:var(--ink-4); }
+
+  .pend-cat-actions{ display:flex; gap:5px; }
+  .pca-btn{
+    width:28px; height:28px; border-radius:7px;
+    border:1px solid var(--line-2); background:var(--paper);
+    color:var(--ink-2); display:inline-flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .pca-btn:hover{ border-color:var(--ink); color:var(--ink); }
+  .pca-btn.pca-ok:hover{ background:var(--forest); color:var(--paper); border-color:var(--forest); }
+  .pca-btn.pca-del:hover{ background:var(--indigo-2); color:var(--paper); border-color:var(--indigo-2); }
+  .pca-btn.pca-post:hover{ background:var(--champagne); color:var(--paper); border-color:var(--champagne); }
+  .pca-btn.pca-cm:hover{ background:var(--amber); color:var(--paper); border-color:var(--amber); }
+  .pca-btn.pca-view:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+  .pend-cat-empty{ padding:14px; text-align:center; color:var(--ink-4); font-style:italic; font-size:11px; }
+
+  /* Responsivos */
+  @media (max-width: 1100px){
+    .cov-grid{ grid-template-columns:1fr 1fr; }
+    .cov-today{ grid-column:span 2; }
+    .perf-row, .perf-row-3{ grid-template-columns:1fr 1fr; }
+    .cons-week-grid{ grid-template-columns:repeat(4,1fr); }
+  }
+  @media (max-width: 760px){
+    .cov-grid{ grid-template-columns:1fr; }
+    .cov-today{ grid-column:auto; }
+    .perf-row, .perf-row-3{ grid-template-columns:1fr; }
+    .cons-week-grid{ grid-template-columns:repeat(2,1fr); }
+    .cpx-status-bar{ grid-template-columns:1fr; }
+    .cpx-stat small{ display:none; }
+  }
+
+  /* CINZA — fora da jornada / dia bloqueado (feriado, folga, etc.) */
+  .cdc.s-off{
+    background:repeating-linear-gradient(135deg, rgba(160,165,175,.10) 0 6px, rgba(160,165,175,.04) 6px 12px);
+    border-color:rgba(150,155,165,.40);
+    cursor:not-allowed;
+  }
+  .cdc.s-off:hover{ transform:none; box-shadow:none; border-color:rgba(150,155,165,.55); }
+  .cdc.s-off .cdc-num{ color:rgba(100,105,115,.65); font-weight:400; }
+  .cdc.s-off .cdc-pill{ background:rgba(150,155,165,.45); }
+  .ccl-off .dot{ background:rgba(150,155,165,.55); }
+  .cdp-status.s-off{ background:rgba(160,165,175,.16); color:#5a6070; }
+  .cdp-status.s-off .cdp-dot{ background:rgba(150,155,165,.65); }
+  .cps.cps-off b{ color:#5a6070; }
+
+  /* ============ AGENDA INTELIGENTE — Painel lateral enriquecido ============ */
+  .ag-smart-section{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:12px; margin-top:10px;
+  }
+  .ag-smart-section-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    margin-bottom:10px;
+  }
+  .ag-smart-section-title{
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+    display:flex; align-items:center; gap:6px;
+  }
+  .ag-smart-section-title .ag-smart-ic{
+    width:16px; height:16px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:700; color:var(--paper);
+  }
+  .ag-smart-ic.ic-pend{ background:var(--burgundy); }
+  .ag-smart-ic.ic-next{ background:var(--forest); }
+  .ag-smart-ic.ic-alert{ background:var(--amber); }
+  .ag-smart-ic.ic-best{ background:linear-gradient(135deg, #b88a3d, #d4a574); }
+  .ag-smart-count{
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    color:var(--ink-3); background:var(--paper-3);
+    padding:2px 7px; border-radius:9px;
+  }
+  .ag-smart-count.is-on{ background:var(--burgundy); color:var(--paper); }
+  .ag-smart-row{
+    display:grid; grid-template-columns:auto 1fr auto; gap:9px; align-items:center;
+    padding:8px 9px; background:var(--paper-2); border:1px solid var(--line);
+    border-radius:9px; margin-top:6px; transition:all .15s ease;
+  }
+  .ag-smart-row:first-child{ margin-top:0; }
+  .ag-smart-row:hover{ border-color:var(--ink); transform:translateX(2px); }
+  .ag-smart-row-ic{
+    width:26px; height:26px; border-radius:7px; display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.04em;
+    background:var(--paper-3); color:var(--ink-3);
+  }
+  .ag-smart-row.k-tarefa .ag-smart-row-ic{ background:rgba(212,165,116,.18); color:#7a5a32; }
+  .ag-smart-row.k-pendencia .ag-smart-row-ic{ background:rgba(167,51,71,.16); color:var(--burgundy); }
+  .ag-smart-row-title{ font-size:12px; font-weight:600; color:var(--ink); line-height:1.25; }
+  .ag-smart-row-meta{ font-size:10.5px; color:var(--ink-3); margin-top:1px; }
+  .ag-smart-row-go{
+    width:24px; height:24px; border-radius:50%; border:1px solid var(--line-2);
+    background:var(--paper); color:var(--ink-3);
+    display:inline-flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .ag-smart-row-go:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .ag-smart-countdown{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700; letter-spacing:.08em;
+    color:var(--forest); background:var(--forest-bg);
+    padding:2px 7px; border-radius:8px; display:inline-block;
+  }
+  .ag-smart-countdown.is-soon{ color:var(--burgundy); background:var(--burgundy-bg); }
+  .ag-smart-countdown.is-now{ color:var(--paper); background:var(--burgundy); animation:agSmartPulse 1.6s ease-in-out infinite; }
+  @keyframes agSmartPulse{ 0%,100%{opacity:1;} 50%{opacity:.6;} }
+  .ag-smart-row.is-stale{ border-color:rgba(212,165,116,.5); background:rgba(245,234,210,.32); }
+  .ag-smart-row.is-stale .ag-smart-row-ic{ background:var(--amber); color:var(--paper); }
+  .ag-smart-alert-days{
+    font-family:var(--font-mono); font-size:9px; font-weight:700; color:var(--amber);
+    text-transform:uppercase; letter-spacing:.1em;
+  }
+  .ag-smart-suggest-btn{
+    width:100%; padding:9px 12px; border-radius:10px;
+    background:linear-gradient(135deg, #14171f, #2a2e3a);
+    color:#f4efe6; border:none; cursor:pointer;
+    font-family:var(--font-mono); font-size:10.5px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:all .18s ease;
+    box-shadow:0 4px 12px -6px rgba(20,23,31,.4);
+  }
+  .ag-smart-suggest-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px -8px rgba(20,23,31,.55); }
+  .ag-smart-suggest-btn .em{ color:#d4a574; }
+  .ag-smart-bestslot{
+    display:grid; grid-template-columns:1fr auto; gap:10px;
+    padding:10px 11px; background:linear-gradient(180deg, rgba(245,234,210,.45), var(--paper));
+    border:1px solid rgba(212,165,116,.45); border-radius:10px;
+    margin-top:8px;
+  }
+  .ag-smart-bestslot:first-of-type{ margin-top:10px; }
+  .ag-smart-bestslot-rank{
+    position:absolute; transform:translate(-4px,-12px);
+    width:20px; height:20px; border-radius:50%;
+    background:linear-gradient(135deg, #b88a3d, #d4a574);
+    color:#fff; font-family:var(--font-mono); font-size:10px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 6px rgba(184,138,61,.4);
+  }
+  .ag-smart-bestslot-main{ position:relative; }
+  .ag-smart-bestslot-time{
+    font-family:var(--font-display); font-size:18px; font-weight:500; color:var(--ink);
+    letter-spacing:-.01em;
+  }
+  .ag-smart-bestslot-dur{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    color:var(--ink-3); letter-spacing:.1em; text-transform:uppercase;
+    margin-left:8px;
+  }
+  .ag-smart-bestslot-reason{
+    font-size:10.5px; color:var(--ink-3); margin-top:3px; font-style:italic; line-height:1.35;
+  }
+  .ag-smart-bestslot-cta{
+    align-self:center;
+    padding:6px 10px; border-radius:8px;
+    background:var(--ink); color:var(--paper); border:none; cursor:pointer;
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase;
+    transition:all .15s ease;
+  }
+  .ag-smart-bestslot-cta:hover{ background:#b88a3d; }
+  .ag-smart-window{
+    display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center;
+    padding:10px 11px; border-radius:10px; margin-top:6px;
+    border:1px solid var(--line); transition:all .15s ease;
+  }
+  .ag-smart-window:first-of-type{ margin-top:8px; }
+  .ag-smart-window:hover{ transform:translateX(2px); border-color:var(--ink); }
+  .ag-smart-window-time{
+    font-family:var(--font-display); font-size:16px; font-weight:500; color:var(--ink);
+    letter-spacing:-.005em;
+  }
+  .ag-smart-window-dur{
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    color:var(--ink-3); letter-spacing:.08em; margin-top:2px;
+  }
+  .ag-smart-window-quality{
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    vertical-align:middle; margin-right:6px;
+  }
+  .ag-smart-window.q-short{ background:linear-gradient(180deg, rgba(220,236,210,.32), var(--paper)); border-color:rgba(120,170,90,.32); }
+  .ag-smart-window.q-short .ag-smart-window-quality{ background:rgba(150,190,120,.85); }
+  .ag-smart-window.q-good{ background:linear-gradient(180deg, rgba(196,220,180,.45), var(--paper)); border-color:rgba(90,150,70,.5); }
+  .ag-smart-window.q-good .ag-smart-window-quality{ background:var(--forest); }
+  .ag-smart-window.q-prime{ background:linear-gradient(180deg, rgba(245,234,210,.55), var(--paper)); border-color:rgba(184,138,61,.55); }
+  .ag-smart-window.q-prime .ag-smart-window-quality{ background:linear-gradient(135deg, #b88a3d, #d4a574); box-shadow:0 0 0 2px rgba(212,165,116,.25); }
+  .ag-smart-window-book{
+    padding:5px 9px; border-radius:7px;
+    background:transparent; color:var(--ink); border:1px solid var(--line-2);
+    font-family:var(--font-mono); font-size:9px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .ag-smart-window-book:hover{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .ag-smart-empty{
+    padding:12px 10px; text-align:center; color:var(--ink-3);
+    font-size:11px; font-style:italic;
+  }
+
   /* Painel lateral do dia */
   .cons-day-panel{
     background:rgba(255,255,255,.66); border:1px solid var(--line);
@@ -17630,18 +18368,25 @@ renderCcTrainingTasks = function(it, raw){
    ============================================ */
 state.consultorDash = state.consultorDash || {
   selectedId: null,
-  tab: 'pendencias',
+  tab: 'overview',
   calYear: TODAY.getFullYear(),
   calMonth: TODAY.getMonth(),
   selectedISO: null,
+  calView: 'month',
+  anchorISO: null,
+  pendFilters: { kind:'all', priority:'all', date:'all', company:'all', status:'open' },
+  perfPeriod: 'last6',
+  osFilters: { status:'all', kind:'all' },
+  showSuggest: false,
 };
 
 window.consSelectConsultant = (id) => {
   state.consultorDash.selectedId = id;
-  state.consultorDash.tab = 'pendencias';
+  state.consultorDash.tab = 'overview';
   state.consultorDash.selectedISO = null;
   state.consultorDash.calYear = TODAY.getFullYear();
   state.consultorDash.calMonth = TODAY.getMonth();
+  state.consultorDash.anchorISO = null;
   renderConsultorView();
 };
 window.consSwitchTab = (tab) => { state.consultorDash.tab = tab; renderConsultorView(); };
@@ -17658,6 +18403,29 @@ window.consNavMonth = (delta) => {
   renderConsultorView();
 };
 window.consSelectDay = (iso) => { state.consultorDash.selectedISO = iso; renderConsultorView(); };
+window.consSetAgendaView = (v) => {
+  state.consultorDash.calView = v;
+  if (v === 'month'){
+    state.consultorDash.calYear = TODAY.getFullYear();
+    state.consultorDash.calMonth = TODAY.getMonth();
+  } else if (!state.consultorDash.anchorISO){
+    state.consultorDash.anchorISO = state.consultorDash.selectedISO || isoFromDate(TODAY);
+  }
+  renderConsultorView();
+};
+window.consNavAnchor = (delta) => {
+  const d = state.consultorDash;
+  if (!d.anchorISO) d.anchorISO = isoFromDate(TODAY);
+  const cur = parseISO(d.anchorISO);
+  const step = d.calView === 'week' ? 7 : 1;
+  if (delta === 0) d.anchorISO = isoFromDate(TODAY);
+  else { cur.setDate(cur.getDate() + delta*step); d.anchorISO = isoFromDate(cur); }
+  renderConsultorView();
+};
+window.consSetPendFilter = (key, val) => { state.consultorDash.pendFilters[key] = val; renderConsultorView(); };
+window.consClearPendFilters = () => { state.consultorDash.pendFilters = { kind:'all', priority:'all', date:'all', company:'all', status:'open' }; renderConsultorView(); };
+window.consSetPerfPeriod = (v) => { state.consultorDash.perfPeriod = v; renderConsultorView(); };
+window.consSetOSFilter = (key, val) => { state.consultorDash.osFilters[key] = val; renderConsultorView(); };
 
 function _consPendenciasForConsultant(consultantId){
   /* Junta de RECORDS + EVENTS o que for "pendência" do consultor:
@@ -17685,14 +18453,318 @@ function _consPendenciasForConsultant(consultantId){
 }
 
 function _consAvailability(consultantId, isoDate){
-  /* Status do dia: livre / provisionado / agendado.
-     Reaproveita consultantDayLoad para contagens. */
+  /* Status do dia (5 estados):
+     - off                → fora da jornada (dia não trabalhado) ou data bloqueada
+     - livre              → nenhum compromisso
+     - parcialmente-livre → tem algo mas ainda sobra >= 50% da capacidade
+     - provisionado       → só provisórios (nenhum confirmado)
+     - agendado           → jornada lotada / sem janela útil */
+  const c = consultantById(consultantId);
+  if (c && _consAgDayKind(c, isoDate) === 'off'){
+    const load = consultantDayLoad(consultantId, isoDate);
+    return { status:'off', load };
+  }
   const load = consultantDayLoad(consultantId, isoDate);
   let status = 'livre';
-  if (load.ocupadosCount > 0) status = 'agendado';
-  else if (load.provisionadosCount > 0) status = 'provisionado';
+  if (load.ocupadosCount > 0){
+    if (load.capacityMin > 0 && (load.freeMin / load.capacityMin) >= 0.5 && (load.ocupadosCount + load.provisionadosCount) <= 2){
+      status = 'parcialmente-livre';
+    } else {
+      status = 'agendado';
+    }
+  } else if (load.provisionadosCount > 0){
+    status = 'provisionado';
+  }
   return { status, load };
 }
+
+/* Detecta se um dia ISO está "fora da jornada" do consultor (feriado/folga). */
+function _consAgDayKind(c, iso){
+  if (!c || !iso) return 'normal';
+  try {
+    const d = parseISO(iso);
+    const dow = d.getDay();
+    const freeDays = Array.isArray(c.freeDays) ? c.freeDays : [1,2,3,4,5];
+    const blocked = Array.isArray(c.blockedDates) ? c.blockedDates : [];
+    if (!freeDays.includes(dow)) return 'off';
+    if (blocked.includes(iso)) return 'off';
+  } catch(e){}
+  return 'normal';
+}
+
+/* Pendências concluídas do consultor (para a aba "Concluídas") */
+function _consPendenciasConcludedForConsultant(consultantId){
+  const out = [];
+  RECORDS.forEach(r => {
+    if (r.consultantId !== consultantId) return;
+    const isTask = r.kind === 'tarefa';
+    if (!isTask) return;
+    if (!['concluido','atendido','em-os'].includes(r.status)) return;
+    out.push({
+      _src:'record', id:r.id, kind:r.kind, title:r.title||'(sem título)',
+      status:r.status, priority:r.priority||null, date:r.date||null,
+      timeStart:r.timeStart||'', timeEnd:r.timeEnd||'',
+      companyId:r.companyId, raw:r,
+      completedAt: r.realizedAt || r.updatedAt || r.createdAt,
+    });
+  });
+  return out.sort((a,b) => (b.completedAt||'').localeCompare(a.completedAt||''));
+}
+
+/* Janelas livres do dia, baseadas em workStart/workEnd do consultor */
+function _consAvailableSlots(consultantId, isoDate){
+  const c = consultantById(consultantId);
+  if (!c) return [];
+  const ws = c.workStart || '09:00';
+  const we = c.workEnd   || '18:00';
+  const wsMin = timeToMin(ws), weMin = timeToMin(we);
+  if (weMin <= wsMin) return [];
+  /* Coleta intervalos ocupados (confirmados + provisórios) */
+  const busy = EVENTS
+    .filter(e => e.consultantId === consultantId && e.date === isoDate && !['cancelado','reagendado'].includes(e.status))
+    .map(e => ({ s: timeToMin(e.timeStart||ws), e: timeToMin(e.timeEnd||we), title:e.title||'', status:e.status }))
+    .filter(x => x.e > x.s)
+    .sort((a,b) => a.s - b.s);
+  /* Calcula buracos livres dentro da jornada */
+  const slots = [];
+  let cursor = wsMin;
+  busy.forEach(b => {
+    if (b.s > cursor){
+      slots.push({ start: cursor, end: Math.min(b.s, weMin), minutes: Math.min(b.s, weMin) - cursor });
+    }
+    cursor = Math.max(cursor, b.e);
+  });
+  if (cursor < weMin) slots.push({ start: cursor, end: weMin, minutes: weMin - cursor });
+  return slots.filter(s => s.minutes >= 30).map(s => ({
+    startLabel: minToTime(s.start), endLabel: minToTime(s.end),
+    duration: s.minutes,
+  }));
+}
+if (typeof window.minToTime !== 'function'){
+  window.minToTime = (m) => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
+}
+
+/* Ações rápidas sobre pendência (do tipo record) */
+window.consQuickComplete = (recordId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const before = r.status;
+  r.status = 'concluido';
+  r.realizationStatus = 'realizado';
+  r.realizedAt = nowISO();
+  r.inPendencias = false;
+  pushHistory(r, 'concluído via Painel do Consultor', `${before} → concluido`);
+  if (typeof chargeCardForRecord === 'function') chargeCardForRecord(r);
+  toast('success','Pendência concluída', r.title);
+  persist();
+  renderConsultorView();
+};
+window.consQuickCancel = (recordId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const reason = prompt('Motivo do cancelamento:', '');
+  if (reason === null) return;
+  const before = r.status;
+  r.status = 'cancelado';
+  r.realizationStatus = 'nao-realizado';
+  r.canceledReason = (reason||'').trim() || 'sem motivo';
+  r.inPendencias = false;
+  pushHistory(r, 'cancelado via Painel do Consultor', `${before} → cancelado · ${r.canceledReason}`);
+  toast('warn','Pendência cancelada', r.canceledReason);
+  persist();
+  renderConsultorView();
+};
+/* Classificação de criticidade: critical / high / medium / low */
+function _consPendCriticality(item, todayISO){
+  const r = item.raw || item;
+  if (!todayISO) todayISO = isoFromDate(TODAY);
+  /* Verifica idade desde criação/data prevista */
+  const refDate = item.date || r.createdAt || r.updatedAt;
+  if (refDate){
+    const ref = (refDate||'').slice(0,10);
+    if (ref < todayISO){
+      const days = Math.floor((parseISO(todayISO) - parseISO(ref))/86400000);
+      if (days > 3) return 'critical';
+      return 'high';
+    }
+    const days = Math.floor((parseISO(ref) - parseISO(todayISO))/86400000);
+    if (days <= 3) return 'medium';
+  }
+  /* OS-flavored: enviada há >5 dias */
+  if (item._osStatus === 'enviada' && r.sentAt){
+    const age = Math.floor((Date.now() - new Date(r.sentAt).getTime())/86400000);
+    if (age > 7) return 'critical';
+    if (age > 5) return 'high';
+  }
+  /* Prioridade explícita */
+  if ((r.priority||'').toLowerCase() === 'alta') return 'high';
+  if ((r.priority||'').toLowerCase() === 'media') return 'medium';
+  return 'low';
+}
+
+/* Categoriza pendências do consultor em 5 grupos por origem */
+function _consPendCategorize(consultantId){
+  const todayISO = isoFromDate(TODAY);
+  const threeDaysAgoISO = (() => { const d = new Date(TODAY); d.setDate(d.getDate()-3); return isoFromDate(d); })();
+  const fiveDaysAgo = Date.now() - 5*86400000;
+
+  /* 1. OS abertas (não assinadas/canceladas) do consultor */
+  const osOpen = ORDERS_SERVICE
+    .filter(o => o.consultantId === consultantId
+              && o.status !== 'cancelada' && o.status !== 'assinada')
+    .map(o => {
+      const co = companyById(o.companyId);
+      let subStatus = 'nova';
+      if (o.status === 'enviada' && o.sentAt){
+        const age = (Date.now() - new Date(o.sentAt).getTime())/86400000;
+        if (age > 7) subStatus = 'atrasada';
+        else if (age > 3) subStatus = 'aguardando-cliente';
+        else subStatus = 'em-andamento';
+      }
+      return {
+        _kind:'os', id:o.id, raw:o,
+        title: o.title || `OS ${(o.id||'').slice(-6)}`,
+        companyId: o.companyId, companyName: co?co.fantasia:'',
+        date: o.dateStart ? (o.dateStart||'').slice(0,10) : (o.createdAt||'').slice(0,10),
+        _osStatus: o.status, subStatus,
+        priority: o.priority || (subStatus === 'atrasada' ? 'alta' : 'media'),
+      };
+    });
+
+  /* 2. Treinamentos com ação necessária */
+  const trainAction = [];
+  RECORDS.filter(r => r.consultantId === consultantId && r.kind === 'treinamento').forEach(r => {
+    const co = companyById(r.companyId);
+    const hasActiveOS = ORDERS_SERVICE.some(o => o.itemId === r.id && o.status !== 'cancelada');
+    let actionType = null;
+    if (r.realizationStatus === 'realizado' && !hasActiveOS) actionType = 'OS pendente';
+    else if (['pendente','provisorio','criado'].includes(r.status) && r.date && r.date < todayISO) actionType = 'Confirmar realização';
+    else if (r.realizationStatus === 'realizado' && Array.isArray(r.checklist) && r.checklist.some(s => !s.done && s.realizationStatus !== 'realizado')) actionType = 'Lançar relatório';
+    if (!actionType) return;
+    trainAction.push({
+      _kind:'train', id:r.id, raw:r,
+      title: r.title || '(sem título)',
+      companyId: r.companyId, companyName: co?co.fantasia:'',
+      date: r.date,
+      actionType,
+      priority: r.priority || 'media',
+    });
+  });
+
+  /* 3. Clientes aguardando retorno: atendimentos em-andamento/pendente com data passada >3 dias */
+  const clientWaiting = RECORDS
+    .filter(r => r.consultantId === consultantId && r.kind === 'atendimento'
+              && ['pendente','em-andamento','em-atendimento'].includes(r.status)
+              && r.date && r.date < threeDaysAgoISO)
+    .map(r => {
+      const co = companyById(r.companyId);
+      const waitDays = Math.floor((parseISO(todayISO) - parseISO(r.date))/86400000);
+      return {
+        _kind:'wait', id:r.id, raw:r,
+        title: r.title || '(sem título)',
+        companyId: r.companyId, companyName: co?co.fantasia:'',
+        date: r.date, waitDays,
+        priority: waitDays > 7 ? 'alta' : 'media',
+      };
+    });
+
+  /* 4. Tarefas administrativas: kind=tarefa sem vínculo de origem */
+  const taskAdmin = RECORDS
+    .filter(r => r.consultantId === consultantId && r.kind === 'tarefa'
+              && !r.linkedTrainingId && !r.linkedAtendimentoId && !r.linkedOSId
+              && !['concluido','cancelado'].includes(r.status))
+    .map(r => {
+      const co = companyById(r.companyId);
+      return {
+        _kind:'task', id:r.id, raw:r,
+        title: r.title || '(sem título)',
+        companyId: r.companyId, companyName: co?co.fantasia:'',
+        date: r.date,
+        priority: r.priority || 'baixa',
+      };
+    });
+
+  /* 5. Documentos pendentes: OS enviada há >5 dias sem assinatura */
+  const docPending = ORDERS_SERVICE
+    .filter(o => o.consultantId === consultantId
+              && o.status === 'enviada' && o.sentAt
+              && new Date(o.sentAt).getTime() < fiveDaysAgo)
+    .map(o => {
+      const co = companyById(o.companyId);
+      const age = Math.floor((Date.now() - new Date(o.sentAt).getTime())/86400000);
+      return {
+        _kind:'doc', id:o.id, raw:o,
+        title: o.title || `OS ${(o.id||'').slice(-6)}`,
+        companyId: o.companyId, companyName: co?co.fantasia:'',
+        date: (o.sentAt||'').slice(0,10), age,
+        _osStatus: o.status,
+        priority: age > 10 ? 'alta' : 'media',
+      };
+    });
+
+  return { osOpen, trainAction, clientWaiting, taskAdmin, docPending };
+}
+
+/* Handlers globais para as 3 novas ações rápidas */
+window.consPendDelegate = (recordId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const others = CONSULTANTS.filter(c => c.id !== r.consultantId);
+  if (!others.length){ toast('warn','Sem outros consultores'); return; }
+  const list = others.map((c,i) => `${i+1}. ${c.name}`).join('\n');
+  const idx = prompt(`Delegar "${r.title||'(sem título)'}" para qual consultor?\n\n${list}\n\nDigite o número:`, '');
+  if (idx === null) return;
+  const n = parseInt(idx,10) - 1;
+  if (isNaN(n) || n < 0 || n >= others.length){ toast('error','Número inválido'); return; }
+  const target = others[n];
+  const oldId = r.consultantId;
+  r.consultantId = target.id;
+  pushHistory(r, 'delegado', `${(consultantById(oldId)||{}).name||oldId} → ${target.name}`);
+  toast('success','Delegado', `Para ${target.name}`);
+  persist();
+  renderConsultorView();
+};
+
+window.consPendPostpone = (recordId) => consQuickReschedule(recordId);
+
+window.consPendComment = (recordId, isOS) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const target = isOS ? orderById(recordId) : RECORDS.find(x => x.id === recordId);
+  if (!target) return;
+  const txt = prompt('Comentário rápido (será salvo no histórico):', '');
+  if (txt === null) return;
+  const clean = (txt||'').trim();
+  if (!clean){ toast('warn','Comentário vazio'); return; }
+  pushHistory(target, 'comentário', clean);
+  toast('success','Comentário salvo');
+  persist();
+  renderConsultorView();
+};
+
+window.consSetPendView = (view) => {
+  state.consultorDash.pendFilters.view = view;
+  renderConsultorView();
+};
+
+window.consQuickReschedule = (recordId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const r = RECORDS.find(x => x.id === recordId);
+  if (!r) return;
+  const cur = r.date || isoFromDate(TODAY);
+  const next = prompt('Nova data (AAAA-MM-DD):', cur);
+  if (next === null) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(next)){ toast('error','Formato inválido','Use AAAA-MM-DD'); return; }
+  const time = prompt('Novo horário (HH:MM, opcional):', r.timeStart||'') || '';
+  r.date = next;
+  r.timeStart = time.trim() || r.timeStart;
+  pushHistory(r, 'reagendado via Painel do Consultor', `${cur} → ${next}${time?` ${time}`:''}`);
+  toast('success','Reagendada', `${isoToBR(next)}${time?` ${time}`:''}`);
+  persist();
+  renderConsultorView();
+};
 
 function renderConsultorView(){
   const body = document.getElementById('consBody');
@@ -17738,7 +18810,7 @@ function _renderConsultorSelectHTML(){
         <div class="cons-pick-stats">
           <div class="cps"><b>${totalPend}</b><span>pendências</span></div>
           <div class="cps"><b>${monthEvs}</b><span>no mês</span></div>
-          <div class="cps cps-${av.status}"><b>${av.status==='livre'?'Livre':av.status==='provisionado'?'Prov.':'Ocup.'}</b><span>hoje</span></div>
+          <div class="cps cps-${av.status}"><b>${av.status==='off'?'Folga':av.status==='livre'?'Livre':av.status==='parcialmente-livre'?'Parc.':av.status==='provisionado'?'Prov.':'Ocup.'}</b><span>hoje</span></div>
         </div>
         <div class="cons-pick-cta">
           Abrir painel
@@ -17775,12 +18847,21 @@ function _renderConsultorDashHTML(){
   for (let day=1; day<=daysInMonth; day++){
     const iso = `${d.calYear}-${pad(d.calMonth+1)}-${pad(day)}`;
     const s = _consAvailability(c.id, iso).status;
-    if (s === 'livre') livre++; else if (s === 'provisionado') prov++; else ag++;
+    /* livre + parcialmente-livre contam como "livre"; off é ignorado */
+    if (s === 'livre' || s === 'parcialmente-livre') livre++;
+    else if (s === 'provisionado') prov++;
+    else if (s === 'off') {}
+    else ag++;
   }
   const overdue = pendList.filter(p => p.date && p.date < todayISO && !['concluido','atendido','cancelado'].includes(p.status)).length;
 
+  const consOSCount = ORDERS_SERVICE.filter(o => o.consultantId === c.id && osIsActive(o)).length;
   const tabs = `
     <div class="cons-tabs" role="tablist">
+      <button type="button" class="cons-tab ${d.tab==='overview'?'active':''}" onclick="consSwitchTab('overview')" role="tab">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+        Visão Geral
+      </button>
       <button type="button" class="cons-tab ${d.tab==='pendencias'?'active':''}" onclick="consSwitchTab('pendencias')" role="tab">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
         Pendências
@@ -17788,14 +18869,26 @@ function _renderConsultorDashHTML(){
       </button>
       <button type="button" class="cons-tab ${d.tab==='agenda'?'active':''}" onclick="consSwitchTab('agenda')" role="tab">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        Agenda / Disponibilidade
+        Agenda
         <span class="cons-tab-pill">${ag}</span>
+      </button>
+      <button type="button" class="cons-tab ${d.tab==='performance'?'active':''}" onclick="consSwitchTab('performance')" role="tab">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        Performance
+      </button>
+      <button type="button" class="cons-tab ${d.tab==='os'?'active':''}" onclick="consSwitchTab('os')" role="tab">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+        Ordens de Serviço
+        ${consOSCount?`<span class="cons-tab-pill is-on">${consOSCount}</span>`:''}
       </button>
     </div>`;
 
-  const body = d.tab === 'pendencias'
-    ? _renderConsPendenciasHTML(c, pendList, overdue)
-    : _renderConsAgendaHTML(c);
+  let body = '';
+  if (d.tab === 'overview') body = _renderConsOverviewHTML(c, pendList);
+  else if (d.tab === 'pendencias') body = _renderConsPendenciasHTML(c, pendList, overdue);
+  else if (d.tab === 'agenda') body = _renderConsAgendaHTML(c);
+  else if (d.tab === 'performance') body = _renderConsPerformanceHTML(c);
+  else if (d.tab === 'os') body = _renderConsOSListHTML(c);
 
   return `
     <div class="cons-stage cons-dash-stage">
@@ -17829,8 +18922,8 @@ function _renderConsultorDashHTML(){
             <div class="cm-lbl">Atrasadas</div>
           </div>
           <div class="cons-metric m-today is-${today.status}">
-            <div class="cm-ic">${today.status==='livre'?'●':today.status==='provisionado'?'◐':'●'}</div>
-            <div class="cm-val">${today.status==='livre'?'Livre':today.status==='provisionado'?'Provisório':'Ocupado'}</div>
+            <div class="cm-ic">${today.status==='off'?'⊘':today.status==='livre'?'●':today.status==='provisionado'?'◐':'●'}</div>
+            <div class="cm-val">${today.status==='off'?'Folga':today.status==='livre'?'Livre':today.status==='parcialmente-livre'?'Parcial':today.status==='provisionado'?'Provisório':'Ocupado'}</div>
             <div class="cm-lbl">Hoje · ${pad(today.load.ocupadosCount)}/${pad(today.load.provisionadosCount)}</div>
           </div>
           <div class="cons-metric m-month">
@@ -17845,46 +18938,298 @@ function _renderConsultorDashHTML(){
     </div>`;
 }
 
-function _renderConsPendenciasHTML(c, pendList, overdueCount){
+/* === PENDÊNCIAS CATEGORIZADAS — visão 360° por origem (5 categorias) === */
+function _renderConsPendCategorizedHTML(c, pendList, concluded){
   const todayISO = isoFromDate(TODAY);
-  if (!pendList.length){
+  const f = state.consultorDash.pendFilters;
+  const cats = _consPendCategorize(c.id);
+  const totalCats = cats.osOpen.length + cats.trainAction.length + cats.clientWaiting.length + cats.taskAdmin.length + cats.docPending.length;
+
+  /* Counters topo (mesma barra de status) */
+  const critico = pendList.filter(p => p.date && p.date < todayISO).length;
+  const andamento = pendList.length - critico;
+  const doneCount = concluded.length;
+  const tabBar = `
+    <div class="cpx-status-bar">
+      <button type="button" class="cpx-stat is-critical ${critico?'has-on':''}" onclick="consSetPendFilter('status','open');consSetPendFilter('date','overdue');consSetPendView('flat')">
+        <div class="cpx-stat-ic">●</div>
+        <div><b>${pad(critico)}</b><span>Críticas</span></div>
+        <small>Atrasadas ou prazo estourando</small>
+      </button>
+      <button type="button" class="cpx-stat is-progress" onclick="consSetPendFilter('status','open');consSetPendFilter('date','all');consSetPendView('flat')">
+        <div class="cpx-stat-ic">◐</div>
+        <div><b>${pad(andamento)}</b><span>Em andamento</span></div>
+        <small>Dentro do prazo, ainda abertas</small>
+      </button>
+      <button type="button" class="cpx-stat is-done" onclick="consSetPendFilter('status','done');consSetPendView('flat')">
+        <div class="cpx-stat-ic">✓</div>
+        <div><b>${pad(doneCount)}</b><span>Concluídas</span></div>
+        <small>Histórico do que já foi resolvido</small>
+      </button>
+    </div>`;
+
+  /* Toolbar: view toggle + sort */
+  const toolbar = `
+    <div class="pend-cat-toolbar">
+      <div class="pend-cat-vt">
+        <button type="button" class="${f.view==='categorias'?'active':''}" onclick="consSetPendView('categorias')">Categorias</button>
+        <button type="button" class="${f.view==='flat'?'active':''}" onclick="consSetPendView('flat')">Lista</button>
+      </div>
+      <label>Ordenar por
+        <select onchange="state.consultorDash.pendFilters.sortBy=this.value;renderConsultorView()">
+          <option value="date" ${f.sortBy==='date'?'selected':''}>Data</option>
+          <option value="company" ${f.sortBy==='company'?'selected':''}>Cliente</option>
+          <option value="kind" ${f.sortBy==='kind'?'selected':''}>Tipo</option>
+          <option value="priority" ${f.sortBy==='priority'?'selected':''}>Prioridade</option>
+        </select>
+      </label>
+      <span class="pct-meta">Total: <b>${totalCats}</b> pendência(s) em 5 categorias</span>
+    </div>`;
+
+  if (!totalCats){
     return `
-      <div class="cons-empty">
-        <div class="cons-empty-glow"></div>
-        <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <h3>Tudo em dia</h3>
-        <p>${c.name} não tem pendências em aberto no momento.</p>
+      <div class="cons-pend-wrap">
+        ${tabBar}
+        ${toolbar}
+        <div class="cons-empty">
+          <div class="cons-empty-glow"></div>
+          <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <h3>Visão 360° limpa</h3>
+          <p>${c.name} não tem pendências em nenhuma das 5 categorias.</p>
+        </div>
       </div>`;
   }
-  /* Agrupa por status: atrasadas, sem data, próximas */
-  const overdue = [], noDate = [], upcoming = [];
-  pendList.forEach(p => {
-    if (!p.date) noDate.push(p);
-    else if (p.date < todayISO) overdue.push(p);
-    else upcoming.push(p);
-  });
-  overdue.sort((a,b) => (a.date||'').localeCompare(b.date||''));
-  upcoming.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+
+  /* Sort items dentro de cada categoria */
+  const sortItems = (arr) => {
+    const sortBy = f.sortBy;
+    return arr.slice().sort((a,b) => {
+      if (sortBy === 'company') return (a.companyName||'').localeCompare(b.companyName||'');
+      if (sortBy === 'kind') return (a._kind||'').localeCompare(b._kind||'');
+      if (sortBy === 'priority'){
+        const order = { alta:0, media:1, baixa:2 };
+        return (order[(a.priority||'baixa').toLowerCase()]||2) - (order[(b.priority||'baixa').toLowerCase()]||2);
+      }
+      /* default: date — atrasadas primeiro */
+      const da = a.date || '9999';
+      const db = b.date || '9999';
+      return da.localeCompare(db);
+    });
+  };
+
+  /* Renderiza uma linha de pendência categorizada */
+  const renderRow = (item) => {
+    const crit = _consPendCriticality(item, todayISO);
+    const isOS = item._kind === 'os' || item._kind === 'doc';
+    const subStatusBadge = item.subStatus
+      ? `<span class="pend-cat-sub sub-${item.subStatus}">${({nova:'NOVA','em-andamento':'EM ANDAMENTO','aguardando-cliente':'AGUARDANDO CLIENTE',atrasada:'ATRASADA'})[item.subStatus]||item.subStatus.toUpperCase()}</span>`
+      : '';
+    const actionBadge = item.actionType ? `<span class="pend-cat-action">${item.actionType.toUpperCase()}</span>` : '';
+    const waitBadge = item.waitDays ? `<span class="pend-cat-wait">há ${item.waitDays} dias</span>` : '';
+    const ageBadge = item.age ? `<span class="pend-cat-wait">há ${item.age} dias sem assinar</span>` : '';
+    const dateHTML = item.date ? `<b>${isoToBR(item.date)}</b>` : '<i>sem data</i>';
+    const co = companyById(item.companyId);
+
+    const openAction = isOS
+      ? `onclick="openOSModal('${item.raw.itemSrc}','${item.raw.itemId}','${item.id}')"`
+      : `onclick="openRegistroModal('${item.id}')"`;
+    const cardOpen = co ? `onclick="(function(){const card=CLIENT_CARDS.find(x=>x.companyId==='${co.id}');if(card)openClientCardModal(card.id);})()"`:'';
+
+    return `
+      <div class="pend-cat-row crit-${crit} ${crit==='critical'?'is-pulsing':''}">
+        <span class="pend-cat-prio prio-${crit}" title="${crit}">${crit==='critical'?'!':crit==='high'?'↑':crit==='medium'?'→':'↓'}</span>
+        <div class="pend-cat-main">
+          <div class="pend-cat-title">${item.title}</div>
+          <div class="pend-cat-meta">
+            <span class="pend-cat-company">${co?co.fantasia:'<i>sem empresa</i>'}</span>
+            ${subStatusBadge}${actionBadge}${waitBadge}${ageBadge}
+          </div>
+        </div>
+        <div class="pend-cat-date">${dateHTML}</div>
+        <div class="pend-cat-actions">
+          <button type="button" class="pca-btn pca-view" title="Visualizar" ${openAction}>
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          ${!isOS ? `
+          <button type="button" class="pca-btn pca-ok" title="Resolver/Concluir" onclick="consQuickComplete('${item.id}')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg>
+          </button>
+          <button type="button" class="pca-btn pca-del" title="Delegar a outro consultor" onclick="consPendDelegate('${item.id}')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/></svg>
+          </button>
+          <button type="button" class="pca-btn pca-post" title="Adiar (reagendar)" onclick="consPendPostpone('${item.id}')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </button>` : ''}
+          <button type="button" class="pca-btn pca-cm" title="Comentário rápido" onclick="consPendComment('${item.id}',${isOS?'true':'false'})">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </button>
+          ${cardOpen ? `<button type="button" class="pca-btn" title="Abrir card do cliente" ${cardOpen}>
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          </button>`:''}
+        </div>
+      </div>`;
+  };
+
+  /* Renderiza uma seção colapsável de categoria */
+  const renderCat = (items, key, label, ic, hint) => {
+    const sorted = sortItems(items);
+    const hasCritical = items.some(i => _consPendCriticality(i, todayISO) === 'critical');
+    const openAttr = items.length && (hasCritical || ['osOpen','docPending'].includes(key)) ? 'open' : '';
+    return `
+      <details class="pend-cat-section cat-${key}" ${openAttr}>
+        <summary>
+          <span class="pcs-ic">${ic}</span>
+          <span class="pcs-label">${label}</span>
+          <span class="pcs-hint">${hint}</span>
+          <span class="pcs-count ${hasCritical?'has-crit':''}">${pad(items.length)}</span>
+        </summary>
+        <div class="pend-cat-rows">
+          ${items.length ? sorted.map(renderRow).join('') : `<div class="pend-cat-empty">Nada aqui — categoria limpa.</div>`}
+        </div>
+      </details>`;
+  };
+
+  return `
+    <div class="cons-pend-wrap">
+      ${tabBar}
+      ${toolbar}
+      ${renderCat(cats.osOpen, 'osOpen', 'Ordens de Serviço em aberto', '§', 'rascunho, enviadas, aguardando cliente, atrasadas')}
+      ${renderCat(cats.trainAction, 'trainAction', 'Treinamentos com ação necessária', '✦', 'OS pendente, confirmar realização, lançar relatório')}
+      ${renderCat(cats.clientWaiting, 'clientWaiting', 'Clientes aguardando retorno', '◷', 'atendimentos sem evolução há >3 dias')}
+      ${renderCat(cats.taskAdmin, 'taskAdmin', 'Tarefas administrativas', '☰', 'tarefas avulsas — vencidas ou próximas')}
+      ${renderCat(cats.docPending, 'docPending', 'Documentos pendentes de assinatura', '✎', 'OS enviadas há mais de 5 dias sem assinar')}
+    </div>`;
+}
+
+function _renderConsPendenciasHTML(c, pendList, overdueCount){
+  const todayISO = isoFromDate(TODAY);
+  const f = state.consultorDash.pendFilters;
+  /* view padrão: categorias (visão 360°) */
+  if (!f.view) f.view = 'categorias';
+  if (!f.sortBy) f.sortBy = 'date';
+  const concluded = _consPendenciasConcludedForConsultant(c.id);
+
+  /* Se modo categorias e status=open, delega para o renderer categorizado */
+  if (f.view === 'categorias' && f.status !== 'done'){
+    return _renderConsPendCategorizedHTML(c, pendList, concluded);
+  }
+
+  /* Apply filters */
+  let working = (f.status === 'done') ? concluded.slice() : pendList.slice();
+  if (f.kind !== 'all') working = working.filter(p => p.kind === f.kind);
+  if (f.priority !== 'all') working = working.filter(p => (p.priority||'').toLowerCase() === f.priority);
+  if (f.company !== 'all') working = working.filter(p => p.companyId === f.company);
+  if (f.date === 'overdue') working = working.filter(p => p.date && p.date < todayISO);
+  else if (f.date === 'today') working = working.filter(p => p.date === todayISO);
+  else if (f.date === 'week'){
+    const wkEnd = new Date(TODAY); wkEnd.setDate(wkEnd.getDate()+7);
+    const wkEndISO = isoFromDate(wkEnd);
+    working = working.filter(p => p.date && p.date >= todayISO && p.date <= wkEndISO);
+  }
+
+  /* Empresas únicas para o select de filtro */
+  const seenCo = new Set();
+  const coOptions = pendList.concat(concluded).filter(p => {
+    if (!p.companyId || seenCo.has(p.companyId)) return false;
+    seenCo.add(p.companyId); return true;
+  }).map(p => companyById(p.companyId)).filter(Boolean);
+
+  /* Counters topo (sempre baseados em pendList ativo) */
+  const critico = pendList.filter(p => p.date && p.date < todayISO).length;
+  const andamento = pendList.length - critico;
+  const doneCount = concluded.length;
+
+  const tabBar = `
+    <div class="cpx-status-bar">
+      <button type="button" class="cpx-stat is-critical ${f.status==='open' && f.date!=='overdue'?'active':''} ${critico?'has-on':''}" onclick="consSetPendFilter('status','open');consSetPendFilter('date','overdue')">
+        <div class="cpx-stat-ic">●</div>
+        <div><b>${pad(critico)}</b><span>Críticas</span></div>
+        <small>Atrasadas ou prazo estourando</small>
+      </button>
+      <button type="button" class="cpx-stat is-progress ${f.status==='open' && f.date!=='overdue'?'active':''}" onclick="consSetPendFilter('status','open');consSetPendFilter('date','all')">
+        <div class="cpx-stat-ic">◐</div>
+        <div><b>${pad(andamento)}</b><span>Em andamento</span></div>
+        <small>Dentro do prazo, ainda abertas</small>
+      </button>
+      <button type="button" class="cpx-stat is-done ${f.status==='done'?'active':''}" onclick="consSetPendFilter('status','done')">
+        <div class="cpx-stat-ic">✓</div>
+        <div><b>${pad(doneCount)}</b><span>Concluídas</span></div>
+        <small>Histórico do que já foi resolvido</small>
+      </button>
+    </div>`;
+
+  const filters = `
+    <div class="cpx-filters">
+      <label>Tipo
+        <select onchange="consSetPendFilter('kind', this.value)">
+          <option value="all" ${f.kind==='all'?'selected':''}>Todos</option>
+          <option value="tarefa" ${f.kind==='tarefa'?'selected':''}>Tarefa</option>
+          <option value="treinamento" ${f.kind==='treinamento'?'selected':''}>Treinamento</option>
+          <option value="atendimento" ${f.kind==='atendimento'?'selected':''}>Atendimento</option>
+        </select>
+      </label>
+      <label>Prioridade
+        <select onchange="consSetPendFilter('priority', this.value)">
+          <option value="all" ${f.priority==='all'?'selected':''}>Todas</option>
+          <option value="alta" ${f.priority==='alta'?'selected':''}>Alta</option>
+          <option value="media" ${f.priority==='media'?'selected':''}>Média</option>
+          <option value="baixa" ${f.priority==='baixa'?'selected':''}>Baixa</option>
+        </select>
+      </label>
+      <label>Data
+        <select onchange="consSetPendFilter('date', this.value)">
+          <option value="all" ${f.date==='all'?'selected':''}>Qualquer</option>
+          <option value="overdue" ${f.date==='overdue'?'selected':''}>Atrasadas</option>
+          <option value="today" ${f.date==='today'?'selected':''}>Hoje</option>
+          <option value="week" ${f.date==='week'?'selected':''}>Próx. 7 dias</option>
+        </select>
+      </label>
+      <label>Cliente
+        <select onchange="consSetPendFilter('company', this.value)">
+          <option value="all" ${f.company==='all'?'selected':''}>Todos</option>
+          ${coOptions.map(co => `<option value="${co.id}" ${f.company===co.id?'selected':''}>${co.fantasia}</option>`).join('')}
+        </select>
+      </label>
+      <button type="button" class="cpx-clear" onclick="consClearPendFilters()">Limpar filtros</button>
+    </div>`;
+
+  if (!working.length){
+    return `
+      <div class="cons-pend-wrap">
+        ${tabBar}
+        ${filters}
+        <div class="cons-empty">
+          <div class="cons-empty-glow"></div>
+          <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <h3>${f.status==='done'?'Nenhuma pendência concluída no recorte':'Tudo em dia'}</h3>
+          <p>${f.status==='done'?'Ajuste os filtros para ver outro período.':`${c.name} não tem pendências em aberto com os filtros aplicados.`}</p>
+        </div>
+      </div>`;
+  }
 
   const renderRow = (p) => {
     const co = companyById(p.companyId);
     const stLabel = (statusById(p.status)||{}).label || p.status || '—';
     const kindLabel = p.failedTrain ? 'Treino não realizado' : p.kind === 'tarefa' ? 'Tarefa' : p.kind === 'treinamento' ? 'Treinamento' : 'Atendimento';
+    /* Origem: detecta se a pendência veio de um treinamento (linkedTrainingId) */
+    const origem = p.raw && p.raw.linkedTrainingId ? 'Treinamento' : p.raw && p.raw.linkedAtendimentoId ? 'Atendimento' : p.raw && p.raw.linkedOSId ? 'OS' : kindLabel;
     const kindCls = p.failedTrain ? 'k-fail' : `k-${p.kind}`;
     const dateHTML = p.date
       ? `<b>${isoToBR(p.date)}</b>${p.timeStart?`<span class="cp-time">${p.timeStart}${p.timeEnd?`–${p.timeEnd}`:''}</span>`:''}`
       : `<span class="cp-nodate">sem data</span>`;
     const isOverdue = p.date && p.date < todayISO;
+    const isDone = f.status === 'done';
     const priorityHTML = p.priority
       ? `<span class="cp-pri pri-${(p.priority||'').toLowerCase()}">${p.priority.toUpperCase()}</span>`
       : '';
     return `
-      <div class="cons-pend-row ${isOverdue?'is-overdue':''} ${p.flagged?'is-flagged':''} ${p.failedTrain?'is-failed':''}">
+      <div class="cons-pend-row ${isOverdue?'is-overdue':''} ${p.flagged?'is-flagged':''} ${p.failedTrain?'is-failed':''} ${isDone?'is-done':''}">
         <div class="cp-kind ${kindCls}">${kindLabel}</div>
         <div class="cp-main">
           <div class="cp-title">${p.title}</div>
           <div class="cp-meta">
             <span class="cp-company">${co?co.fantasia:'<i>sem empresa</i>'}</span>
+            <span class="cp-origin">origem: ${origem}</span>
             <span class="cp-status">${stLabel}</span>
             ${priorityHTML}
             ${p.flagged?'<span class="cp-flag">PENDÊNCIA</span>':''}
@@ -17892,6 +19237,17 @@ function _renderConsPendenciasHTML(c, pendList, overdueCount){
         </div>
         <div class="cp-date">${dateHTML}</div>
         <div class="cp-actions">
+          ${!isDone ? `
+            <button type="button" class="cp-btn cp-ok" title="Concluir" onclick="consQuickComplete('${p.id}')">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg>
+            </button>
+            <button type="button" class="cp-btn cp-cal" title="Reagendar" onclick="consQuickReschedule('${p.id}')">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </button>
+            <button type="button" class="cp-btn cp-x" title="Cancelar" onclick="consQuickCancel('${p.id}')">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+            </button>
+          ` : ''}
           ${co ? `<button type="button" class="cp-btn" title="Abrir card do cliente" onclick="(function(){const card=CLIENT_CARDS.find(x=>x.companyId==='${co.id}');if(card)openClientCardModal(card.id);else openRegistroModal('${p.id}');})()">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>` : ''}
@@ -17902,118 +19258,1078 @@ function _renderConsPendenciasHTML(c, pendList, overdueCount){
       </div>`;
   };
 
-  const section = (title, items, cls, ic) => items.length ? `
-    <div class="cons-pend-group ${cls}">
-      <div class="cpg-head"><span class="cpg-ic">${ic}</span> ${title} <em>· ${items.length}</em></div>
-      <div class="cpg-rows">${items.map(renderRow).join('')}</div>
-    </div>` : '';
+  /* Agrupamento visual (apenas para abertas) */
+  let bodyHTML;
+  if (f.status === 'done'){
+    bodyHTML = `<div class="cpg-rows">${working.map(renderRow).join('')}</div>`;
+  } else {
+    const overdue = [], noDate = [], upcoming = [];
+    working.forEach(p => {
+      if (!p.date) noDate.push(p);
+      else if (p.date < todayISO) overdue.push(p);
+      else upcoming.push(p);
+    });
+    overdue.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    upcoming.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const section = (title, items, cls, ic) => items.length ? `
+      <div class="cons-pend-group ${cls}">
+        <div class="cpg-head"><span class="cpg-ic">${ic}</span> ${title} <em>· ${items.length}</em></div>
+        <div class="cpg-rows">${items.map(renderRow).join('')}</div>
+      </div>` : '';
+    bodyHTML = `
+      ${section('Atrasadas', overdue, 'g-overdue', '⚠')}
+      ${section('Sem data', noDate, 'g-nodate', '?')}
+      ${section('Próximas', upcoming, 'g-upcoming', '→')}`;
+  }
 
   return `
     <div class="cons-pend-wrap">
-      <div class="cons-pend-summary">
-        <div class="cps-card cps-overdue ${overdue.length?'is-on':''}">
-          <span>Atrasadas</span><b>${pad(overdue.length)}</b>
+      ${tabBar}
+      ${filters}
+      ${bodyHTML}
+    </div>`;
+}
+
+/* ============ NOVAS ABAS: Overview, Performance, OS ============ */
+
+function _consMetricsForPeriod(consultantId, period){
+  /* period: 'thisMonth' | 'last3' | 'last6' | 'year' */
+  const now = TODAY;
+  let from = new Date(now); let months = 1;
+  if (period === 'last3'){ months = 3; from.setMonth(now.getMonth()-2); from.setDate(1); }
+  else if (period === 'last6'){ months = 6; from.setMonth(now.getMonth()-5); from.setDate(1); }
+  else if (period === 'year'){ months = 12; from = new Date(now.getFullYear(), 0, 1); }
+  else { from.setDate(1); }
+  const fromISO = isoFromDate(from);
+  const toISO = isoFromDate(now);
+
+  const inRange = (iso) => iso && iso >= fromISO && iso <= (toISO+'T23:59:59');
+  const trainings = RECORDS.filter(r => r.consultantId === consultantId && r.kind === 'treinamento' && inRange(r.date||r.createdAt));
+  const t_agendados   = trainings.filter(r => ['confirmado','em-andamento'].includes(r.status)).length;
+  const t_provs       = trainings.filter(r => r.status === 'provisorio' || r.status === 'pendente').length;
+  const t_concluidos  = trainings.filter(r => r.status === 'atendido' || r.status === 'concluido' || r.status === 'em-os' || r.realizationStatus === 'realizado').length;
+  const t_cancelados  = trainings.filter(r => r.status === 'cancelado' || r.realizationStatus === 'nao-realizado').length;
+
+  const oses = ORDERS_SERVICE.filter(o => o.consultantId === consultantId && inRange((o.createdAt||'').slice(0,10)));
+  const os_total = oses.length;
+  const os_concl = oses.filter(o => o.status === 'assinada').length;
+  const os_canc  = oses.filter(o => o.status === 'cancelada').length;
+
+  /* Evolução mensal: contagem de treinamentos por mês no range */
+  const monthly = [];
+  for (let m=months-1; m>=0; m--){
+    const dt = new Date(now.getFullYear(), now.getMonth()-m, 1);
+    const key = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}`;
+    const count = trainings.filter(r => (r.date||r.createdAt||'').startsWith(key)).length;
+    const concl = trainings.filter(r => (r.date||r.createdAt||'').startsWith(key) && (r.status==='concluido'||r.status==='atendido'||r.status==='em-os'||r.realizationStatus==='realizado')).length;
+    monthly.push({ label: dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''), total:count, concl });
+  }
+
+  /* Ocupação da agenda — % de dias úteis com algum compromisso no período */
+  const fromDate = new Date(fromISO);
+  const toDate = new Date(toISO);
+  let utilDays = 0, ocupDays = 0;
+  for (let dt = new Date(fromDate); dt <= toDate; dt.setDate(dt.getDate()+1)){
+    const dow = dt.getDay();
+    if (dow === 0 || dow === 6) continue;
+    utilDays++;
+    const iso = isoFromDate(dt);
+    const av = _consAvailability(consultantId, iso);
+    if (av.status !== 'livre') ocupDays++;
+  }
+  const ocupRate = utilDays ? Math.round((ocupDays/utilDays)*100) : 0;
+
+  /* Clientes ativos vs encerrados */
+  const cardsAtivos = CLIENT_CARDS.filter(c => !c.archived && c.status !== 'concluida' && _cardConsultantOf(c) === consultantId).length;
+  const cardsEnc = CLIENT_CARDS.filter(c => (c.archived || c.status === 'concluida') && _cardConsultantOf(c) === consultantId).length;
+
+  return {
+    period, fromISO, toISO,
+    t_agendados, t_provs, t_concluidos, t_cancelados,
+    os_total, os_concl, os_canc,
+    monthly, ocupRate, ocupDays, utilDays,
+    cardsAtivos, cardsEnc,
+  };
+}
+
+function _cardConsultantOf(card){
+  /* infere consultor responsável do card a partir dos items */
+  const items = (typeof getCardItems === 'function') ? getCardItems(card.companyId) : [];
+  const ids = items.map(i => i.consultantId).filter(Boolean);
+  return ids[0] || (companyById(card.companyId)||{}).consultantId || null;
+}
+
+function _consOSesForConsultant(consultantId){
+  return ORDERS_SERVICE.filter(o => o.consultantId === consultantId);
+}
+
+/* Helpers SVG — donut + bar chart simples, sem libs */
+function _svgDonut(segments, size){
+  size = size || 180;
+  const r = size/2 - 12, cx = size/2, cy = size/2;
+  const total = segments.reduce((s,x) => s + Math.max(0,x.value), 0) || 1;
+  let acc = 0;
+  const paths = segments.map(seg => {
+    const v = Math.max(0, seg.value);
+    const pct = v/total;
+    const a0 = acc * 2*Math.PI - Math.PI/2;
+    const a1 = (acc+pct) * 2*Math.PI - Math.PI/2;
+    acc += pct;
+    if (v === 0) return '';
+    const large = pct > 0.5 ? 1 : 0;
+    const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
+    const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+    return `<path d="M ${cx} ${cy} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${seg.color}" opacity=".95"></path>`;
+  }).join('');
+  const inner = r * 0.62;
+  return `
+    <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" class="donut-svg">
+      ${paths}
+      <circle cx="${cx}" cy="${cy}" r="${inner}" fill="var(--paper)" />
+      <text x="${cx}" y="${cy-4}" text-anchor="middle" class="donut-label">${total}</text>
+      <text x="${cx}" y="${cy+14}" text-anchor="middle" class="donut-sub">total</text>
+    </svg>`;
+}
+
+function _svgBars(data, opts){
+  opts = opts || {};
+  const w = opts.width || 460, h = opts.height || 180;
+  const pad = { t:14, r:14, b:26, l:30 };
+  const innerW = w - pad.l - pad.r, innerH = h - pad.t - pad.b;
+  const max = Math.max(1, ...data.map(d => Math.max(d.total||0, d.concl||0)));
+  const bw = innerW / Math.max(1, data.length);
+  const ticks = 4;
+  const grid = Array.from({length: ticks+1}, (_,i) => {
+    const y = pad.t + innerH - (i/ticks)*innerH;
+    const val = Math.round((i/ticks)*max);
+    return `<line x1="${pad.l}" y1="${y}" x2="${w-pad.r}" y2="${y}" stroke="var(--line)" stroke-dasharray="2 3"/>
+            <text x="${pad.l-6}" y="${y+3}" text-anchor="end" class="bar-tick">${val}</text>`;
+  }).join('');
+  const bars = data.map((d,i) => {
+    const x = pad.l + i*bw;
+    const ht = (Math.max(0,d.total||0)/max)*innerH;
+    const hc = (Math.max(0,d.concl||0)/max)*innerH;
+    const bw0 = Math.max(8, bw*0.34);
+    return `
+      <g>
+        <rect x="${x + bw*0.18}" y="${pad.t + innerH - ht}" width="${bw0}" height="${ht}" rx="3" fill="var(--champagne)"></rect>
+        <rect x="${x + bw*0.18 + bw0 + 3}" y="${pad.t + innerH - hc}" width="${bw0}" height="${hc}" rx="3" fill="var(--forest)"></rect>
+        <text x="${x + bw/2}" y="${h-8}" text-anchor="middle" class="bar-label">${d.label}</text>
+      </g>`;
+  }).join('');
+  return `
+    <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" class="bars-svg" preserveAspectRatio="xMidYMid meet">
+      ${grid}
+      ${bars}
+    </svg>`;
+}
+
+/* ============================================================
+   PERFORMANCE PRO — helpers SVG e métricas
+   ============================================================ */
+
+/* Comparativo: período atual vs período anterior equivalente */
+function _consPerfCompare(consultantId, period){
+  const cur = _consMetricsForPeriod(consultantId, period);
+  /* Calcula período anterior — desloca janela */
+  const now = TODAY;
+  let prevFrom, prevTo;
+  if (period === 'thisMonth'){
+    prevFrom = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    prevTo = new Date(now.getFullYear(), now.getMonth(), 0);
+  } else if (period === 'last3'){
+    prevFrom = new Date(now.getFullYear(), now.getMonth()-5, 1);
+    prevTo = new Date(now.getFullYear(), now.getMonth()-3, 0);
+  } else if (period === 'last6'){
+    prevFrom = new Date(now.getFullYear(), now.getMonth()-11, 1);
+    prevTo = new Date(now.getFullYear(), now.getMonth()-6, 0);
+  } else {
+    prevFrom = new Date(now.getFullYear()-1, 0, 1);
+    prevTo = new Date(now.getFullYear()-1, 11, 31);
+  }
+  const prevFromISO = isoFromDate(prevFrom);
+  const prevToISO = isoFromDate(prevTo);
+  const inRange = (iso) => iso && iso >= prevFromISO && iso <= prevToISO+'T23:59:59';
+  const prevTrains = RECORDS.filter(r => r.consultantId === consultantId && r.kind === 'treinamento' && inRange(r.date||r.createdAt));
+  const prevConcl = prevTrains.filter(r => r.status === 'atendido' || r.status === 'concluido' || r.status === 'em-os' || r.realizationStatus === 'realizado').length;
+  /* Ocupação no período anterior */
+  let utilP=0, ocupP=0;
+  for (let dt=new Date(prevFrom); dt<=prevTo; dt.setDate(dt.getDate()+1)){
+    if (dt.getDay()===0 || dt.getDay()===6) continue;
+    utilP++;
+    if (_consAvailability(consultantId, isoFromDate(dt)).status !== 'livre') ocupP++;
+  }
+  const prevOcup = utilP ? Math.round((ocupP/utilP)*100) : 0;
+  const prevOS = ORDERS_SERVICE.filter(o => o.consultantId === consultantId && inRange((o.createdAt||'').slice(0,10))).length;
+
+  const delta = (c, p) => {
+    if (!p && !c) return { delta:0, pct:0, dir:'flat' };
+    if (!p) return { delta:c, pct:100, dir:'up' };
+    const d = c - p;
+    return { delta:d, pct: Math.round((d/p)*100), dir: d>0?'up':d<0?'down':'flat' };
+  };
+
+  return {
+    cur,
+    ocupRate: { cur:cur.ocupRate, prev:prevOcup, ...delta(cur.ocupRate, prevOcup) },
+    concl:    { cur:cur.t_concluidos, prev:prevConcl, ...delta(cur.t_concluidos, prevConcl) },
+    osTotal:  { cur:cur.os_total, prev:prevOS, ...delta(cur.os_total, prevOS) },
+  };
+}
+
+/* Minutos por categoria de tempo (treinos / atendimentos-OS / admin / reuniões) */
+function _consPerfTimeDistribution(consultantId, period){
+  const cur = _consMetricsForPeriod(consultantId, period);
+  const fromISO = cur.fromISO, toISO = cur.toISO;
+  const inRange = (iso) => iso && iso >= fromISO && iso <= toISO+'T23:59:59';
+  let trainMin=0, attMin=0, admMin=0, meetMin=0;
+  EVENTS.forEach(e => {
+    if (e.consultantId !== consultantId) return;
+    if (!inRange(e.date)) return;
+    if (e.status === 'cancelado' || e.status === 'reagendado') return;
+    const dur = Math.max(0, timeToMin(e.timeEnd||'')-timeToMin(e.timeStart||''));
+    if (dur <= 0) return;
+    /* Detecta tipo: record vinculado pelo título/kind */
+    const linkedRec = RECORDS.find(r => r.id === e.recordId || (r.companyId === e.companyId && r.date === e.date));
+    if (linkedRec && linkedRec.kind === 'treinamento') trainMin += dur;
+    else if (linkedRec && linkedRec.kind === 'atendimento') attMin += dur;
+    else if (linkedRec && linkedRec.kind === 'tarefa') admMin += dur;
+    else meetMin += dur;
+  });
+  return { trainMin, attMin, admMin, meetMin };
+}
+
+/* Matrix 7 (dias da semana) × 12 (8h–19h) com count de eventos confirmados */
+function _consPerfHeatmap(consultantId, period){
+  const cur = _consMetricsForPeriod(consultantId, period);
+  const fromISO = cur.fromISO, toISO = cur.toISO;
+  const matrix = Array.from({length:7}, () => Array(12).fill(0));
+  EVENTS.forEach(e => {
+    if (e.consultantId !== consultantId) return;
+    if (!e.date || e.date < fromISO || e.date > toISO) return;
+    if (!['confirmado','em-andamento','atendido','concluido','em-os'].includes(e.status)) return;
+    try {
+      const dt = parseISO(e.date);
+      const dow = dt.getDay();
+      const h = parseInt((e.timeStart||'08:00').split(':')[0], 10);
+      const col = h - 8;
+      if (col >= 0 && col < 12) matrix[dow][col] += 1;
+    } catch(err){}
+  });
+  return matrix;
+}
+
+/* Funnel: Clientes ativos → Atendimentos realizados → OS geradas → OS concluídas */
+function _consPerfFunnel(consultantId, period){
+  const cur = _consMetricsForPeriod(consultantId, period);
+  const fromISO = cur.fromISO, toISO = cur.toISO;
+  const inRange = (iso) => iso && iso >= fromISO && iso <= toISO+'T23:59:59';
+  const clientes = CLIENT_CARDS.filter(c => _cardConsultantOf(c) === consultantId).length;
+  const atendimentos = RECORDS.filter(r => r.consultantId === consultantId && r.kind === 'atendimento'
+    && (r.status === 'atendido' || r.status === 'concluido' || r.realizationStatus === 'realizado')
+    && inRange(r.date||r.createdAt)).length;
+  const osTotal = ORDERS_SERVICE.filter(o => o.consultantId === consultantId && inRange((o.createdAt||'').slice(0,10))).length;
+  const osConcl = ORDERS_SERVICE.filter(o => o.consultantId === consultantId && o.status === 'assinada' && inRange((o.signedAt||o.createdAt||'').slice(0,10))).length;
+  return [
+    { label:'Clientes', value:clientes, color:'var(--ink-2)' },
+    { label:'Atendimentos realizados', value:atendimentos, color:'var(--amber)' },
+    { label:'OS geradas', value:osTotal, color:'var(--champagne)' },
+    { label:'OS concluídas', value:osConcl, color:'var(--forest)' },
+  ];
+}
+
+/* SVG: Line chart com pontos e área */
+function _svgLine(points, opts){
+  opts = opts || {};
+  const w = opts.width || 460, h = opts.height || 160;
+  const pad = { t:18, r:14, b:24, l:34 };
+  const innerW = w - pad.l - pad.r, innerH = h - pad.t - pad.b;
+  if (!points.length) return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}"></svg>`;
+  const max = Math.max(1, ...points.map(p => p.value||0));
+  const stepX = innerW / Math.max(1, points.length-1);
+  const coords = points.map((p,i) => ({
+    x: pad.l + i*stepX,
+    y: pad.t + innerH - (Math.max(0,p.value)/max)*innerH,
+    label: p.label, value: p.value,
+  }));
+  const path = coords.map((c,i) => `${i===0?'M':'L'} ${c.x.toFixed(2)} ${c.y.toFixed(2)}`).join(' ');
+  const area = `${path} L ${coords[coords.length-1].x.toFixed(2)} ${(pad.t+innerH).toFixed(2)} L ${coords[0].x.toFixed(2)} ${(pad.t+innerH).toFixed(2)} Z`;
+  const ticks = 4;
+  const grid = Array.from({length:ticks+1}, (_,i) => {
+    const y = pad.t + innerH - (i/ticks)*innerH;
+    const v = Math.round((i/ticks)*max);
+    return `<line x1="${pad.l}" y1="${y}" x2="${w-pad.r}" y2="${y}" stroke="var(--line)" stroke-dasharray="2 3"/>
+            <text x="${pad.l-6}" y="${y+3}" text-anchor="end" class="bar-tick">${v}%</text>`;
+  }).join('');
+  const pts = coords.map(c =>
+    `<circle cx="${c.x.toFixed(2)}" cy="${c.y.toFixed(2)}" r="4" fill="var(--champagne)" stroke="var(--paper)" stroke-width="2"><title>${c.label}: ${c.value}%</title></circle>`
+  ).join('');
+  const xLabels = coords.map(c => `<text x="${c.x.toFixed(2)}" y="${h-6}" text-anchor="middle" class="bar-label">${c.label}</text>`).join('');
+  return `
+    <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" class="line-svg" preserveAspectRatio="xMidYMid meet">
+      ${grid}
+      <path d="${area}" fill="var(--champagne)" opacity=".18"/>
+      <path d="${path}" fill="none" stroke="var(--champagne)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${pts}
+      ${xLabels}
+    </svg>`;
+}
+
+/* SVG: Heatmap 7×12 */
+function _svgHeatmap(matrix, opts){
+  opts = opts || {};
+  const w = opts.width || 460, h = opts.height || 200;
+  const pad = { t:14, r:6, b:20, l:34 };
+  const rows = 7, cols = 12;
+  const cellW = (w - pad.l - pad.r) / cols;
+  const cellH = (h - pad.t - pad.b) / rows;
+  const max = Math.max(1, ...matrix.flat());
+  const dowLabels = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  let cells = '';
+  for (let r=0; r<rows; r++){
+    for (let c=0; c<cols; c++){
+      const v = matrix[r][c]||0;
+      const op = v ? 0.18 + (v/max)*0.82 : 0.04;
+      const fill = v >= max*0.7 ? '#2d5f3f' : v >= max*0.4 ? '#b8895a' : v >= max*0.2 ? '#e8d4b4' : '#f0e1c8';
+      cells += `<rect x="${pad.l + c*cellW}" y="${pad.t + r*cellH}" width="${cellW-1}" height="${cellH-1}" rx="2" fill="${fill}" opacity="${op}"><title>${dowLabels[r]} · ${c+8}h: ${v}</title></rect>`;
+      if (v > 0) cells += `<text x="${pad.l + c*cellW + cellW/2}" y="${pad.t + r*cellH + cellH/2 + 3}" text-anchor="middle" class="hm-cnt">${v}</text>`;
+    }
+  }
+  const rowLabels = dowLabels.map((d,i) => `<text x="${pad.l-6}" y="${pad.t + i*cellH + cellH/2 + 3}" text-anchor="end" class="bar-tick">${d}</text>`).join('');
+  const colLabels = Array.from({length:cols}, (_,i) => `<text x="${pad.l + i*cellW + cellW/2}" y="${h-6}" text-anchor="middle" class="bar-label">${i+8}h</text>`).join('');
+  return `
+    <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" class="heat-svg" preserveAspectRatio="xMidYMid meet">
+      ${cells}${rowLabels}${colLabels}
+    </svg>`;
+}
+
+/* SVG: Funnel — trapézios decrescentes */
+function _svgFunnel(stages, opts){
+  opts = opts || {};
+  const w = opts.width || 460, h = opts.height || 220;
+  const pad = { t:14, r:14, b:14, l:14 };
+  const innerW = w - pad.l - pad.r, innerH = h - pad.t - pad.b;
+  const n = stages.length;
+  if (!n) return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}"></svg>`;
+  const rowH = innerH / n;
+  const max = Math.max(1, ...stages.map(s => s.value));
+  let body = '';
+  for (let i=0; i<n; i++){
+    const v = stages[i].value;
+    const ratio = v / max;
+    const widthRatio = Math.max(0.18, ratio);
+    const w0 = innerW * widthRatio;
+    const x0 = pad.l + (innerW - w0)/2;
+    const y0 = pad.t + i*rowH;
+    body += `
+      <rect x="${x0}" y="${y0+2}" width="${w0}" height="${rowH-6}" rx="6" fill="${stages[i].color}" opacity=".92"/>
+      <text x="${pad.l+innerW/2}" y="${y0 + rowH/2 - 3}" text-anchor="middle" class="funnel-label" fill="#fff">${stages[i].label}</text>
+      <text x="${pad.l+innerW/2}" y="${y0 + rowH/2 + 12}" text-anchor="middle" class="funnel-val" fill="#fff">${v}${i>0 && stages[i-1].value?` · ${Math.round((v/stages[i-1].value)*100)}%`:''}</text>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" class="funnel-svg" preserveAspectRatio="xMidYMid meet">${body}</svg>`;
+}
+
+/* SVG: Gauge meio-círculo com agulha */
+function _svgGauge(value, max, opts){
+  opts = opts || {};
+  const w = opts.width || 220, h = opts.height || 130;
+  const cx = w/2, cy = h - 18, r = w/2 - 14;
+  const pct = Math.max(0, Math.min(1, value/Math.max(1,max)));
+  /* arc track */
+  const tx0 = cx - r, ty0 = cy;
+  const tx1 = cx + r, ty1 = cy;
+  const track = `M ${tx0} ${ty0} A ${r} ${r} 0 0 1 ${tx1} ${ty1}`;
+  /* fill arc até pct */
+  const ang = Math.PI - pct*Math.PI; /* π → 0 */
+  const fx = cx + r*Math.cos(ang), fy = cy - r*Math.sin(ang);
+  const large = pct > 0.5 ? 1 : 0;
+  const fill = `M ${tx0} ${ty0} A ${r} ${r} 0 ${large} 1 ${fx.toFixed(2)} ${fy.toFixed(2)}`;
+  const color = pct < 0.5 ? 'var(--burgundy)' : pct < 0.8 ? 'var(--amber)' : 'var(--forest)';
+  /* needle */
+  const nx = cx + (r-6)*Math.cos(ang);
+  const ny = cy - (r-6)*Math.sin(ang);
+  /* ticks at 25/50/75% */
+  const ticksHTML = [0.25, 0.5, 0.75].map(p => {
+    const a = Math.PI - p*Math.PI;
+    const x1 = cx + r*Math.cos(a), y1 = cy - r*Math.sin(a);
+    const x2 = cx + (r-7)*Math.cos(a), y2 = cy - (r-7)*Math.sin(a);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink-3)" stroke-width="1.5"/>`;
+  }).join('');
+  return `
+    <svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" class="gauge-svg">
+      <path d="${track}" fill="none" stroke="var(--paper-3)" stroke-width="10" stroke-linecap="round"/>
+      <path d="${fill}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"/>
+      ${ticksHTML}
+      <circle cx="${cx}" cy="${cy}" r="6" fill="var(--ink)"/>
+      <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(2)}" y2="${ny.toFixed(2)}" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <text x="${cx}" y="${cy-r-6}" text-anchor="middle" class="gauge-val">${Math.round(pct*100)}%</text>
+    </svg>`;
+}
+
+function _renderConsOverviewHTML(c, pendList){
+  const todayISO = isoFromDate(TODAY);
+  const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate()+1);
+  const tomorrowISO = isoFromDate(tomorrow);
+  const todayEvents = EVENTS.filter(e => e.consultantId === c.id && e.date === todayISO && !['cancelado','reagendado'].includes(e.status)).sort((a,b)=>(a.timeStart||'').localeCompare(b.timeStart||''));
+  const tomorrowEvents = EVENTS.filter(e => e.consultantId === c.id && e.date === tomorrowISO && !['cancelado','reagendado'].includes(e.status)).sort((a,b)=>(a.timeStart||'').localeCompare(b.timeStart||''));
+  const slotsToday = _consAvailableSlots(c.id, todayISO);
+  const av = _consAvailability(c.id, todayISO);
+  const m = _consMetricsForPeriod(c.id, 'thisMonth');
+  const t_total = m.t_agendados + m.t_provs + m.t_concluidos + m.t_cancelados;
+  const score = (() => {
+    const base = t_total ? (m.t_concluidos / t_total) : 0.6;
+    const ocup = m.ocupRate/100;
+    const pendPenalty = Math.min(0.3, pendList.length*0.02);
+    return Math.max(0, Math.min(100, Math.round((base*0.5 + ocup*0.5 - pendPenalty)*100)));
+  })();
+  const urgentes = pendList.filter(p => p.date && p.date < todayISO).slice(0,3);
+
+  const evRow = (e) => {
+    const co = companyById(e.companyId);
+    return `
+      <div class="cov-ev">
+        <div class="cov-ev-time"><b>${e.timeStart||'--:--'}</b><span>${e.timeEnd||''}</span></div>
+        <div class="cov-ev-main">
+          <div class="cov-ev-title">${e.title||'(sem título)'}</div>
+          <div class="cov-ev-meta">${co?co.fantasia:'sem empresa'} · ${(statusById(e.status)||{}).label||e.status}</div>
         </div>
-        <div class="cps-card cps-nodate ${noDate.length?'is-on':''}">
-          <span>Sem data</span><b>${pad(noDate.length)}</b>
+        <button type="button" class="cov-ev-go" onclick="openEventModal('${e.id}')" title="Abrir evento">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>`;
+  };
+  const pendRow = (p) => {
+    const co = companyById(p.companyId);
+    return `
+      <div class="cov-pend">
+        <div class="cov-pend-ic">!</div>
+        <div class="cov-pend-main">
+          <div class="cov-pend-title">${p.title}</div>
+          <div class="cov-pend-meta">${co?co.fantasia:''}${p.date?` · ${isoToBR(p.date)}`:''}${p.priority?` · ${p.priority.toUpperCase()}`:''}</div>
         </div>
-        <div class="cps-card cps-upcoming ${upcoming.length?'is-on':''}">
-          <span>Próximas</span><b>${pad(upcoming.length)}</b>
+        <button type="button" class="cov-pend-go" onclick="consQuickComplete('${p.id}')" title="Concluir">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M5 12l5 5L20 7"/></svg>
+        </button>
+      </div>`;
+  };
+
+  return `
+    <div class="cov-wrap">
+      <div class="cov-grid">
+        <section class="cov-card cov-today">
+          <div class="cov-card-head"><span class="cov-card-ic">●</span> Hoje · ${TODAY.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})}</div>
+          <div class="cov-status s-${av.status}">
+            <span class="cov-status-dot"></span>
+            ${av.status==='livre'?'Dia livre':av.status==='provisionado'?'Provisionado':av.status==='parcialmente-livre'?'Parcialmente livre':'Agendado · sem janela'}
+          </div>
+          <div class="cov-today-stats">
+            <div><b>${pad(av.load.ocupadosCount)}</b><span>Confirmados</span></div>
+            <div><b>${pad(av.load.provisionadosCount)}</b><span>Provisórios</span></div>
+            <div><b>${Math.round((av.load.freeMin||0)/60*10)/10}h</b><span>Livre na jornada</span></div>
+          </div>
+          <div class="cov-today-evs">
+            ${todayEvents.length ? todayEvents.slice(0,4).map(evRow).join('') : '<div class="cov-empty">Sem compromissos para hoje.</div>'}
+            ${todayEvents.length > 4 ? `<button type="button" class="cov-more" onclick="consSwitchTab('agenda')">Ver todos os ${todayEvents.length} eventos →</button>`:''}
+          </div>
+        </section>
+
+        <section class="cov-card cov-score">
+          <div class="cov-card-head"><span class="cov-card-ic">★</span> Score do consultor</div>
+          <div class="cov-score-wrap">
+            <div class="cov-score-circle" style="--p:${score}">
+              <span class="csc-val">${score}</span>
+              <span class="csc-lbl">/100</span>
+            </div>
+            <div class="cov-score-info">
+              <div><b>${m.ocupRate}%</b><span>Ocupação no mês</span></div>
+              <div><b>${m.t_concluidos}</b><span>Treinos concluídos</span></div>
+              <div><b>${pendList.length}</b><span>Pendências em aberto</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="cov-card cov-slots">
+          <div class="cov-card-head"><span class="cov-card-ic">⏱</span> Janelas livres hoje</div>
+          ${slotsToday.length ? `
+            <div class="cov-slot-list">
+              ${slotsToday.map(s => `
+                <div class="cov-slot">
+                  <b>${s.startLabel} – ${s.endLabel}</b>
+                  <span>${Math.round(s.duration/60*10)/10}h disponíveis</span>
+                </div>`).join('')}
+            </div>
+            <div class="cov-slot-hint">Use estas janelas para novos clientes ou pendências sem data.</div>
+          ` : `<div class="cov-empty">Jornada de hoje já preenchida ou sem horário configurado.</div>`}
+        </section>
+
+        <section class="cov-card cov-tomorrow">
+          <div class="cov-card-head"><span class="cov-card-ic">→</span> Amanhã · ${tomorrow.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'})}</div>
+          ${tomorrowEvents.length ? tomorrowEvents.slice(0,4).map(evRow).join('') : `<div class="cov-empty">Sem compromissos para amanhã.</div>`}
+        </section>
+
+        <section class="cov-card cov-urgent">
+          <div class="cov-card-head"><span class="cov-card-ic">!</span> Pendências urgentes</div>
+          ${urgentes.length ? urgentes.map(pendRow).join('') : `<div class="cov-empty">Nenhuma pendência crítica.</div>`}
+          ${pendList.length ? `<button type="button" class="cov-more" onclick="consSwitchTab('pendencias')">Abrir aba completa de pendências →</button>`:''}
+        </section>
+
+        <section class="cov-card cov-quick">
+          <div class="cov-card-head"><span class="cov-card-ic">⚡</span> Ações rápidas</div>
+          <div class="cov-quick-grid">
+            <button type="button" class="cov-q-btn" onclick="consSwitchTab('agenda')">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              <span>Abrir agenda</span>
+            </button>
+            <button type="button" class="cov-q-btn" onclick="consSwitchTab('pendencias')">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>Ver pendências</span>
+            </button>
+            <button type="button" class="cov-q-btn" onclick="consSwitchTab('performance')">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+              <span>Performance</span>
+            </button>
+            <button type="button" class="cov-q-btn" onclick="consSwitchTab('os')">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+              <span>Ordens de serviço</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>`;
+}
+
+function _renderConsPerformanceHTML(c){
+  const d = state.consultorDash;
+  const period = d.perfPeriod;
+  const m = _consMetricsForPeriod(c.id, period);
+  const t_total = m.t_agendados + m.t_provs + m.t_concluidos + m.t_cancelados;
+  const concl_pct = t_total ? Math.round((m.t_concluidos/t_total)*100) : 0;
+  const canc_pct  = t_total ? Math.round((m.t_cancelados/t_total)*100) : 0;
+  const meta = 20; /* meta-base de treinos no período — UI futura para configurar */
+  const metaPct = Math.min(100, Math.round((m.t_concluidos/Math.max(1,meta))*100));
+
+  /* Score consolidado */
+  const score = (() => {
+    const base = t_total ? (m.t_concluidos / t_total) : 0;
+    const ocup = m.ocupRate/100;
+    const ratio = m.os_total ? (m.os_concl / m.os_total) : 0;
+    return Math.max(0, Math.min(100, Math.round((base*0.45 + ocup*0.35 + ratio*0.2)*100)));
+  })();
+
+  const donut = _svgDonut([
+    { label:'Concluídos', value:m.t_concluidos, color:'#2d5f3f' },
+    { label:'Agendados',  value:m.t_agendados,  color:'#b8895a' },
+    { label:'Provisórios',value:m.t_provs,      color:'#c87533' },
+    { label:'Cancelados', value:m.t_cancelados, color:'#8a2638' },
+  ]);
+
+  /* Comparativo período atual vs anterior */
+  const cmp = _consPerfCompare(c.id, period);
+  const delta = (obj, suffix) => {
+    if (!obj) return '';
+    const arrow = obj.dir==='up'?'↑':obj.dir==='down'?'↓':'→';
+    const cls = obj.dir==='up'?'is-up':obj.dir==='down'?'is-down':'is-flat';
+    return `<span class="pfp-delta ${cls}">${arrow} ${obj.dir==='flat'?'estável':`${Math.abs(obj.pct)}%`}${suffix||''}</span>`;
+  };
+
+  /* Distribuição de tempo */
+  const td = _consPerfTimeDistribution(c.id, period);
+  const tdTotal = td.trainMin + td.attMin + td.admMin + td.meetMin;
+  const tdDonut = _svgDonut([
+    { label:'Treinos',     value:td.trainMin, color:'#2d5f3f' },
+    { label:'Atend./OS',   value:td.attMin,   color:'#b8632a' },
+    { label:'Administrativo', value:td.admMin, color:'#4555a3' },
+    { label:'Reuniões',    value:td.meetMin,  color:'#b8895a' },
+  ], 170);
+  const fmtH = (min) => `${Math.floor(min/60)}h${min%60?` ${pad(min%60)}m`:''}`;
+
+  /* Line chart — evolução do aproveitamento (% por mês) */
+  const lineData = m.monthly.map(mo => ({
+    label: mo.label,
+    value: mo.total ? Math.round((mo.concl/mo.total)*100) : 0,
+  }));
+
+  /* Heatmap semanal */
+  const heat = _consPerfHeatmap(c.id, period);
+
+  /* Funnel */
+  const funnelStages = _consPerfFunnel(c.id, period);
+
+  /* Horas trabalhadas vs previstas no período */
+  const hoursWorked = Math.round((td.trainMin + td.attMin + td.meetMin)/60);
+  const hoursExpected = (() => {
+    const c0 = c;
+    const ws = timeToMin(c0.workStart||'09:00');
+    const we = timeToMin(c0.workEnd  ||'18:00');
+    const lunch = (typeof c0.lunchMin === 'number') ? c0.lunchMin : 60;
+    const hPerDay = Math.max(0, (we - ws - lunch))/60;
+    return Math.round(hPerDay * m.utilDays);
+  })();
+  const hoursPct = hoursExpected ? Math.min(150, Math.round((hoursWorked/hoursExpected)*100)) : 0;
+
+  const periodLabel = period === 'thisMonth' ? 'Mês atual' : period === 'last3' ? 'Últimos 3 meses' : period === 'last6' ? 'Últimos 6 meses' : 'Ano corrente';
+
+  return `
+    <div class="perf-wrap">
+      <div class="perf-period">
+        <span>Período</span>
+        <button type="button" class="${period==='thisMonth'?'active':''}" onclick="consSetPerfPeriod('thisMonth')">Mês atual</button>
+        <button type="button" class="${period==='last3'?'active':''}" onclick="consSetPerfPeriod('last3')">3 meses</button>
+        <button type="button" class="${period==='last6'?'active':''}" onclick="consSetPerfPeriod('last6')">6 meses</button>
+        <button type="button" class="${period==='year'?'active':''}" onclick="consSetPerfPeriod('year')">Ano</button>
+        <span class="perf-period-chip">${periodLabel}</span>
+      </div>
+
+      <div class="pfp-kpis">
+        <div class="pfp-kpi pfp-kpi-ocup">
+          <div class="pfp-kpi-ic">⏱</div>
+          <div class="pfp-kpi-val">${m.ocupRate}%</div>
+          <div class="pfp-kpi-lbl">Ocupação da agenda</div>
+          <div class="pfp-kpi-bar"><div style="width:${Math.min(100,m.ocupRate)}%"></div></div>
+          ${delta(cmp.ocupRate, ' vs anterior')}
+        </div>
+        <div class="pfp-kpi pfp-kpi-train">
+          <div class="pfp-kpi-ic">✦</div>
+          <div class="pfp-kpi-val">${m.t_concluidos}<span class="pfp-kpi-sub">/${t_total||0}</span></div>
+          <div class="pfp-kpi-lbl">Treinamentos concluídos</div>
+          <div class="pfp-kpi-bar"><div style="width:${concl_pct}%;background:var(--forest)"></div></div>
+          ${delta(cmp.concl, ' vs anterior')}
+        </div>
+        <div class="pfp-kpi pfp-kpi-os">
+          <div class="pfp-kpi-ic">§</div>
+          <div class="pfp-kpi-val">${m.os_concl}<span class="pfp-kpi-sub">/${m.os_total||0}</span></div>
+          <div class="pfp-kpi-lbl">OS abertas → concluídas</div>
+          <div class="pfp-kpi-bar"><div style="width:${m.os_total?Math.round((m.os_concl/m.os_total)*100):0}%;background:var(--champagne)"></div></div>
+          ${delta(cmp.osTotal, ' vs anterior')}
+        </div>
+        <div class="pfp-kpi pfp-kpi-hours">
+          <div class="pfp-kpi-ic">◴</div>
+          <div class="pfp-kpi-val">${hoursWorked}h<span class="pfp-kpi-sub">/${hoursExpected}h</span></div>
+          <div class="pfp-kpi-lbl">Horas trabalhadas</div>
+          <div class="pfp-kpi-bar"><div style="width:${Math.min(100,hoursPct)}%;background:var(--indigo-2)"></div></div>
+          <span class="pfp-delta is-flat">${hoursPct}% da jornada prevista</span>
+        </div>
+        <div class="pfp-kpi pfp-kpi-sat">
+          <div class="pfp-kpi-ic">★</div>
+          <div class="pfp-kpi-val">—</div>
+          <div class="pfp-kpi-lbl">Satisfação (NPS)</div>
+          <div class="pfp-kpi-bar"><div style="width:0%"></div></div>
+          <span class="pfp-delta is-flat">integre NPS para ver</span>
         </div>
       </div>
-      ${section('Atrasadas', overdue, 'g-overdue', '⚠')}
-      ${section('Sem data', noDate, 'g-nodate', '?')}
-      ${section('Próximas', upcoming, 'g-upcoming', '→')}
+
+      <div class="perf-row">
+        <section class="perf-card perf-donut-card">
+          <div class="perf-card-head"><span class="perf-ic">⊙</span> Distribuição de treinamentos</div>
+          <div class="perf-donut-row">
+            ${donut}
+            <ul class="perf-legend">
+              <li><i style="background:#2d5f3f"></i><span>Concluídos</span><b>${m.t_concluidos}</b></li>
+              <li><i style="background:#b8895a"></i><span>Agendados</span><b>${m.t_agendados}</b></li>
+              <li><i style="background:#c87533"></i><span>Provisórios</span><b>${m.t_provs}</b></li>
+              <li><i style="background:#8a2638"></i><span>Cancelados</span><b>${m.t_cancelados}</b></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="perf-card perf-bars-card">
+          <div class="perf-card-head">
+            <span class="perf-ic">▌</span> Evolução mensal
+            <span class="perf-card-legend">
+              <i style="background:var(--champagne)"></i>Total <i style="background:var(--forest)"></i>Concluídos
+            </span>
+          </div>
+          ${_svgBars(m.monthly)}
+        </section>
+      </div>
+
+      <div class="perf-row perf-row-3">
+        <section class="perf-card perf-meta-card">
+          <div class="perf-card-head"><span class="perf-ic">🎯</span> Meta vs. realizado</div>
+          <div class="pfp-gauge-wrap">${_svgGauge(m.t_concluidos, meta)}</div>
+          <div class="perf-meta-num" style="justify-content:center"><b>${m.t_concluidos}</b><span>de ${meta} treinos</span></div>
+          <div class="perf-meta-pct" style="text-align:center">${metaPct}% da meta</div>
+        </section>
+
+        <section class="perf-card perf-ocup-card">
+          <div class="perf-card-head"><span class="perf-ic">⏱</span> Ocupação da agenda</div>
+          <div class="perf-circle" style="--p:${m.ocupRate}">
+            <span>${m.ocupRate}%</span>
+          </div>
+          <div class="perf-ocup-sub">${m.ocupDays} de ${m.utilDays} dias úteis com agenda</div>
+        </section>
+
+        <section class="perf-card perf-score-card">
+          <div class="perf-card-head"><span class="perf-ic">★</span> Score de aproveitamento</div>
+          <div class="perf-circle gold" style="--p:${score}">
+            <span>${score}</span>
+          </div>
+          <div class="perf-ocup-sub">Índice consolidado (concl. + ocup. + OS)</div>
+        </section>
+      </div>
+
+      <div class="perf-row">
+        <section class="perf-card pfp-td-card">
+          <div class="perf-card-head"><span class="perf-ic">◔</span> Distribuição de tempo · ${fmtH(tdTotal)} no período</div>
+          <div class="perf-donut-row">
+            ${tdDonut}
+            <ul class="perf-legend">
+              <li><i style="background:#2d5f3f"></i><span>Treinos</span><b>${fmtH(td.trainMin)}</b></li>
+              <li><i style="background:#b8632a"></i><span>Atend./OS</span><b>${fmtH(td.attMin)}</b></li>
+              <li><i style="background:#4555a3"></i><span>Administrativo</span><b>${fmtH(td.admMin)}</b></li>
+              <li><i style="background:#b8895a"></i><span>Reuniões</span><b>${fmtH(td.meetMin)}</b></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="perf-card pfp-line-card">
+          <div class="perf-card-head">
+            <span class="perf-ic">↗</span> Evolução do aproveitamento
+            <span class="perf-card-legend"><i style="background:var(--champagne)"></i>% concluído / total por mês</span>
+          </div>
+          ${_svgLine(lineData)}
+        </section>
+      </div>
+
+      <div class="perf-row">
+        <section class="perf-card pfp-heat-card">
+          <div class="perf-card-head">
+            <span class="perf-ic">▦</span> Heatmap de produtividade
+            <span class="perf-card-legend">eventos confirmados por dia × hora</span>
+          </div>
+          ${_svgHeatmap(heat)}
+        </section>
+
+        <section class="perf-card pfp-funnel-card">
+          <div class="perf-card-head"><span class="perf-ic">▼</span> Funil de conversão</div>
+          ${_svgFunnel(funnelStages)}
+        </section>
+      </div>
+
+      <div class="perf-row perf-row-3">
+        <section class="perf-card perf-stat-card">
+          <div class="perf-card-head"><span class="perf-ic">§</span> Ordens de Serviço</div>
+          <div class="perf-stat-grid">
+            <div><b>${m.os_total}</b><span>Total</span></div>
+            <div class="ok"><b>${m.os_concl}</b><span>Assinadas</span></div>
+            <div class="bad"><b>${m.os_canc}</b><span>Canceladas</span></div>
+          </div>
+        </section>
+        <section class="perf-card perf-stat-card">
+          <div class="perf-card-head"><span class="perf-ic">◆</span> Clientes</div>
+          <div class="perf-stat-grid">
+            <div><b>${m.cardsAtivos}</b><span>Ativos</span></div>
+            <div><b>${m.cardsEnc}</b><span>Encerrados</span></div>
+            <div><b>${m.cardsAtivos+m.cardsEnc}</b><span>Total</span></div>
+          </div>
+        </section>
+        <section class="perf-card perf-stat-card">
+          <div class="perf-card-head"><span class="perf-ic">%</span> Taxas</div>
+          <div class="perf-stat-grid">
+            <div class="ok"><b>${concl_pct}%</b><span>Conclusão</span></div>
+            <div class="bad"><b>${canc_pct}%</b><span>Cancelamento</span></div>
+            <div><b>${m.t_provs}</b><span>Pendentes</span></div>
+          </div>
+        </section>
+      </div>
+    </div>`;
+}
+
+function _renderConsOSListHTML(c){
+  const f = state.consultorDash.osFilters;
+  let list = _consOSesForConsultant(c.id);
+  if (f.status !== 'all') list = list.filter(o => (o.status||'rascunho') === f.status);
+  if (f.kind !== 'all') list = list.filter(o => (o.kind||'') === f.kind);
+  list.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+
+  const all = _consOSesForConsultant(c.id);
+  const tot = all.length;
+  const ativ = all.filter(osIsActive).length;
+  const canc = all.filter(o => o.status === 'cancelada').length;
+  const assin = all.filter(o => o.status === 'assinada').length;
+
+  const filters = `
+    <div class="ost-filters" style="margin-bottom:14px">
+      <label>Status
+        <select onchange="consSetOSFilter('status', this.value)">
+          <option value="all" ${f.status==='all'?'selected':''}>Todos</option>
+          <option value="rascunho" ${f.status==='rascunho'?'selected':''}>Rascunho</option>
+          <option value="enviada" ${f.status==='enviada'?'selected':''}>Enviada</option>
+          <option value="assinada" ${f.status==='assinada'?'selected':''}>Assinada</option>
+          <option value="cancelada" ${f.status==='cancelada'?'selected':''}>Cancelada</option>
+        </select>
+      </label>
+      <label>Tipo
+        <select onchange="consSetOSFilter('kind', this.value)">
+          <option value="all" ${f.kind==='all'?'selected':''}>Todos</option>
+          <option value="atendimento" ${f.kind==='atendimento'?'selected':''}>Atendimento</option>
+          <option value="treinamento" ${f.kind==='treinamento'?'selected':''}>Treinamento</option>
+          <option value="tarefa" ${f.kind==='tarefa'?'selected':''}>Tarefa</option>
+        </select>
+      </label>
+    </div>`;
+
+  const indicators = `
+    <div class="ost-indicators">
+      <div class="ost-ind"><b>${pad(tot)}</b><span>OS totais</span></div>
+      <div class="ost-ind is-active"><b>${pad(ativ)}</b><span>Ativas</span></div>
+      <div class="ost-ind"><b>${pad(assin)}</b><span>Assinadas</span></div>
+      <div class="ost-ind is-cancel"><b>${pad(canc)}</b><span>Canceladas</span></div>
+    </div>`;
+
+  const rows = list.length ? list.map(o => {
+    const co = companyById(o.companyId);
+    const stCls = o.status === 'cancelada' ? 'cancelled'
+              : o.status === 'assinada' ? 'signed'
+              : o.status === 'enviada' ? 'sent'
+              : 'draft';
+    const stLabel = o.status === 'cancelada' ? 'Cancelada'
+                  : o.status === 'assinada' ? 'Assinada'
+                  : o.status === 'enviada' ? 'Enviada'
+                  : 'Rascunho';
+    return `
+      <div class="ost-row st-${stCls}">
+        <div class="ost-kind k-${o.kind||'atendimento'}">${(o.kind||'OS').toUpperCase()}</div>
+        <div class="ost-main">
+          <div class="ost-title">${o.title || `OS ${(o.id||'').slice(-6)}`}</div>
+          <div class="ost-meta">
+            <span>§ ${(o.id||'').slice(-6).toUpperCase()}</span>
+            <span>${co?co.fantasia:'sem empresa'}</span>
+            <span>Criada ${fmtDateTime(o.createdAt||'')}</span>
+            ${o.signedAt?`<span>Assinada ${fmtDateTime(o.signedAt)}</span>`:''}
+            ${o.canceledAt?`<span class="ost-meta-cancel">Cancelada · ${o.canceledReason||''}</span>`:''}
+          </div>
+        </div>
+        <div class="ost-status"><span class="ost-pill st-${stCls}">${stLabel}</span></div>
+        <div class="ost-actions">
+          <button title="Abrir OS" onclick="openOSModal('${o.itemSrc}','${o.itemId}','${o.id}')">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          ${co ? `<button title="Abrir card do cliente" onclick="(function(){const card=CLIENT_CARDS.find(x=>x.companyId==='${co.id}');if(card)openClientCardModal(card.id);})()">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          </button>`:''}
+          ${o.status !== 'cancelada' ? `
+          <button title="Cancelar OS" class="danger" onclick="cancelOS('${o.id}')">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+          </button>`:''}
+        </div>
+      </div>`;
+  }).join('') : `<div class="ost-empty">Nenhuma OS deste consultor com os filtros aplicados.</div>`;
+
+  return `
+    <div class="ost-wrap" style="padding:0">
+      ${indicators}
+      ${filters}
+      <div class="ost-list">${rows}</div>
     </div>`;
 }
 
 function _renderConsAgendaHTML(c){
   const d = state.consultorDash;
-  const monthName = new Date(d.calYear, d.calMonth, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
-  const firstDow = new Date(d.calYear, d.calMonth, 1).getDay();
-  const daysInMonth = new Date(d.calYear, d.calMonth+1, 0).getDate();
   const todayISO = isoFromDate(TODAY);
+  const view = d.calView || 'month';
+  if (!d.anchorISO && view !== 'month') d.anchorISO = d.selectedISO || todayISO;
 
-  /* Conta dias por status para legenda dinâmica */
-  let livre=0, prov=0, ag=0;
-  const cells = [];
-  for (let i=0; i<firstDow; i++) cells.push(`<div class="cdc empty"></div>`);
-  for (let day=1; day<=daysInMonth; day++){
-    const iso = `${d.calYear}-${pad(d.calMonth+1)}-${pad(day)}`;
+  /* Toolbar superior — toggle mês/semana/dia + navegação */
+  const headerLabel = (() => {
+    if (view === 'month') return new Date(d.calYear, d.calMonth, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+    if (view === 'week'){
+      const anchor = parseISO(d.anchorISO || todayISO);
+      const wStart = new Date(anchor); wStart.setDate(wStart.getDate() - wStart.getDay());
+      const wEnd = new Date(wStart); wEnd.setDate(wEnd.getDate()+6);
+      return `${pad(wStart.getDate())} ${wStart.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')} – ${pad(wEnd.getDate())} ${wEnd.toLocaleDateString('pt-BR',{month:'short',year:'numeric'}).replace('.','')}`;
+    }
+    const dt = parseISO(d.anchorISO || todayISO);
+    return dt.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  })();
+
+  const navFn = view === 'month' ? 'consNavMonth' : 'consNavAnchor';
+  const toolbar = `
+    <div class="cons-cal-head">
+      <div class="cch-nav">
+        <button type="button" class="cch-btn" onclick="${navFn}(-1)" title="Anterior">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button type="button" class="cch-btn cch-today" onclick="${navFn}(0)">Hoje</button>
+        <button type="button" class="cch-btn" onclick="${navFn}(1)" title="Próximo">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+      <h3>${headerLabel.charAt(0).toUpperCase()+headerLabel.slice(1)}</h3>
+      <div class="cons-view-switch" role="tablist">
+        <button type="button" class="${view==='month'?'active':''}" onclick="consSetAgendaView('month')">Mês</button>
+        <button type="button" class="${view==='week'?'active':''}" onclick="consSetAgendaView('week')">Semana</button>
+        <button type="button" class="${view==='day'?'active':''}" onclick="consSetAgendaView('day')">Dia</button>
+      </div>
+    </div>`;
+
+  let gridHTML = '';
+  if (view === 'month'){
+    const firstDow = new Date(d.calYear, d.calMonth, 1).getDay();
+    const daysInMonth = new Date(d.calYear, d.calMonth+1, 0).getDate();
+    let livre=0, plivre=0, prov=0, ag=0, off=0;
+    const cells = [];
+    for (let i=0; i<firstDow; i++) cells.push(`<div class="cdc empty"></div>`);
+    for (let day=1; day<=daysInMonth; day++){
+      const iso = `${d.calYear}-${pad(d.calMonth+1)}-${pad(day)}`;
+      const av = _consAvailability(c.id, iso);
+      if (av.status === 'livre') livre++;
+      else if (av.status === 'parcialmente-livre') plivre++;
+      else if (av.status === 'provisionado') prov++;
+      else if (av.status === 'off') off++;
+      else ag++;
+      const isToday = iso === todayISO;
+      const isSelected = iso === d.selectedISO;
+      const dow = new Date(d.calYear, d.calMonth, day).getDay();
+      const isWeekend = dow === 0 || dow === 6;
+      const tipLabel =
+        av.status === 'off' ? 'Fora da jornada' :
+        av.status === 'livre' ? 'Livre' :
+        av.status === 'parcialmente-livre' ? 'Parcialmente livre' :
+        av.status === 'provisionado' ? 'Provisionado' : 'Agendado';
+      cells.push(`
+        <button type="button" class="cdc s-${av.status} ${isToday?'is-today':''} ${isSelected?'is-selected':''} ${isWeekend?'is-weekend':''}" onclick="consSelectDay('${iso}')" title="${tipLabel} · ${av.load.ocupadosCount} confirmado(s), ${av.load.provisionadosCount} provisório(s)">
+          <span class="cdc-num">${day}</span>
+          <span class="cdc-pill"></span>
+          ${av.load.ocupadosCount+av.load.provisionadosCount>0?`<span class="cdc-count">${av.load.ocupadosCount+av.load.provisionadosCount}</span>`:''}
+        </button>`);
+    }
+    const dowLabels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    gridHTML = `
+      <div class="cons-cal-legend center">
+        <span class="ccl ccl-livre"><span class="dot"></span> ${livre} livres</span>
+        ${plivre?`<span class="ccl ccl-parcial"><span class="dot"></span> ${plivre} parc.</span>`:''}
+        <span class="ccl ccl-provisionado"><span class="dot"></span> ${prov} prov.</span>
+        <span class="ccl ccl-agendado"><span class="dot"></span> ${ag} ocup.</span>
+        ${off?`<span class="ccl ccl-off"><span class="dot"></span> ${off} fora da jornada</span>`:''}
+      </div>
+      <div class="cons-cal-dow">${dowLabels.map(x=>`<div>${x}</div>`).join('')}</div>
+      <div class="cons-cal-grid">${cells.join('')}</div>`;
+  } else if (view === 'week'){
+    const anchor = parseISO(d.anchorISO || todayISO);
+    const wStart = new Date(anchor); wStart.setDate(wStart.getDate() - wStart.getDay());
+    const dowLabels = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+    const cols = [];
+    for (let i=0; i<7; i++){
+      const dt = new Date(wStart); dt.setDate(wStart.getDate()+i);
+      const iso = isoFromDate(dt);
+      const av = _consAvailability(c.id, iso);
+      const slots = _consAvailableSlots(c.id, iso);
+      const evs = EVENTS
+        .filter(e => e.consultantId === c.id && e.date === iso && !['cancelado','reagendado'].includes(e.status))
+        .sort((a,b) => (a.timeStart||'').localeCompare(b.timeStart||''));
+      const isToday = iso === todayISO;
+      const isSelected = iso === d.selectedISO;
+      cols.push(`
+        <div class="cwk-col s-${av.status} ${isToday?'is-today':''} ${isSelected?'is-selected':''}" onclick="consSelectDay('${iso}')">
+          <div class="cwk-head">
+            <span class="cwk-dow">${dowLabels[i]}</span>
+            <span class="cwk-day">${pad(dt.getDate())}</span>
+            <span class="cwk-pill cwk-pill-${av.status}">${av.status==='livre'?'LIVRE':av.status==='parcialmente-livre'?'PARCIAL':av.status==='provisionado'?'PROV.':'OCUP.'}</span>
+          </div>
+          <div class="cwk-evs">
+            ${evs.slice(0,3).map(e => {
+              const co = companyById(e.companyId);
+              const isConf = ['confirmado','em-andamento','atendido','concluido','em-os'].includes(e.status);
+              return `<div class="cwk-ev ${isConf?'is-confirmed':'is-provisional'}" onclick="event.stopPropagation();openEventModal('${e.id}')"><b>${e.timeStart||'--:--'}</b> ${e.title||'(sem título)'}<small>${co?co.fantasia:''}</small></div>`;
+            }).join('') || '<div class="cwk-empty">Sem eventos</div>'}
+            ${evs.length>3?`<div class="cwk-more">+${evs.length-3} mais</div>`:''}
+          </div>
+          ${slots.length?`<div class="cwk-slots-mini">${slots.slice(0,3).map(s=>`<span>${s.startLabel}–${s.endLabel}</span>`).join('')}</div>`:''}
+        </div>`);
+    }
+    gridHTML = `<div class="cons-week-grid">${cols.join('')}</div>`;
+  } else {
+    /* view === 'day' — timeline horária */
+    const iso = d.anchorISO || todayISO;
     const av = _consAvailability(c.id, iso);
-    if (av.status === 'livre') livre++; else if (av.status === 'provisionado') prov++; else ag++;
-    const isToday = iso === todayISO;
-    const isSelected = iso === d.selectedISO;
-    const dow = new Date(d.calYear, d.calMonth, day).getDay();
-    const isWeekend = dow === 0 || dow === 6;
-    cells.push(`
-      <button type="button" class="cdc s-${av.status} ${isToday?'is-today':''} ${isSelected?'is-selected':''} ${isWeekend?'is-weekend':''}" onclick="consSelectDay('${iso}')" title="${av.status==='livre'?'Livre':av.status==='provisionado'?'Provisionado':'Agendado'} · ${av.load.ocupadosCount} confirmado(s), ${av.load.provisionadosCount} provisório(s)">
-        <span class="cdc-num">${day}</span>
-        <span class="cdc-pill"></span>
-        ${av.load.ocupadosCount+av.load.provisionadosCount>0?`<span class="cdc-count">${av.load.ocupadosCount+av.load.provisionadosCount}</span>`:''}
-      </button>`);
+    const evs = EVENTS
+      .filter(e => e.consultantId === c.id && e.date === iso && !['cancelado','reagendado'].includes(e.status))
+      .sort((a,b) => (a.timeStart||'').localeCompare(b.timeStart||''));
+    const ws = timeToMin(c.workStart || '08:00');
+    const we = timeToMin(c.workEnd   || '18:00');
+    const hours = [];
+    const startH = Math.max(0, Math.floor(ws/60) - 1);
+    const endH   = Math.min(23, Math.ceil(we/60) + 1);
+    for (let h=startH; h<=endH; h++){
+      const hMin = h*60;
+      const ev = evs.find(e => timeToMin(e.timeStart||'') >= hMin && timeToMin(e.timeStart||'') < hMin+60);
+      const inJorn = hMin >= ws && hMin < we;
+      hours.push(`
+        <div class="cdy-row ${inJorn?'in-jorn':''} ${ev?'has-ev':''}">
+          <div class="cdy-hour">${pad(h)}:00</div>
+          <div class="cdy-slot">
+            ${ev ? (() => {
+              const co = companyById(ev.companyId);
+              const isConf = ['confirmado','em-andamento','atendido','concluido','em-os'].includes(ev.status);
+              return `<div class="cdy-ev ${isConf?'is-confirmed':'is-provisional'}" onclick="openEventModal('${ev.id}')">
+                <b>${ev.timeStart||'--:--'}–${ev.timeEnd||'?'}</b>
+                <span>${ev.title||'(sem título)'}</span>
+                <small>${co?co.fantasia:''} · ${(statusById(ev.status)||{}).label||ev.status}</small>
+              </div>`;
+            })() : (inJorn ? '<div class="cdy-free">Janela livre</div>' : '<div class="cdy-off">fora da jornada</div>')}
+          </div>
+        </div>`);
+    }
+    gridHTML = `
+      <div class="cdy-status s-${av.status}">
+        <span class="cdy-status-dot"></span>
+        ${av.status==='livre'?'Dia livre':av.status==='parcialmente-livre'?'Parcialmente livre':av.status==='provisionado'?'Provisionado':'Agendado'}
+        <em>· jornada ${c.workStart||'--:--'} → ${c.workEnd||'--:--'}</em>
+      </div>
+      <div class="cdy-grid">${hours.join('')}</div>`;
   }
-  /* Painel lateral: detalhes do dia selecionado */
-  const detailISO = d.selectedISO || todayISO;
-  const detail = _consDayDetail(c.id, detailISO);
 
-  const dowLabels = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  /* Painel lateral SEMPRE: detalhes + janelas livres */
+  const detailISO = (view === 'month' ? (d.selectedISO || todayISO) : (d.anchorISO || todayISO));
+  const detail = _consDayDetail(c.id, detailISO);
+  const slots = _consAvailableSlots(c.id, detailISO);
+
+  const sidePanel = `
+    <aside class="cons-day-panel">
+      <div class="cdp-head">
+        <div class="cdp-eyebrow">${detail.dayLabel}</div>
+        <h4>${detail.title}</h4>
+        <div class="cdp-status s-${detail.status}">
+          <span class="cdp-dot"></span> ${detail.statusLabel}
+        </div>
+      </div>
+      <div class="cdp-stats">
+        <div><b>${pad(detail.load.ocupadosCount)}</b><span>Confirmados</span></div>
+        <div><b>${pad(detail.load.provisionadosCount)}</b><span>Provisórios</span></div>
+        <div><b>${Math.round((detail.load.freeMin||0)/60*10)/10}h</b><span>Livre</span></div>
+      </div>
+
+      <div class="cdp-section-title"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Compromissos</div>
+      <div class="cdp-list">
+        ${detail.events.length ? detail.events.map(e => {
+          const co = companyById(e.companyId);
+          const st = (statusById(e.status)||{}).label || e.status;
+          const isConf = ['confirmado','em-andamento','atendido','concluido','em-os'].includes(e.status);
+          return `
+            <div class="cdp-ev ${isConf?'is-confirmed':'is-provisional'}">
+              <div class="cdp-ev-time"><b>${e.timeStart||'--:--'}</b><span>${e.timeEnd||''}</span></div>
+              <div class="cdp-ev-main">
+                <div class="cdp-ev-title">${e.title||'(sem título)'}</div>
+                <div class="cdp-ev-meta">${co?co.fantasia:'<i>sem empresa</i>'} · ${st}</div>
+              </div>
+              <button type="button" class="cdp-ev-go" title="Abrir evento" onclick="openEventModal('${e.id}')">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </button>
+            </div>`;
+        }).join('') : `<div class="cdp-empty">Nenhum compromisso neste dia.</div>`}
+      </div>
+
+      ${/* === AGENDA INTELIGENTE === */ ''}
+      ${_consAgSidebarExtrasHTML(c, detailISO)}
+      ${_consAgSuggestPanelHTML(c, detailISO)}
+      ${_consAgWindowsHTML(c, detailISO)}
+    </aside>`;
 
   return `
     <div class="cons-agenda-wrap">
-      <div class="cons-cal">
-        <div class="cons-cal-head">
-          <div class="cch-nav">
-            <button type="button" class="cch-btn" onclick="consNavMonth(-1)" title="Mês anterior">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <button type="button" class="cch-btn cch-today" onclick="consNavMonth(0)">Hoje</button>
-            <button type="button" class="cch-btn" onclick="consNavMonth(1)" title="Próximo mês">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          </div>
-          <h3>${monthName.charAt(0).toUpperCase()+monthName.slice(1)}</h3>
-          <div class="cons-cal-legend">
-            <span class="ccl ccl-livre"><span class="dot"></span> ${livre} livres</span>
-            <span class="ccl ccl-provisionado"><span class="dot"></span> ${prov} prov.</span>
-            <span class="ccl ccl-agendado"><span class="dot"></span> ${ag} ocup.</span>
-          </div>
-        </div>
-        <div class="cons-cal-dow">${dowLabels.map(x=>`<div>${x}</div>`).join('')}</div>
-        <div class="cons-cal-grid">${cells.join('')}</div>
-      </div>
-      <aside class="cons-day-panel">
-        <div class="cdp-head">
-          <div class="cdp-eyebrow">${detail.dayLabel}</div>
-          <h4>${detail.title}</h4>
-          <div class="cdp-status s-${detail.status}">
-            <span class="cdp-dot"></span> ${detail.statusLabel}
-          </div>
-        </div>
-        <div class="cdp-stats">
-          <div><b>${pad(detail.load.ocupadosCount)}</b><span>Confirmados</span></div>
-          <div><b>${pad(detail.load.provisionadosCount)}</b><span>Provisórios</span></div>
-          <div><b>${Math.round((detail.load.freeMin||0)/60*10)/10}h</b><span>Livre</span></div>
-        </div>
-        <div class="cdp-list">
-          ${detail.events.length ? detail.events.map(e => {
-            const co = companyById(e.companyId);
-            const st = (statusById(e.status)||{}).label || e.status;
-            const isConf = ['confirmado','em-andamento','atendido','concluido'].includes(e.status);
-            return `
-              <div class="cdp-ev ${isConf?'is-confirmed':'is-provisional'}">
-                <div class="cdp-ev-time"><b>${e.timeStart||'--:--'}</b><span>${e.timeEnd||''}</span></div>
-                <div class="cdp-ev-main">
-                  <div class="cdp-ev-title">${e.title||'(sem título)'}</div>
-                  <div class="cdp-ev-meta">${co?co.fantasia:'<i>sem empresa</i>'} · ${st}</div>
-                </div>
-                <button type="button" class="cdp-ev-go" title="Abrir evento" onclick="openEventModal('${e.id}')">
-                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </button>
-              </div>`;
-          }).join('') : `<div class="cdp-empty">Nenhum compromisso neste dia. Janela ${c.workStart||'--:--'} → ${c.workEnd||'--:--'} disponível.</div>`}
-        </div>
-      </aside>
+      <div class="cons-cal">${toolbar}${gridHTML}</div>
+      ${sidePanel}
     </div>`;
 }
 
@@ -18026,8 +20342,339 @@ function _consDayDetail(consultantId, iso){
   const dt = parseISO(iso);
   const dayLabel = dt.toLocaleDateString('pt-BR', { weekday:'long' }).toUpperCase();
   const title = `${pad(dt.getDate())} de ${dt.toLocaleDateString('pt-BR',{ month:'long' })}`;
-  const statusLabel = av.status === 'livre' ? 'Dia livre' : av.status === 'provisionado' ? 'Dia provisionado' : 'Dia agendado';
+  const statusLabel =
+    av.status === 'off' ? 'Fora da jornada' :
+    av.status === 'livre' ? 'Dia livre' :
+    av.status === 'parcialmente-livre' ? 'Parcialmente livre' :
+    av.status === 'provisionado' ? 'Dia provisionado' : 'Dia agendado';
   return { dayLabel, title, status:av.status, statusLabel, load:av.load, events };
+}
+
+/* ============================================================
+   AGENDA INTELIGENTE — helpers (escopo: Painel do Consultor → Agenda)
+   Prefixo: _consAg*
+   ============================================================ */
+
+/* Janelas livres ≥ minDur min na jornada do consultor para um dia ISO.
+   Considera workStart/workEnd, almoço (bloco centrado em 12:30 com lunchMin min),
+   e eventos não-cancelados como blocos ocupados. */
+function _consAgAvailableSlots(consultantId, iso, minDur){
+  minDur = minDur || 30;
+  const c = consultantById(consultantId);
+  if (!c) return [];
+  if (_consAgDayKind(c, iso) === 'off') return [];
+  const ws = timeToMin(c.workStart || '08:00');
+  const we = timeToMin(c.workEnd   || '17:00');
+  if (we <= ws) return [];
+  const lunchMin = (typeof c.lunchMin === 'number') ? c.lunchMin : 60;
+
+  const blocks = [];
+  EVENTS.forEach(e => {
+    if (e.consultantId !== consultantId) return;
+    if (e.date !== iso) return;
+    if (e.status === 'cancelado' || e.status === 'reagendado') return;
+    const a = timeToMin(e.timeStart || '');
+    const b = timeToMin(e.timeEnd || '');
+    if (b > a) blocks.push({ s:Math.max(a, ws), e:Math.min(b, we) });
+  });
+  if (lunchMin > 0){
+    const lunchCenter = Math.max(ws + Math.floor(lunchMin/2), Math.min(we - Math.ceil(lunchMin/2), 12*60 + 30));
+    const ls = lunchCenter - Math.floor(lunchMin/2);
+    const le = ls + lunchMin;
+    if (le > ls) blocks.push({ s:Math.max(ls, ws), e:Math.min(le, we) });
+  }
+  blocks.sort((a,b) => a.s - b.s);
+  const merged = [];
+  blocks.forEach(b => {
+    if (!merged.length || b.s > merged[merged.length-1].e){ merged.push({ s:b.s, e:b.e }); }
+    else { merged[merged.length-1].e = Math.max(merged[merged.length-1].e, b.e); }
+  });
+  const slots = [];
+  let cursor = ws;
+  merged.forEach(b => {
+    if (b.s - cursor >= minDur){
+      slots.push({ startMin:cursor, endMin:b.s, duration:b.s - cursor, startLabel:minToTime(cursor), endLabel:minToTime(b.s) });
+    }
+    cursor = Math.max(cursor, b.e);
+  });
+  if (we - cursor >= minDur){
+    slots.push({ startMin:cursor, endMin:we, duration:we - cursor, startLabel:minToTime(cursor), endLabel:minToTime(we) });
+  }
+  return slots;
+}
+
+/* Pontua slots por tamanho (sweet 90-150min), horário (manhã 09-11h, meio-tarde 14-16h),
+   continuidade (adjacente a confirmados ±15min). Retorna top N. */
+function _consAgBestSlots(consultantId, iso, opts){
+  opts = opts || {};
+  const topN = opts.topN || 3;
+  const minDur = opts.minDur || 30;
+  const slots = _consAgAvailableSlots(consultantId, iso, minDur);
+  if (!slots.length) return [];
+  const confirmedTimes = EVENTS
+    .filter(e => e.consultantId === consultantId && e.date === iso
+              && ['confirmado','em-andamento','atendido','concluido','em-os'].includes(e.status))
+    .map(e => ({ s:timeToMin(e.timeStart||''), e:timeToMin(e.timeEnd||'') }));
+  const scored = slots.map(slot => {
+    let score = 0;
+    const reasons = [];
+    const dur = slot.duration;
+    let sizeScore;
+    if (dur >= 90 && dur <= 150){ sizeScore = 40; reasons.push('duração ideal (90–150min)'); }
+    else if (dur >= 60 && dur < 90){ sizeScore = 28; }
+    else if (dur > 150 && dur <= 240){ sizeScore = 30; reasons.push('janela longa'); }
+    else if (dur > 240){ sizeScore = 22; }
+    else if (dur >= 45){ sizeScore = 18; }
+    else { sizeScore = 8; }
+    score += sizeScore;
+    const sH = slot.startMin / 60, eH = slot.endMin / 60;
+    let timeBonus = 0;
+    if (sH < 11 && eH > 9){ timeBonus = Math.max(timeBonus, 22); reasons.push('manhã produtiva'); }
+    if (sH < 16 && eH > 14){ timeBonus = Math.max(timeBonus, 18); reasons.push('meio-tarde produtivo'); }
+    if (sH >= 16){ timeBonus = Math.max(timeBonus, 6); }
+    score += timeBonus;
+    let adjacent = false;
+    confirmedTimes.forEach(ct => {
+      if (Math.abs(slot.startMin - ct.e) <= 15 || Math.abs(slot.endMin - ct.s) <= 15) adjacent = true;
+    });
+    if (adjacent){ score += 14; reasons.push('agrupa com agenda existente'); }
+    if (slot.startMin < 8*60 || slot.endMin > 18*60) score -= 6;
+    const reason = reasons.length ? reasons.slice(0, 2).join(' · ') : 'janela disponível';
+    return { slot, score, reason };
+  });
+  scored.sort((a,b) => b.score - a.score);
+  return scored.slice(0, topN);
+}
+
+/* Próximos N compromissos futuros do consultor com countdown. */
+function _consAgUpcoming(consultantId, n){
+  n = n || 5;
+  const now = new Date();
+  const nowISO = isoFromDate(now);
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  return EVENTS
+    .filter(e => e.consultantId === consultantId
+              && e.status !== 'cancelado' && e.status !== 'reagendado'
+              && (e.date > nowISO || (e.date === nowISO && timeToMin(e.timeEnd||e.timeStart||'00:00') >= nowMin)))
+    .sort((a,b) => {
+      const dc = (a.date||'').localeCompare(b.date||'');
+      if (dc) return dc;
+      return (a.timeStart||'').localeCompare(b.timeStart||'');
+    })
+    .slice(0, n)
+    .map(e => ({ ev:e, countdown:_consAgCountdown(e.date, e.timeStart) }));
+}
+
+function _consAgCountdown(iso, hhmm){
+  if (!iso) return { label:'sem data', kind:'far' };
+  const now = new Date();
+  try {
+    const d = parseISO(iso);
+    if (hhmm){ const [h,m] = hhmm.split(':').map(Number); d.setHours(h||0, m||0, 0, 0); }
+    else d.setHours(23,59,0,0);
+    const diffMs = d.getTime() - now.getTime();
+    const diffMin = Math.round(diffMs / 60000);
+    if (diffMin < 0) return { label:'em andamento', kind:'now' };
+    if (diffMin < 60) return { label:`em ${diffMin}min`, kind:'now' };
+    if (diffMin < 60*8) return { label:`em ${Math.round(diffMin/60)}h`, kind:'soon' };
+    const nowISO = isoFromDate(now);
+    const tom = new Date(now); tom.setDate(tom.getDate()+1);
+    const tomISO = isoFromDate(tom);
+    if (iso === tomISO) return { label:`amanhã ${hhmm||''}`.trim(), kind:'soon' };
+    if (iso === nowISO) return { label:`hoje ${hhmm||''}`.trim(), kind:'now' };
+    const diffDays = Math.round(diffMs / 86400000);
+    if (diffDays <= 7) return { label:`em ${diffDays} dia${diffDays>1?'s':''}`, kind:'far' };
+    return { label:isoToBR(iso), kind:'far' };
+  } catch(e){ return { label:iso, kind:'far' }; }
+}
+
+function _consAgPendenciasHoje(consultantId, iso){
+  const list = [];
+  RECORDS.forEach(r => {
+    if (r.consultantId !== consultantId) return;
+    if (r.date !== iso) return;
+    if (['concluido','atendido','cancelado'].includes(r.status)) return;
+    const isPend = r.inPendencias === true || r.kind === 'tarefa';
+    if (!isPend) return;
+    list.push(r);
+  });
+  return list.sort((a,b) => (a.timeStart||'').localeCompare(b.timeStart||''));
+}
+
+function _consAgStaleProvisional(consultantId){
+  const now = new Date();
+  const cutoff = now.getTime() - 7*86400000;
+  const todayISO = isoFromDate(now);
+  return EVENTS
+    .filter(e => e.consultantId === consultantId
+              && ['provisorio','pendente','criado'].includes(e.status)
+              && e.date >= todayISO)
+    .map(e => {
+      const ts = e.updatedAt || e.createdAt || null;
+      const tms = ts ? new Date(ts).getTime() : (cutoff - 1);
+      const ageDays = Math.max(7, Math.round((now.getTime() - tms) / 86400000));
+      return { ev:e, ageDays, isStale: tms <= cutoff };
+    })
+    .filter(x => x.isStale)
+    .sort((a,b) => b.ageDays - a.ageDays)
+    .slice(0, 6);
+}
+
+window.consAgToggleSuggest = () => {
+  state.consultorDash.showSuggest = !state.consultorDash.showSuggest;
+  renderConsultorView();
+};
+
+window.consAgUseSlot = (startLabel, endLabel) => {
+  try { toast('info', 'Horário sugerido', `${startLabel} → ${endLabel}`); } catch(e){}
+};
+
+function _consAgSidebarExtrasHTML(c, iso){
+  const pendHoje = _consAgPendenciasHoje(c.id, iso);
+  const upcoming = _consAgUpcoming(c.id, 5);
+  const stale = _consAgStaleProvisional(c.id);
+
+  const pendHTML = `
+    <div class="ag-smart-section">
+      <div class="ag-smart-section-head">
+        <span class="ag-smart-section-title"><span class="ag-smart-ic ic-pend">!</span> Pendências de hoje</span>
+        <span class="ag-smart-count ${pendHoje.length?'is-on':''}">${pad(pendHoje.length)}</span>
+      </div>
+      ${pendHoje.length ? pendHoje.map(p => {
+        const co = companyById(p.companyId);
+        const kCls = p.kind === 'tarefa' ? 'k-tarefa' : 'k-pendencia';
+        const kLabel = p.kind === 'tarefa' ? 'TAR' : (p.kind||'PEN').slice(0,3).toUpperCase();
+        const tm = p.timeStart ? `${p.timeStart}${p.timeEnd?' → '+p.timeEnd:''} · ` : '';
+        return `
+          <div class="ag-smart-row ${kCls}">
+            <div class="ag-smart-row-ic">${kLabel}</div>
+            <div>
+              <div class="ag-smart-row-title">${p.title||'(sem título)'}</div>
+              <div class="ag-smart-row-meta">${tm}${co?co.fantasia:'<i>sem empresa</i>'}</div>
+            </div>
+            <button type="button" class="ag-smart-row-go" title="Abrir" onclick="openRegistroModal('${p.id}')">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+          </div>`;
+      }).join('') : `<div class="ag-smart-empty">Nenhuma pendência marcada para hoje.</div>`}
+    </div>`;
+
+  const upcHTML = `
+    <div class="ag-smart-section">
+      <div class="ag-smart-section-head">
+        <span class="ag-smart-section-title"><span class="ag-smart-ic ic-next">→</span> Próximos 5 compromissos</span>
+        <span class="ag-smart-count ${upcoming.length?'is-on':''}">${pad(upcoming.length)}</span>
+      </div>
+      ${upcoming.length ? upcoming.map(({ev, countdown}) => {
+        const co = companyById(ev.companyId);
+        const isConf = ['confirmado','em-andamento','atendido','concluido','em-os'].includes(ev.status);
+        return `
+          <div class="ag-smart-row">
+            <div class="ag-smart-row-ic">${isoToBR(ev.date).slice(0,5)}</div>
+            <div>
+              <div class="ag-smart-row-title">${ev.title||'(sem título)'}</div>
+              <div class="ag-smart-row-meta">
+                ${ev.timeStart||'--:--'} · ${co?co.fantasia:'<i>sem empresa</i>'}
+                ${isConf?'':'<span style="color:var(--amber);font-weight:600;margin-left:4px">· prov.</span>'}
+              </div>
+              <span class="ag-smart-countdown is-${countdown.kind}" style="margin-top:4px">${countdown.label}</span>
+            </div>
+            <button type="button" class="ag-smart-row-go" title="Abrir evento" onclick="openEventModal('${ev.id}')">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+          </div>`;
+      }).join('') : `<div class="ag-smart-empty">Sem compromissos futuros próximos.</div>`}
+    </div>`;
+
+  const staleHTML = stale.length ? `
+    <div class="ag-smart-section">
+      <div class="ag-smart-section-head">
+        <span class="ag-smart-section-title"><span class="ag-smart-ic ic-alert">⚠</span> Alertas de reagendamento</span>
+        <span class="ag-smart-count is-on">${pad(stale.length)}</span>
+      </div>
+      ${stale.map(({ev, ageDays}) => {
+        const co = companyById(ev.companyId);
+        return `
+          <div class="ag-smart-row is-stale">
+            <div class="ag-smart-row-ic">⚠</div>
+            <div>
+              <div class="ag-smart-row-title">${ev.title||'(sem título)'}</div>
+              <div class="ag-smart-row-meta">${isoToBR(ev.date)} · ${co?co.fantasia:'<i>sem empresa</i>'}</div>
+              <span class="ag-smart-alert-days">há ${ageDays} dias sem confirmação</span>
+            </div>
+            <button type="button" class="ag-smart-row-go" title="Abrir" onclick="openEventModal('${ev.id}')">
+              <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+          </div>`;
+      }).join('')}
+    </div>` : '';
+
+  return pendHTML + upcHTML + staleHTML;
+}
+
+function _consAgWindowsHTML(c, iso){
+  if (_consAgDayKind(c, iso) === 'off'){
+    return `
+      <div class="ag-smart-section">
+        <div class="ag-smart-section-head">
+          <span class="ag-smart-section-title"><span class="ag-smart-ic ic-best">⊘</span> Janelas disponíveis</span>
+        </div>
+        <div class="ag-smart-empty">Fora da jornada de trabalho. Nenhuma janela disponível.</div>
+      </div>`;
+  }
+  const slots = _consAgAvailableSlots(c.id, iso, 30);
+  const qualityClass = (dur) => dur >= 120 ? 'q-prime' : (dur >= 60 ? 'q-good' : 'q-short');
+  return `
+    <div class="ag-smart-section">
+      <div class="ag-smart-section-head">
+        <span class="ag-smart-section-title"><span class="ag-smart-ic ic-best">◴</span> Janelas disponíveis</span>
+        <span class="ag-smart-count ${slots.length?'is-on':''}">${pad(slots.length)}</span>
+      </div>
+      ${slots.length ? slots.map(s => {
+        const durH = Math.floor(s.duration / 60);
+        const durM = s.duration % 60;
+        const durLabel = durH ? `${durH}h${durM?` ${pad(durM)}m`:''}` : `${durM}min`;
+        return `
+          <div class="ag-smart-window ${qualityClass(s.duration)}">
+            <div>
+              <div class="ag-smart-window-time"><span class="ag-smart-window-quality"></span>${s.startLabel} → ${s.endLabel}</div>
+              <div class="ag-smart-window-dur">${durLabel} disponíveis</div>
+            </div>
+            <button type="button" class="ag-smart-window-book" onclick="consAgUseSlot('${s.startLabel}','${s.endLabel}')">Agendar aqui</button>
+          </div>`;
+      }).join('') : `<div class="ag-smart-empty">Sem janelas livres de pelo menos 30min na jornada deste dia.</div>`}
+    </div>`;
+}
+
+function _consAgSuggestPanelHTML(c, iso){
+  const off = _consAgDayKind(c, iso) === 'off';
+  const best = off ? [] : _consAgBestSlots(c.id, iso, { topN:3 });
+  const btn = `
+    <button type="button" class="ag-smart-suggest-btn" onclick="consAgToggleSuggest()">
+      <span class="em">💡</span> ${state.consultorDash.showSuggest ? 'Ocultar sugestões' : 'Sugerir 3 melhores horários'}
+    </button>`;
+  if (!state.consultorDash.showSuggest) return `<div style="margin-top:6px">${btn}</div>`;
+  const list = best.length ? best.map((b,i) => {
+    const dur = b.slot.duration;
+    const durLabel = dur >= 60 ? `${Math.floor(dur/60)}h${dur%60?` ${pad(dur%60)}m`:''}` : `${dur}min`;
+    return `
+      <div class="ag-smart-bestslot">
+        <div class="ag-smart-bestslot-main">
+          <span class="ag-smart-bestslot-rank">${i+1}</span>
+          <div class="ag-smart-bestslot-time">${b.slot.startLabel} → ${b.slot.endLabel}<span class="ag-smart-bestslot-dur">${durLabel}</span></div>
+          <div class="ag-smart-bestslot-reason">${b.reason}</div>
+        </div>
+        <button type="button" class="ag-smart-bestslot-cta" onclick="consAgUseSlot('${b.slot.startLabel}','${b.slot.endLabel}')">Usar este</button>
+      </div>`;
+  }).join('') : `<div class="ag-smart-empty">Sem janelas adequadas neste dia.</div>`;
+  return `
+    <div style="margin-top:6px">${btn}</div>
+    <div class="ag-smart-section" style="border-color:rgba(212,165,116,.45)">
+      <div class="ag-smart-section-head">
+        <span class="ag-smart-section-title"><span class="ag-smart-ic ic-best">★</span> Melhores horários sugeridos</span>
+      </div>
+      ${list}
+    </div>`;
 }
 
 /* Helper local — converte Date em ISO yyyy-mm-dd respeitando timezone local (já existe outro

@@ -2894,11 +2894,66 @@
   .pub-empty{ padding:18px; color:var(--ink-3); font-style:italic; text-align:center; }
   .pub-empty-card{ text-align:center; padding:48px 24px; color:var(--ink-3); font-style:italic; }
 
-  .pub-it-list{ display:flex; flex-direction:column; gap:6px; }
-  .pub-it{ display:grid; grid-template-columns:36px 1fr; gap:12px; align-items:center; padding:10px 12px; background:var(--paper-2); border:1px solid var(--line); border-radius:10px; }
-  .pub-it-num{ width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--paper); font-family:var(--font-display); font-weight:600; font-size:14px; display:inline-flex; align-items:center; justify-content:center; }
-  .pub-it-title{ font-weight:600; color:var(--ink); font-size:13.5px; }
+  .pub-it-list{ display:flex; flex-direction:column; gap:10px; }
+  .pub-it{
+    display:grid; grid-template-columns:36px 1fr; gap:14px; align-items:flex-start;
+    padding:14px 16px; background:var(--paper-2); border:1px solid var(--line); border-radius:12px;
+    transition:border-color .15s ease;
+  }
+  .pub-it.needs-pick{ border-color:var(--champagne); background:linear-gradient(180deg,rgba(245,234,210,.4),var(--paper-2)); }
+  .pub-it-num{ width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--paper); font-family:var(--font-display); font-weight:600; font-size:14px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .pub-it.needs-pick .pub-it-num{ background:var(--champagne); }
+  .pub-it-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .pub-it-title{ font-weight:600; color:var(--ink); font-size:14px; flex:1; min-width:200px; }
   .pub-it-meta{ font-family:var(--font-mono); font-size:11px; color:var(--ink-3); margin-top:2px; }
+  .pub-it-desc{ font-size:12.5px; color:var(--ink-3); margin-top:8px; line-height:1.5; font-style:italic; }
+  .pub-it-fixed{
+    display:inline-block; padding:6px 12px; background:var(--paper); border:1px solid var(--line);
+    border-radius:8px; font-family:var(--font-mono); font-size:12px; color:var(--ink-2);
+  }
+  .pub-it-fixed b{ color:var(--ink); }
+  .pub-kind-badge{
+    font-family:var(--font-mono); font-size:9px; font-weight:700; letter-spacing:.12em;
+    padding:3px 8px; border-radius:10px;
+  }
+  .pub-kind-badge.k-train{ background:#d8e3d8; color:#2d5f3f; }
+  .pub-kind-badge.k-task{ background:#dbdeef; color:#2f3a78; }
+  .pub-kind-badge.k-att{ background:#f0dcc4; color:#b8632a; }
+
+  .pub-it-picker{
+    background:var(--paper); border:1px dashed var(--champagne); border-radius:8px;
+    padding:10px 12px; margin-top:4px;
+  }
+  .pub-it-picker-label{
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--champagne);
+    margin-bottom:8px;
+  }
+  .pub-it-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .pub-chip{
+    background:var(--paper-2); border:1.5px solid var(--line-2);
+    border-radius:8px; padding:8px 14px; cursor:pointer;
+    font-family:var(--font-body); font-size:13px; font-weight:600; color:var(--ink-2);
+    transition:all .15s ease;
+    display:inline-flex; flex-direction:column; align-items:center; gap:2px; line-height:1.1;
+  }
+  .pub-chip:hover{ border-color:var(--ink); transform:translateY(-1px); }
+  .pub-chip.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); box-shadow:0 4px 12px -4px rgba(20,23,31,.4); }
+  .pub-chip.on .pub-chip-dow{ color:var(--champagne-2); }
+  .pub-chip-dow{
+    font-family:var(--font-mono); font-size:9px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .pub-it-dateinput{
+    padding:9px 12px; border:1px solid var(--line-2); border-radius:7px;
+    font-family:var(--font-body); font-size:13px; background:var(--paper); color:var(--ink);
+    width:auto; max-width:200px;
+  }
+  .pub-it-dateinput:focus{ outline:none; border-color:var(--ink); }
+  .pub-it-time-hint{
+    font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3);
+    letter-spacing:.04em; margin-top:6px;
+  }
 
   .pub-field{ margin:14px 0; }
   .pub-field label{ display:block; font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); margin-bottom:4px; }
@@ -9107,6 +9162,8 @@ window.addSelectedTemplatesToSchedule = () => {
           checklist: Array.isArray(srcItem.checklist) ? [...srcItem.checklist] : [],
           responsibleId: srcItem.defaultResponsibleId || null,
           pendingDate: !(date && (srcItem.kind !== 'treinamento' || srcItem.timeStart)),
+          /* Dias sugeridos do template — usados na confirmação pública para o cliente escolher */
+          suggestedDays: Array.isArray(srcItem.suggestedDays) ? [...srcItem.suggestedDays] : [],
         };
         state.croTplItems.push(ci);
         added++;
@@ -9499,6 +9556,8 @@ function saveDraftSchedule(opts = {}){
       recurrence: it.recurrence || null,
       observations: it.observations || '',
       pendingDate,
+      /* Dias sugeridos pelo template — preservados para o cliente escolher na confirmação pública */
+      suggestedDays: Array.isArray(it.suggestedDays) ? [...it.suggestedDays] : (it.date ? [it.date] : []),
       recordId: null, eventId: null,
       status: 'provisorio',
     };
@@ -21408,9 +21467,18 @@ function _pubRouter(){
   const m = hash.match(/^#\/p\/([a-z]+)(?:\/([^/]+))?(?:\/([^/]+))?/);
   const host = document.getElementById('pubMount');
   const body = document.body;
+  const wasPublic = body.classList.contains('public-mode');
   if (!m){
     body.classList.remove('public-mode');
     if (host) host.innerHTML = '';
+    /* Se estávamos em modo público e voltamos ao admin, força re-render completo
+       para refletir mudanças feitas pelo cliente (confirmação, assinatura, feedback) */
+    if (wasPublic && typeof renderAll === 'function'){
+      try { renderAll(); } catch(e){}
+      try { if (typeof renderClientKanban === 'function') renderClientKanban(); } catch(e){}
+      try { if (document.getElementById('modalClientCard')?.classList.contains('show')) renderClientCardModal(); } catch(e){}
+      try { if (document.getElementById('modalOS')?.classList.contains('show')) renderOSModal(); } catch(e){}
+    }
     return false;
   }
   body.classList.add('public-mode');
@@ -21479,14 +21547,66 @@ function _renderPubScheduleConfirmHTML(sId, token){
       </div>`);
   }
 
-  const itemsHTML = items.length ? items.map((it,i) => `
-    <div class="pub-it">
-      <div class="pub-it-num">${pad(i+1)}</div>
-      <div class="pub-it-main">
-        <div class="pub-it-title">${(it.title||'(sem título)').replace(/</g,'&lt;')}</div>
-        <div class="pub-it-meta">${it.date?isoToBR(it.date):'data a definir'}${it.timeStart?` · ${it.timeStart}${it.timeEnd?`–${it.timeEnd}`:''}`:''} · ${it.kind||'sessão'}</div>
-      </div>
-    </div>`).join('') : '<div class="pub-empty">Sem itens detalhados.</div>';
+  /* Cada item ganha: bloco de seleção de dia se houver suggestedDays (>=2) ou se pendingDate */
+  const itemsHTML = items.length ? items.map((it,i) => {
+    const sd = Array.isArray(it.suggestedDays) ? it.suggestedDays.filter(Boolean).sort() : [];
+    const fixedDate = it.date && !it.pendingDate && sd.length <= 1;
+    const needsPick = !fixedDate && (sd.length >= 2 || it.pendingDate);
+    const currentPick = it.clientSelectedDate || it.date || (sd[0] || '');
+
+    let dateBlock = '';
+    if (fixedDate){
+      dateBlock = `<div class="pub-it-fixed">📅 <b>${isoToBR(it.date)}</b>${it.timeStart?` · ${it.timeStart}${it.timeEnd?`–${it.timeEnd}`:''}`:''}</div>`;
+    } else if (sd.length >= 2){
+      /* Lista de chips selecionáveis */
+      dateBlock = `
+        <div class="pub-it-picker" data-item-idx="${i}">
+          <div class="pub-it-picker-label">Escolha o melhor dia para você:</div>
+          <div class="pub-it-chips">
+            ${sd.map(d => `
+              <button type="button" class="pub-chip ${d===currentPick?'on':''}" data-iso="${d}" onclick="pubPickDay(${i}, '${d}')">
+                ${isoToBR(d)}
+                <span class="pub-chip-dow">${parseISO(d).toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','')}</span>
+              </button>`).join('')}
+          </div>
+          ${it.timeStart?`<div class="pub-it-time-hint">Horário: ${it.timeStart}${it.timeEnd?`–${it.timeEnd}`:''}</div>`:''}
+        </div>`;
+    } else if (it.pendingDate || !it.date){
+      /* Sem sugestões — abre um input de data livre */
+      dateBlock = `
+        <div class="pub-it-picker" data-item-idx="${i}">
+          <div class="pub-it-picker-label">Sugira uma data:</div>
+          <input type="date" class="pub-it-dateinput" data-item-idx="${i}" value="${currentPick||''}" min="${isoFromDate(TODAY)}" onchange="pubPickDay(${i}, this.value)" />
+          ${it.timeStart?`<div class="pub-it-time-hint">Horário sugerido: ${it.timeStart}${it.timeEnd?`–${it.timeEnd}`:''}</div>`:''}
+        </div>`;
+    } else {
+      dateBlock = `<div class="pub-it-fixed">📅 <b>${isoToBR(it.date)}</b>${it.timeStart?` · ${it.timeStart}${it.timeEnd?`–${it.timeEnd}`:''}`:''}</div>`;
+    }
+
+    const kindBadge = it.kind === 'treinamento'
+      ? `<span class="pub-kind-badge k-train">✦ TREINAMENTO</span>`
+      : it.kind === 'tarefa'
+        ? `<span class="pub-kind-badge k-task">☰ TAREFA</span>`
+        : `<span class="pub-kind-badge k-att">● ATENDIMENTO</span>`;
+
+    return `
+      <div class="pub-it${needsPick?' needs-pick':''}" data-item-id="${i}">
+        <div class="pub-it-num">${pad(i+1)}</div>
+        <div class="pub-it-main">
+          <div class="pub-it-head">
+            <div class="pub-it-title">${(it.title||'(sem título)').replace(/</g,'&lt;')}</div>
+            ${kindBadge}
+          </div>
+          ${dateBlock}
+          ${it.desc?`<div class="pub-it-desc">${String(it.desc).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`:''}
+        </div>
+      </div>`;
+  }).join('') : '<div class="pub-empty">Sem itens detalhados.</div>';
+
+  const needsAnyPick = items.some(it => {
+    const sd = Array.isArray(it.suggestedDays) ? it.suggestedDays.filter(Boolean) : [];
+    return sd.length >= 2 || it.pendingDate || !it.date;
+  });
 
   return _pubShellHTML('Revisar e confirmar cronograma', 'AGUARDANDO SUA CONFIRMAÇÃO', `
     <div class="pub-summary">
@@ -21496,25 +21616,37 @@ function _renderPubScheduleConfirmHTML(sId, token){
       <div><span>Total de itens</span><b>${items.length}</b></div>
     </div>
     <div class="pub-card">
-      <h3>Sessões previstas</h3>
+      <h3>Sessões previstas${needsAnyPick?' · escolha os melhores dias':''}</h3>
+      ${needsAnyPick?`<p style="font-size:13px;color:var(--ink-3);margin-bottom:14px">Para os itens marcados, selecione a data que melhor se encaixa na sua agenda. Itens com data fixa já estão confirmados.</p>`:''}
       <div class="pub-it-list">${itemsHTML}</div>
     </div>
     <div class="pub-card pub-action">
       <h3>Confirmar cronograma</h3>
-      <p>Ao confirmar, você autoriza o início da execução das sessões nas datas indicadas.</p>
+      <p>Ao confirmar, ${needsAnyPick?'suas escolhas de data serão aplicadas e ':''}você autoriza o início da execução das sessões.</p>
       <div class="pub-field">
         <label>Seu nome completo</label>
         <input type="text" id="pubSchName" placeholder="Como você assina oficialmente?" />
       </div>
       <label class="pub-check">
         <input type="checkbox" id="pubSchAgree" />
-        <span>Li o cronograma e concordo com as datas e o escopo apresentados.</span>
+        <span>Li o cronograma${needsAnyPick?', escolhi os dias quando aplicável':''} e concordo com o escopo apresentado.</span>
       </label>
       <button class="pub-btn pub-btn-primary" onclick="pubConfirmSchedule('${sId}','${token}')">
-        ✓ Confirmar cronograma
+        ✓ Confirmar cronograma${needsAnyPick?' com minhas datas':''}
       </button>
     </div>`);
 }
+
+/* Armazena as escolhas de data do cliente em memória pra serem persistidas no submit */
+window._pubScheduleDayPicks = window._pubScheduleDayPicks || {};
+window.pubPickDay = (itemIdx, iso) => {
+  window._pubScheduleDayPicks[itemIdx] = iso;
+  /* Visual: marca o chip selecionado e desmarca os outros do mesmo bloco */
+  const wrap = document.querySelector(`.pub-it[data-item-id="${itemIdx}"] .pub-it-chips`);
+  if (wrap){
+    wrap.querySelectorAll('.pub-chip').forEach(c => c.classList.toggle('on', c.dataset.iso === iso));
+  }
+};
 
 window.pubConfirmSchedule = (sId, token) => {
   const s = SCHEDULES.find(x => x.id === sId);
@@ -21523,18 +21655,103 @@ window.pubConfirmSchedule = (sId, token) => {
   const agree = (document.getElementById('pubSchAgree')||{}).checked;
   if (!name.trim()){ alert('Informe seu nome para confirmar.'); return; }
   if (!agree){ alert('Marque a caixa para confirmar que leu e concorda.'); return; }
+
+  /* Aplica as escolhas de data do cliente (se houver) */
+  const picks = window._pubScheduleDayPicks || {};
+  const items = s.items || [];
+  let missingDate = false;
+  items.forEach((it, idx) => {
+    const sd = Array.isArray(it.suggestedDays) ? it.suggestedDays.filter(Boolean) : [];
+    const needsPick = sd.length >= 2 || it.pendingDate || !it.date;
+    if (!needsPick) return;
+    const chosen = picks[idx];
+    if (!chosen){
+      if (sd.length){
+        /* default: usa primeira sugestão */
+        it.clientSelectedDate = sd[0];
+        it.date = sd[0];
+        it.pendingDate = false;
+      } else {
+        missingDate = true;
+        return;
+      }
+    } else {
+      it.clientSelectedDate = chosen;
+      it.date = chosen;
+      it.pendingDate = false;
+    }
+    /* Sincroniza o EVENT vinculado a este item */
+    const ev = EVENTS.find(e => e.itemId === it.id || (e.seriesId === s.id && e.title === it.title && !e.date));
+    if (ev){
+      ev.date = it.date;
+      if (it.timeStart) ev.timeStart = it.timeStart;
+      if (it.timeEnd) ev.timeEnd = it.timeEnd;
+    } else if (it.date && it.timeStart && it.timeEnd){
+      /* Cria EVENT novo se não havia (item era pendingDate) */
+      const newEv = {
+        id: uid('e'),
+        consultantId: it.responsibleId || s.consultantId,
+        companyId: s.companyId,
+        date: it.date,
+        timeStart: it.timeStart, timeEnd: it.timeEnd,
+        typeId: it.kind === 'treinamento' ? 'treinamento' : 'tarefa',
+        title: it.title,
+        period:'manha', recurrence:'none', status:'confirmado',
+        desc: it.desc || '', details:'', notes:'',
+        priority: it.priority || 'media',
+        seriesId: s.id, templateId: it.templateId, scheduleId: s.id, itemId: it.id,
+      };
+      EVENTS.push(newEv);
+      it.eventId = newEv.id;
+      if (Array.isArray(s.eventIds)) s.eventIds.push(newEv.id);
+    }
+  });
+
+  if (missingDate){
+    alert('Alguns itens precisam de data. Por favor, escolha um dia para todos os itens marcados antes de confirmar.');
+    return;
+  }
+
   s.status = 'confirmado';
   s.confirmedAt = nowISO();
   s.confirmedByClient = true;
   s.clientConfirmedAt = nowISO();
   s.clientConfirmedName = name.trim();
   s.clientConfirmedUA = navigator.userAgent.slice(0, 120);
-  if (typeof pushHistory === 'function') pushHistory(s, 'confirmado pelo cliente (link público)', name);
+  /* Marca todos os eventos do cronograma como confirmados */
+  EVENTS.forEach(e => {
+    if (e.seriesId === s.id || (s.eventIds||[]).includes(e.id)){
+      if (e.status === 'provisorio' || e.status === 'pendente'){
+        e.status = 'confirmado';
+      }
+    }
+  });
+  if (typeof pushHistory === 'function'){
+    const pickedCount = Object.keys(picks).length;
+    pushHistory(s, 'confirmado pelo cliente (link público)', `${name}${pickedCount?` · ${pickedCount} data(s) escolhida(s)`:''}`);
+  }
   if (typeof logNotification === 'function'){
     try {
       logNotification({ kind:'schedule-confirmed', to:'', subject:`Cronograma confirmado por ${name}`, status:'sucesso', relatedId: sId, relatedType:'schedule', recipientName:name });
     } catch(e){}
   }
+  /* Dispara criação/atualização do card do cliente — reaproveita doConfirmSchedule se existir */
+  try {
+    if (typeof ensureClientCard === 'function'){
+      const card = ensureClientCard(s.companyId, {
+        scheduleId: s.id,
+        status: 'em-andamento',
+        detail: `cronograma confirmado pelo cliente em ${fmtDateTime(s.clientConfirmedAt)}`,
+      });
+      if (card){
+        if (!card.statusManual) card.status = 'em-andamento';
+        if (typeof pushHistory === 'function') pushHistory(card, 'cronograma confirmado pelo cliente', `via link público · ${(s.items||[]).length} itens`);
+      }
+    }
+  } catch(e){ console.warn('ensureClientCard falhou', e); }
+
+  /* Limpa picks da memória */
+  window._pubScheduleDayPicks = {};
   persist();
   _pubRouter();
 };

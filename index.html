@@ -3255,6 +3255,169 @@
     font-family:var(--font-display); font-weight:700;
   }
 
+  /* ============ ABA ASSINATURAS — histórico de documentos assinados ============ */
+  .sig-wrap{ padding:18px 22px 28px; display:flex; flex-direction:column; gap:18px; }
+  .sig-head h3{ font-family:var(--font-display); font-weight:500; font-size:22px; color:var(--ink); letter-spacing:-.01em; }
+  .sig-head h3 em{ color:var(--forest); font-style:italic; }
+  .sig-head p{ color:var(--ink-3); margin-top:4px; font-size:13px; }
+  .sig-head p b{ color:var(--ink-2); }
+
+  .sig-indicators{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .sig-ind{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .sig-ind b{ font-family:var(--font-display); font-size:24px; color:var(--ink); font-weight:500; line-height:1; }
+  .sig-ind span{ font-family:var(--font-mono); font-size:9.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); }
+  .sig-ind.sig-ind-os{ border-color:var(--forest); background:linear-gradient(135deg,var(--forest-bg),var(--paper)); }
+  .sig-ind.sig-ind-os b{ color:var(--forest); }
+  .sig-ind.sig-ind-sch{ border-color:var(--champagne); background:linear-gradient(135deg,var(--champagne-4),var(--paper)); }
+  .sig-ind.sig-ind-sch b{ color:var(--champagne); }
+
+  .sig-section{ display:flex; flex-direction:column; gap:10px; }
+  .sig-section-head{
+    display:flex; align-items:center; gap:10px;
+    padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+  .sig-section-ic{
+    width:28px; height:28px; border-radius:8px;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--forest-bg); color:var(--forest);
+    font-family:var(--font-display); font-size:14px; font-weight:700;
+  }
+  .sig-section-head h4{ font-family:var(--font-display); font-weight:500; font-size:17px; color:var(--ink); }
+  .sig-section-head h4 em{ color:var(--ink-3); font-style:normal; font-size:13px; font-weight:400; }
+
+  .sig-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:12px;
+  }
+  .sig-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .sig-card:hover{ transform:translateY(-2px); box-shadow:0 8px 22px -10px rgba(20,23,31,.22); }
+  .sig-card.sig-os{ border-left:4px solid var(--forest); }
+  .sig-card.sig-sch{ border-left:4px solid var(--champagne); }
+
+  .sig-card-head{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 14px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,.85), var(--paper-2));
+  }
+  .sig-card-ic{
+    width:32px; height:32px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--ink); color:var(--paper);
+    font-family:var(--font-display); font-size:16px; font-weight:700;
+    flex-shrink:0;
+  }
+  .sig-card-title{ flex:1; min-width:0; }
+  .sig-card-title b{
+    display:block; font-weight:600; color:var(--ink); font-size:13.5px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .sig-card-title span{
+    font-family:var(--font-mono); font-size:10px; color:var(--ink-3); letter-spacing:.08em;
+  }
+  .sig-card-badge{
+    background:var(--forest); color:var(--paper);
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.14em; padding:5px 10px; border-radius:14px;
+    flex-shrink:0;
+  }
+  .sig-card-badge.sig-badge-conf{ background:var(--champagne); }
+
+  .sig-card-body{
+    display:flex; gap:14px; padding:14px;
+  }
+  .sig-image{
+    flex:0 0 130px; height:90px;
+    background:repeating-linear-gradient(0deg, var(--paper) 0 18px, var(--paper-2) 18px 19px);
+    border:1px solid var(--line-2); border-radius:8px;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .sig-image img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .sig-image.sig-image-empty{
+    font-family:var(--font-mono); font-size:9.5px; color:var(--ink-4);
+    letter-spacing:.14em; font-style:italic;
+  }
+  .sig-card-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; }
+  .sig-info-row{
+    display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+    font-size:11.5px; color:var(--ink-3);
+    border-bottom:1px dashed var(--line); padding-bottom:3px;
+  }
+  .sig-info-row:last-child{ border:none; padding:0; }
+  .sig-info-row span{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; flex-shrink:0; }
+  .sig-info-row b{
+    font-weight:600; color:var(--ink); text-align:right;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .sig-info-row b small{ font-weight:400; color:var(--ink-3); }
+  .sig-info-row i{ color:var(--ink-3); font-style:italic; font-size:11px; }
+  .sig-info-full{ flex-direction:column; align-items:stretch; gap:2px; }
+  .sig-info-full b{ text-align:left; }
+  .sig-hours{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 9px; background:var(--burgundy-bg); color:var(--burgundy);
+    border-radius:10px; font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.06em;
+  }
+
+  .sig-sch-items{
+    padding:0 14px 12px; border-top:1px dashed var(--line);
+  }
+  .sig-sch-items-title{
+    font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+    margin:10px 0 6px;
+  }
+  .sig-sch-item{
+    display:flex; justify-content:space-between; gap:10px;
+    padding:5px 8px; background:var(--paper-2); border-radius:6px;
+    font-size:11.5px; margin-bottom:4px;
+  }
+  .sig-sch-item-title{ color:var(--ink-2); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+  .sig-sch-item-date{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); flex-shrink:0; }
+  .sig-sch-item-date i{ color:var(--champagne); font-style:normal; font-weight:700; font-size:9px; letter-spacing:.08em; margin-left:4px; }
+  .sig-sch-more{
+    text-align:center; font-family:var(--font-mono); font-size:10px; color:var(--ink-4);
+    padding:4px; font-style:italic;
+  }
+
+  .sig-card-foot{
+    display:flex; gap:6px; flex-wrap:wrap;
+    padding:10px 14px; border-top:1px solid var(--line);
+    background:var(--paper-2);
+  }
+  .sig-btn, .sig-btn-link{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 12px; border-radius:7px; cursor:pointer;
+    font-family:var(--font-mono); font-size:10px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+    transition:all .15s ease; border:1px solid;
+  }
+  .sig-btn{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .sig-btn:hover{ background:var(--champagne); border-color:var(--champagne); }
+  .sig-btn-link{ background:transparent; color:var(--ink-3); border-color:var(--line-2); }
+  .sig-btn-link:hover{ color:var(--ink); border-color:var(--ink); }
+
+  /* Estilo do contador da aba Assinaturas */
+  .cc-tab[data-cct="assinaturas"] .cc-tab-count{
+    font-family:var(--font-display); font-weight:700;
+  }
+
+  /* Responsivo */
+  @media (max-width: 720px){
+    .sig-grid{ grid-template-columns:1fr; }
+    .sig-card-body{ flex-direction:column; }
+    .sig-image{ flex:0 0 auto; width:100%; height:120px; }
+    .sig-indicators{ grid-template-columns:1fr; }
+  }
+
   /* Responsivo aba OS */
   @media (max-width: 900px){
     .ost-indicators{ grid-template-columns:repeat(2,1fr); }
@@ -5531,6 +5694,7 @@
       <div class="cc-tab" data-cct="pendencias">Pendências <span class="cc-tab-count" id="cctPend">0</span></div>
       <div class="cc-tab" data-cct="cronogramas">Cronogramas <span class="cc-tab-count" id="cctSched">0</span></div>
       <div class="cc-tab" data-cct="os">OS <span class="cc-tab-count" id="cctOS">0</span></div>
+      <div class="cc-tab" data-cct="assinaturas">Assinaturas <span class="cc-tab-count" id="cctSig">0</span></div>
       <div class="cc-tab" data-cct="hours">Saldo de Horas <span class="cc-tab-count" id="cctHours">0h</span></div>
       <div class="cc-tab" data-cct="encerramento">Encerramento <span class="cc-tab-count" id="cctEnc">§</span></div>
     </div>
@@ -12224,11 +12388,25 @@ function renderClientCardModal(){
 
   const isEncerramento = state.ccTab === 'encerramento';
   const isOSTab = state.ccTab === 'os';
-  const showSections = state.ccTab !== 'hours' && !isEncerramento && !isOSTab;
+  const isSigTab = state.ccTab === 'assinaturas';
+  const showSections = state.ccTab !== 'hours' && !isEncerramento && !isOSTab && !isSigTab;
+
+  /* Atualiza contador de assinaturas (OS assinadas + cronogramas confirmados pelo cliente) */
+  const signedOSCount = companyOSAll.filter(o => o.status === 'assinada').length;
+  const confirmedSchCount = companySchedules.filter(s => s.confirmedByClient).length;
+  const totalSigs = signedOSCount + confirmedSchCount;
+  const cctSigEl = document.getElementById('cctSig');
+  if (cctSigEl){
+    cctSigEl.textContent = totalSigs;
+    if (totalSigs){ cctSigEl.style.background = 'var(--forest)'; cctSigEl.style.color = 'var(--paper)'; }
+    else { cctSigEl.style.background = ''; cctSigEl.style.color = ''; }
+  }
+
   document.getElementById('ccBody').innerHTML = `
     ${renderHoursTab()}
     ${isEncerramento ? renderEncerramentoTab(card, co, items, companySchedules) : ''}
     ${isOSTab ? renderOSTab(card, companyOSAll) : ''}
+    ${isSigTab ? renderAssinaturasTab(card, co, companyOSAll, companySchedules) : ''}
     ${showSections ? renderSchedulesSection() : ''}
     ${showSections ? renderPendenciasSection() : ''}
     ${showSections ? renderSection('atendimento','Atendimentos','●') : ''}
@@ -18526,6 +18704,155 @@ function _osTotalHours(o){
   const a = new Date(o.dateStart), b = new Date(o.dateEnd);
   if (isNaN(a) || isNaN(b)) return 0;
   return Math.max(0, (b - a) / (1000*60*60));
+}
+
+/* ============================================
+   ABA ASSINATURAS — histórico de OS assinadas + cronogramas confirmados pelo cliente
+   ============================================ */
+function renderAssinaturasTab(card, co, companyOSAll, companySchedules){
+  const signedOSes = companyOSAll
+    .filter(o => o.status === 'assinada')
+    .sort((a,b) => (b.signedAt||'').localeCompare(a.signedAt||''));
+  const confirmedSchs = companySchedules
+    .filter(s => s.confirmedByClient)
+    .sort((a,b) => (b.clientConfirmedAt||'').localeCompare(a.clientConfirmedAt||''));
+
+  const total = signedOSes.length + confirmedSchs.length;
+
+  if (!total){
+    return `
+      <div class="sig-wrap">
+        <div class="sig-head">
+          <h3>Documentos <em>assinados</em></h3>
+          <p>Histórico completo das assinaturas e confirmações feitas pelo cliente.</p>
+        </div>
+        <div class="cons-empty">
+          <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <h3>Nenhum documento assinado ainda</h3>
+          <p>Quando o cliente assinar uma OS ou confirmar um cronograma pelo link público, o histórico aparece aqui.</p>
+        </div>
+      </div>`;
+  }
+
+  const renderOSCard = (o) => {
+    const cs = consultantById(o.consultantId);
+    const sigImg = o.signatureDataURL
+      ? `<div class="sig-image"><img src="${o.signatureDataURL}" alt="assinatura"/></div>`
+      : `<div class="sig-image sig-image-empty">SEM IMAGEM</div>`;
+    const via = o.signedViaPublic ? 'Assinada digitalmente pelo cliente (link público)' : 'Assinatura registrada manualmente';
+    const hoursStr = o.hoursDebitedAmount
+      ? `<span class="sig-hours">⏱ ${o.hoursDebitedAmount.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:2})}h debitadas</span>`
+      : '';
+    return `
+      <div class="sig-card sig-os">
+        <div class="sig-card-head">
+          <div class="sig-card-ic">§</div>
+          <div class="sig-card-title">
+            <b>${(o.title||`OS ${(o.id||'').slice(-6)}`).replace(/</g,'&lt;')}</b>
+            <span>OS · ${(o.id||'').slice(-6).toUpperCase()}</span>
+          </div>
+          <div class="sig-card-badge">✓ ASSINADA</div>
+        </div>
+        <div class="sig-card-body">
+          ${sigImg}
+          <div class="sig-card-info">
+            <div class="sig-info-row"><span>Assinada por</span><b>${(o.signedByName||'(sem nome)').replace(/</g,'&lt;')}</b></div>
+            ${o.signedByRole?`<div class="sig-info-row"><span>Cargo/Doc.</span><b>${o.signedByRole.replace(/</g,'&lt;')}</b></div>`:''}
+            <div class="sig-info-row"><span>Data/hora</span><b>${fmtDateTime(o.signedAt||'')}</b></div>
+            <div class="sig-info-row"><span>Consultor</span><b>${cs?cs.name:'—'}</b></div>
+            <div class="sig-info-row sig-info-full"><span>Origem</span><i>${via}</i></div>
+            ${hoursStr?`<div class="sig-info-row sig-info-full">${hoursStr}</div>`:''}
+          </div>
+        </div>
+        <div class="sig-card-foot">
+          <button type="button" class="sig-btn" onclick="openOSModal('${o.itemSrc}','${o.itemId}','${o.id}')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Ver OS completa
+          </button>
+          ${o.publicSignToken?`<button type="button" class="sig-btn-link" onclick="copyToClipboard('${(typeof publicOSLink==='function'?publicOSLink(o.id):'')}', 'Link da OS assinada (registro)')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 007 0l4-4a5 5 0 00-7-7L12 4"/><path d="M14 11a5 5 0 00-7 0l-4 4a5 5 0 007 7l2-2"/></svg>
+            Copiar link de registro
+          </button>`:''}
+        </div>
+      </div>`;
+  };
+
+  const renderSchCard = (s) => {
+    const cs = consultantById(s.consultantId);
+    const items = s.items || [];
+    const clientPicks = items.filter(it => it.clientSelectedDate).length;
+    const periodLabel = `${isoToBR(s.from||'')} → ${isoToBR(s.to||'')}`;
+    const itemsPreview = items.slice(0, 3).map(it => `
+      <div class="sig-sch-item">
+        <span class="sig-sch-item-title">${(it.title||'sessão').replace(/</g,'&lt;')}</span>
+        <span class="sig-sch-item-date">${it.date?isoToBR(it.date):'sem data'}${it.clientSelectedDate?' <i title="data escolhida pelo cliente">✓ cliente</i>':''}</span>
+      </div>`).join('');
+    const docNumber = (typeof scheduleDocumentNumber === 'function') ? scheduleDocumentNumber(s) : `CRON-${(s.id||'').slice(-6).toUpperCase()}`;
+    return `
+      <div class="sig-card sig-sch">
+        <div class="sig-card-head">
+          <div class="sig-card-ic">§</div>
+          <div class="sig-card-title">
+            <b>Cronograma ${periodLabel}</b>
+            <span>${docNumber}</span>
+          </div>
+          <div class="sig-card-badge sig-badge-conf">✓ CONFIRMADO</div>
+        </div>
+        <div class="sig-card-body">
+          <div class="sig-card-info" style="flex:1">
+            <div class="sig-info-row"><span>Confirmado por</span><b>${(s.clientConfirmedName||'(sem nome)').replace(/</g,'&lt;')}</b></div>
+            <div class="sig-info-row"><span>Data/hora</span><b>${fmtDateTime(s.clientConfirmedAt||'')}</b></div>
+            <div class="sig-info-row"><span>Consultor</span><b>${cs?cs.name:'—'}</b></div>
+            <div class="sig-info-row"><span>Total de sessões</span><b>${items.length}${clientPicks?` <small>· ${clientPicks} data(s) escolhida(s) pelo cliente</small>`:''}</b></div>
+            <div class="sig-info-row sig-info-full"><span>Origem</span><i>Confirmação digital pelo link público</i></div>
+          </div>
+        </div>
+        ${items.length?`<div class="sig-sch-items">
+          <div class="sig-sch-items-title">Primeiras sessões:</div>
+          ${itemsPreview}
+          ${items.length>3?`<div class="sig-sch-more">+ ${items.length-3} sessão(ões)</div>`:''}
+        </div>`:''}
+        <div class="sig-card-foot">
+          <button type="button" class="sig-btn" onclick="closeModal('modalClientCard');setTimeout(()=>openScheduleModalV2('${s.id}'),100)">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Ver cronograma
+          </button>
+          ${s.publicConfirmToken?`<button type="button" class="sig-btn-link" onclick="copyToClipboard('${(typeof publicScheduleLink==='function'?publicScheduleLink(s.id):'')}', 'Link do cronograma confirmado')">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 007 0l4-4a5 5 0 00-7-7L12 4"/><path d="M14 11a5 5 0 00-7 0l-4 4a5 5 0 007 7l2-2"/></svg>
+            Copiar link de registro
+          </button>`:''}
+        </div>
+      </div>`;
+  };
+
+  return `
+    <div class="sig-wrap">
+      <div class="sig-head">
+        <h3>Documentos <em>assinados</em></h3>
+        <p>Histórico completo das assinaturas digitais e confirmações feitas pelo cliente <b>${co?co.fantasia:''}</b>.</p>
+      </div>
+      <div class="sig-indicators">
+        <div class="sig-ind sig-ind-os"><b>${pad(signedOSes.length)}</b><span>OS assinadas</span></div>
+        <div class="sig-ind sig-ind-sch"><b>${pad(confirmedSchs.length)}</b><span>Cronogramas confirmados</span></div>
+        <div class="sig-ind"><b>${pad(total)}</b><span>Total no histórico</span></div>
+      </div>
+      ${signedOSes.length?`
+        <div class="sig-section">
+          <div class="sig-section-head">
+            <span class="sig-section-ic">✎</span>
+            <h4>Ordens de Serviço Assinadas <em>· ${signedOSes.length}</em></h4>
+          </div>
+          <div class="sig-grid">${signedOSes.map(renderOSCard).join('')}</div>
+        </div>`:''}
+      ${confirmedSchs.length?`
+        <div class="sig-section">
+          <div class="sig-section-head">
+            <span class="sig-section-ic">§</span>
+            <h4>Cronogramas Confirmados pelo Cliente <em>· ${confirmedSchs.length}</em></h4>
+          </div>
+          <div class="sig-grid">${confirmedSchs.map(renderSchCard).join('')}</div>
+        </div>`:''}
+    </div>`;
 }
 
 function renderOSTab(card, companyOSAll){

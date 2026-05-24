@@ -2347,6 +2347,28 @@
   .cc-train-tasks-foot button.ctt-add:hover{ background:var(--forest);color:var(--paper); }
   .cc-train-tasks-foot button.ctt-add svg{ width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2; }
 
+  /* Input inline pra adicionar tarefa rapidamente (igual ao template) */
+  .cc-train-tasks-add-inline{
+    display:flex; gap:6px; align-items:stretch; margin-top:8px;
+    padding:6px; background:var(--paper); border:1.5px dashed var(--forest-2);
+    border-radius:6px;
+  }
+  .cc-train-tasks-add-inline .ctt-add-input{
+    flex:1; padding:7px 10px; border:none; background:transparent;
+    font-family:var(--font-body); font-size:13px; color:var(--ink); outline:none;
+  }
+  .cc-train-tasks-add-inline .ctt-add-input::placeholder{ color:var(--ink-4); font-style:italic; }
+  .cc-train-tasks-add-inline .ctt-add-input:focus{ background:var(--paper-2); border-radius:4px; }
+  .cc-train-tasks-add-inline button.ctt-add{
+    display:inline-flex; align-items:center; gap:5px;
+    background:var(--forest); border:none; color:var(--paper);
+    padding:6px 14px; border-radius:4px; font-size:10.5px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; cursor:pointer;
+    transition:all .15s ease;
+  }
+  .cc-train-tasks-add-inline button.ctt-add:hover{ background:#1c4128; transform:translateY(-1px); }
+  .cc-train-tasks-add-inline button.ctt-add svg{ width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2.4; }
+
   /* Tarefa — toggle Realizado / Não realizado inline (compacto) na linha de ações.
      Especificidade dobrada (.cc-item-actions ... button) pra vencer o button 28x28 circular padrão.
      Permite quebra de linha em telas pequenas via flex-wrap no parent. */
@@ -10625,7 +10647,7 @@ window.updateScheduleItem = (schId, itemId, key, val) => {
 };
 
 window.goToRecord = (recordId) => {
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r){ toast('warn','Registro não encontrado'); return; }
   closeModal('modalCrono');
   switchView('registros');
@@ -11441,6 +11463,12 @@ function chargeCardForRecord(record){
   if (!record) return;
   if (!record.companyId) return;
   if (record.kind !== 'tarefa' && record.kind !== 'treinamento') return;
+  /* Se há OS ativa vinculada, o billing é controlado pela OS (osDebitHours/osRefundHours).
+     Evita double-debit/refund. */
+  if (record.linkedOSId){
+    const linkedOS = (typeof ORDERS_SERVICE !== 'undefined') ? ORDERS_SERVICE.find(o => o.id === record.linkedOSId) : null;
+    if (linkedOS && linkedOS.status !== 'cancelada') return;
+  }
   const card = clientCardByCompany(record.companyId);
   if (!card) return;
   _hoursEnsure(card);
@@ -12516,7 +12544,7 @@ function renderCcTrainingTasks(it, raw){
    value ∈ 'realizado' | 'nao-realizado' | 'reset' */
 window.ccTrainTaskToggle = (recordId, idx, value) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r){ toast('error','Registro não encontrado'); return; }
   const list = _normalizeChecklist(r);
   const s = list[idx];
@@ -12554,7 +12582,7 @@ window.ccTrainTaskToggle = (recordId, idx, value) => {
 /* Edita o texto da tarefa do checklist */
 window.ccTrainTaskEdit = (recordId, idx) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const list = _normalizeChecklist(r);
   const s = list[idx];
@@ -12574,7 +12602,7 @@ window.ccTrainTaskEdit = (recordId, idx) => {
 /* Remove uma tarefa do checklist */
 window.ccTrainTaskRemove = (recordId, idx) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const list = _normalizeChecklist(r);
   const s = list[idx];
@@ -12590,7 +12618,7 @@ window.ccTrainTaskRemove = (recordId, idx) => {
 /* Adiciona uma nova tarefa ao checklist do treinamento */
 window.ccTrainTaskAdd = (recordId) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const text = prompt('Texto da nova tarefa do treinamento:', '');
   if (text === null) return;
@@ -13540,6 +13568,91 @@ function osCommit(){
   persist();
 }
 
+/* ============================================
+   BILLING OS — Débito automático na assinatura · Estorno no cancelamento
+   ============================================ */
+
+/* Duração da OS em horas, com fallback para duration do record */
+function _osHoursForBilling(o){
+  /* 1) Tenta dateStart/dateEnd da OS */
+  if (o.dateStart && o.dateEnd){
+    const a = new Date(o.dateStart), b = new Date(o.dateEnd);
+    if (!isNaN(a) && !isNaN(b) && b > a) return Math.max(0, (b - a) / (1000*60*60));
+  }
+  /* 2) Fallback: recordDurationHours do item de origem */
+  if (o.itemSrc === 'record'){
+    const r = RECORDS.find(x => x.id === o.itemId);
+    if (r && typeof recordDurationHours === 'function') return recordDurationHours(r) || 0;
+  }
+  return 0;
+}
+
+/* Debita horas da carteira do cliente quando a OS é assinada.
+   Idempotente: se já debitou, não debita de novo. */
+window.osDebitHours = (o) => {
+  if (!o) return;
+  if (o.hoursDebited) return;
+  if (!o.companyId) return;
+  const card = clientCardByCompany(o.companyId);
+  if (!card){ console.warn('osDebitHours: card não encontrado'); return; }
+  _hoursEnsure(card);
+  const hours = _osHoursForBilling(o);
+  if (hours <= 0){ console.warn('osDebitHours: OS sem duração definida — débito ignorado'); return; }
+  const short = (o.id||'').slice(-6).toUpperCase();
+  hoursLogPush(card, {
+    type:'debit',
+    kind:o.kind || 'os',
+    description:`OS ${short} assinada — ${o.title||'(sem título)'}`,
+    hours,
+    recordId: o.itemSrc === 'record' ? o.itemId : null,
+  });
+  o.hoursDebited = true;
+  o.hoursDebitedAmount = hours;
+  o.hoursDebitedAt = nowISO();
+  /* Marca record/event como já cobrado para evitar double-charge via chargeCardForRecord */
+  if (o.itemSrc === 'record'){
+    const r = RECORDS.find(x => x.id === o.itemId);
+    if (r){ r.chargedToCardAt = nowISO(); r.chargedHours = hours; }
+  }
+  if (typeof pushHistory === 'function') pushHistory(o, `débito automático de ${hours}h`, `saldo do cliente debitado`);
+};
+
+/* Estorna horas debitadas quando a OS é cancelada.
+   Estorna exatamente o valor debitado anteriormente. */
+window.osRefundHours = (o) => {
+  if (!o) return;
+  /* Fallback: se hoursDebited não foi registrado (OS antiga), tenta usar chargedHours do record */
+  let hours = 0;
+  if (o.hoursDebited){
+    hours = o.hoursDebitedAmount || _osHoursForBilling(o);
+  } else if (o.itemSrc === 'record'){
+    const r = RECORDS.find(x => x.id === o.itemId);
+    if (r && r.chargedToCardAt && r.chargedHours > 0) hours = r.chargedHours;
+  }
+  if (hours <= 0) return;
+  if (!o.companyId) return;
+  const card = clientCardByCompany(o.companyId);
+  if (!card) return;
+  _hoursEnsure(card);
+  const short = (o.id||'').slice(-6).toUpperCase();
+  hoursLogPush(card, {
+    type:'refund',
+    kind:o.kind || 'os',
+    description:`OS ${short} cancelada — estorno de horas`,
+    hours,
+    recordId: o.itemSrc === 'record' ? o.itemId : null,
+  });
+  o.hoursDebited = false;
+  o.hoursRefundedAt = nowISO();
+  o.hoursRefundedAmount = hours;
+  /* Limpa charged no record */
+  if (o.itemSrc === 'record'){
+    const r = RECORDS.find(x => x.id === o.itemId);
+    if (r){ r.chargedToCardAt = null; r.chargedHours = null; }
+  }
+  if (typeof pushHistory === 'function') pushHistory(o, `estorno de ${hours}h`, `saldo do cliente devolvido`);
+};
+
 /* Cancela uma OS — restaura status do item de origem, estorna horas, mantém OS no histórico.
    Notifica o cliente automaticamente. */
 window.cancelOS = (osId, reasonArg) => {
@@ -13552,6 +13665,10 @@ window.cancelOS = (osId, reasonArg) => {
   if (reason === null) return;
 
   const before = os.status;
+
+  /* PRIMEIRO: estorna as horas debitadas (antes de limpar linkedOSId) */
+  osRefundHours(os);
+
   os.status = 'cancelada';
   os.canceledAt = nowISO();
   os.canceledReason = (reason || '').trim() || 'sem motivo informado';
@@ -13573,8 +13690,7 @@ window.cancelOS = (osId, reasonArg) => {
         r.checklist.forEach(s => { s.inOS = false; s.linkedOSId = null; });
       }
       pushHistory(r, 'restaurado após cancelamento de OS', `em-os → ${prev}`);
-      /* Estorna horas automaticamente (chargeCardForRecord detecta saída de estado completo) */
-      if (typeof chargeCardForRecord === 'function') chargeCardForRecord(r);
+      /* Não chamamos chargeCardForRecord aqui — billing já foi estornado por osRefundHours */
     }
   } else if (os.itemSrc === 'event'){
     const e = EVENTS.find(x => x.id === os.itemId);
@@ -13892,7 +14008,17 @@ window.osMarkSigned = () => {
   os.status = 'assinada';
   os.signedAt = nowISO();
   pushHistory(os, 'assinada', `confirmada por ${CURRENT_USER?.name||'—'}`);
-  toast('success','OS assinada','Marcação registrada no histórico.');
+  /* Débito automático de horas no saldo do cliente */
+  if (typeof osDebitHours === 'function') osDebitHours(os);
+  /* Conclui o item de origem (treinamento/atendimento) automaticamente */
+  if (os.itemSrc === 'record'){
+    const r = RECORDS.find(x => x.id === os.itemId);
+    if (r){ r.status = 'concluido'; pushHistory(r, 'concluído via assinatura de OS', `OS ${os.id}`); }
+  } else if (os.itemSrc === 'event'){
+    const e = EVENTS.find(x => x.id === os.itemId);
+    if (e){ e.status = 'concluido'; }
+  }
+  toast('success','OS assinada','Saldo debitado · item concluído automaticamente.');
   state.osDraft = JSON.parse(JSON.stringify(os));
   renderOSModal();
   persist();
@@ -18516,7 +18642,7 @@ function wireOSTab(_card){}
    ============================================ */
 window.ccTrainTaskSetDate = (recordId, idx) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const list = _normalizeChecklist(r);
   const s = list[idx]; if (!s) return;
@@ -18536,7 +18662,7 @@ window.ccTrainTaskSetDate = (recordId, idx) => {
 
 window.ccTrainTaskCancel = (recordId, idx) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const list = _normalizeChecklist(r);
   const s = list[idx]; if (!s) return;
@@ -18564,7 +18690,7 @@ window.ccTrainTaskCancel = (recordId, idx) => {
 
 window.ccTrainTaskToPendencia = (recordId, idx) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const list = _normalizeChecklist(r);
   const s = list[idx]; if (!s) return;
@@ -18607,9 +18733,14 @@ window.ccTrainTaskToPendencia = (recordId, idx) => {
 /* Reescreve renderCcTrainingTasks para incluir as 3 novas ações + estados visuais */
 const _origRenderCcTrainingTasks = renderCcTrainingTasks;
 renderCcTrainingTasks = function(it, raw){
-  if (it._src !== 'record') return '';
-  const r = RECORDS.find(x => x.id === it.id);
+  /* Aceita record OU event como container do checklist.
+     Para events sem record, o checklist vive direto no event. */
+  let r = null;
+  if (it._src === 'record') r = RECORDS.find(x => x.id === it.id);
+  else if (it._src === 'event') r = EVENTS.find(x => x.id === it.id);
   if (!r) return '';
+  /* Define _src no próprio objeto para os handlers conseguirem encontrar de volta */
+  r._src = it._src;
   const list = _normalizeChecklist(r);
   const done  = list.filter(s => s.done || s.realizationStatus === 'realizado').length;
   const total = list.length;
@@ -18683,16 +18814,36 @@ renderCcTrainingTasks = function(it, raw){
         </span>
         <span class="ctt-count">${pad(done)}/${pad(total)} concluída(s)${total?` · ${pct}%`:''}</span>
       </div>
-      ${total ? taskRows : `<div class="ctt-empty">Nenhuma tarefa neste treinamento ainda — use o botão abaixo para adicionar.</div>`}
-      <div class="cc-train-tasks-foot">
-        <span class="ctt-progress">${total ? `${done} de ${total} realizada(s)` : 'sem tarefas'}</span>
-        <button type="button" class="ctt-add" onclick="ccTrainTaskAdd('${r.id}')">
+      ${total ? taskRows : `<div class="ctt-empty">Nenhuma tarefa cadastrada neste treinamento — digite abaixo para começar.</div>`}
+      <div class="cc-train-tasks-add-inline">
+        <input type="text" class="ctt-add-input" id="ccttInp-${r.id}" placeholder="✏️ Digite uma nova tarefa e pressione Enter…"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();ccTrainTaskAddInline('${r.id}')}" />
+        <button type="button" class="ctt-add" onclick="ccTrainTaskAddInline('${r.id}')">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Nova tarefa
+          Adicionar
         </button>
       </div>
+      ${total ? `<div class="cc-train-tasks-foot"><span class="ctt-progress">${done} de ${total} realizada(s)</span></div>` : ''}
     </div>
   `;
+};
+
+/* Adiciona tarefa via input inline (chamado pelo botão e por Enter) */
+window.ccTrainTaskAddInline = (recordId) => {
+  if (!canEdit()){ toast('warn','Sem permissão'); return; }
+  const inp = document.getElementById(`ccttInp-${recordId}`);
+  if (!inp) return;
+  const text = (inp.value||'').trim();
+  if (!text){ inp.focus(); return; }
+  const target = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
+  if (!target){ toast('error','Item não encontrado'); return; }
+  const list = _normalizeChecklist(target);
+  list.push({ text, done:false, createdAt: new Date().toISOString() });
+  pushHistory(target, 'tarefa do treino adicionada', text);
+  toast('success','Tarefa adicionada', text);
+  inp.value = '';
+  persist();
+  renderClientCardModal();
 };
 
 /* ============================================
@@ -18879,7 +19030,7 @@ if (typeof window.minToTime !== 'function'){
 /* Ações rápidas sobre pendência (do tipo record) */
 window.consQuickComplete = (recordId) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const before = r.status;
   r.status = 'concluido';
@@ -18894,7 +19045,7 @@ window.consQuickComplete = (recordId) => {
 };
 window.consQuickCancel = (recordId) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const reason = prompt('Motivo do cancelamento:', '');
   if (reason === null) return;
@@ -19042,7 +19193,7 @@ function _consPendCategorize(consultantId){
 /* Handlers globais para as 3 novas ações rápidas */
 window.consPendDelegate = (recordId) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const others = CONSULTANTS.filter(c => c.id !== r.consultantId);
   if (!others.length){ toast('warn','Sem outros consultores'); return; }
@@ -19083,7 +19234,7 @@ window.consSetPendView = (view) => {
 
 window.consQuickReschedule = (recordId) => {
   if (!canEdit()){ toast('warn','Sem permissão'); return; }
-  const r = RECORDS.find(x => x.id === recordId);
+  const r = RECORDS.find(x => x.id === recordId) || EVENTS.find(x => x.id === recordId);
   if (!r) return;
   const cur = r.date || isoFromDate(TODAY);
   const next = prompt('Nova data (AAAA-MM-DD):', cur);
@@ -21880,10 +22031,12 @@ window.pubSignOS = (osId, token) => {
   o.signedViaPublic = true;
   o.signedUA = navigator.userAgent.slice(0,120);
   if (typeof pushHistory === 'function') pushHistory(o, 'assinada pelo cliente (link público)', name);
-  /* Atualiza source item: como em osCommit (de em-os → concluido) */
+  /* DÉBITO AUTOMÁTICO de horas — antes de mudar status do record para evitar interferência */
+  if (typeof osDebitHours === 'function') osDebitHours(o);
+  /* Atualiza source item: de em-os → concluido (billing já foi tratado por osDebitHours) */
   if (o.itemSrc === 'record'){
     const r = RECORDS.find(x => x.id === o.itemId);
-    if (r){ r.status = 'concluido'; if (typeof pushHistory === 'function') pushHistory(r, 'concluído via assinatura de OS', `OS ${o.id}`); if (typeof chargeCardForRecord === 'function') chargeCardForRecord(r); }
+    if (r){ r.status = 'concluido'; if (typeof pushHistory === 'function') pushHistory(r, 'concluído via assinatura de OS', `OS ${o.id}`); }
   } else if (o.itemSrc === 'event'){
     const e = EVENTS.find(x => x.id === o.itemId);
     if (e){ e.status = 'concluido'; }

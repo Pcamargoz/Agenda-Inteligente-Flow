@@ -9543,10 +9543,9 @@ function saveDraftSchedule(opts = {}){
     toast('success',
       `Cronograma enviado para o cliente`,
       `${sch.items.length} itens · ${newEvents.length} eventos${pendCount?` · ${pendCount} aguardando agendar`:''}`);
-    /* Abre modal de envio direto (email/whatsapp/copiar) */
-    if (typeof sendScheduleConfirmRequest === 'function'){
-      setTimeout(() => sendScheduleConfirmRequest(sch.id), 400);
-    }
+    /* O hook offerSendScheduleToClient (logo abaixo, em outro patch) já abre
+       o modal oficial de envio com PDF/Excel + link de confirmação embutido.
+       Não disparamos sendScheduleConfirmRequest aqui para evitar 2 modais. */
     renderAll();
     setTimeout(() => openScheduleModalV2(sch.id), 200);
   } else {
@@ -10375,9 +10374,9 @@ function openScheduleModalV2(scheduleId){
           <span>${pendentes ? `<b>${pendentes}</b> item(ns) sem data/hora · ` : ''}${trainings} treinamento(s) · ${tasks} tarefa(s)${s.submittedAt?` · enviado em ${fmtDateTime(s.submittedAt)}`:''}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-sm" style="background:var(--champagne-4);border:1px solid var(--champagne);color:var(--champagne);font-weight:700" onclick="sendScheduleConfirmRequest('${s.id}')" title="Enviar link de confirmação ao cliente (email/whatsapp/copiar)">
+          <button class="btn btn-sm" style="background:var(--champagne-4);border:1px solid var(--champagne);color:var(--champagne);font-weight:700" onclick="offerSendScheduleToClient('${s.id}')" title="Enviar cronograma ao cliente com PDF/Excel + link de confirmação no site">
             <svg viewBox="0 0 24 24"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-            Enviar link ao cliente
+            Enviar ao cliente
           </button>
           <button class="btn btn-success btn-sm" onclick="openConfirmCronoModal('${s.id}')" ${!canConfirm()?'disabled':''}>
             <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
@@ -13714,11 +13713,19 @@ function osHtmlBody(os, co, cs){
           <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6b7184;font-weight:700;margin-bottom:8px">Observações</div>
           <div style="font-size:12.5px;line-height:1.55;color:#4a4f5e">${esc(os.notes)}</div>
         </td></tr>`:''}
-        <tr><td style="padding:24px 32px;background:#fff;border-bottom:1px solid #ddd5c4;text-align:center">
-          <div style="font-size:12px;color:#4a4f5e;margin-bottom:14px">
-            Para <b>aprovar</b> esta OS, basta responder este e-mail confirmando o aceite,<br>ou solicitar ajustes caso necessário.
+        <tr><td style="padding:28px 32px;background:linear-gradient(180deg,#fff 0%,#f5ead2 100%);border-bottom:1px solid #ddd5c4;text-align:center">
+          <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:8px">Assinatura digital</div>
+          <div style="font-size:13.5px;color:#2a2e3a;margin-bottom:18px;line-height:1.55">
+            Para <b>aprovar e assinar</b> esta Ordem de Serviço, acesse o link abaixo.<br>
+            Você revisa, desenha sua assinatura no site e finaliza em poucos cliques.
           </div>
-          <a href="mailto:${esc(cs?.email||'')}?subject=Aprovado%20-%20${encodeURIComponent(os.title)}" style="display:inline-block;background:#2d5f3f;color:#fff;padding:11px 22px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.04em;border-radius:2px">Responder confirmando aprovação</a>
+          <a href="${esc((typeof publicOSLink === 'function' && os.id) ? publicOSLink(os.id) : '#')}" style="display:inline-block;background:#14171f;color:#f4efe6;padding:14px 32px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border-radius:6px;box-shadow:0 6px 18px -8px rgba(20,23,31,.5)">
+            ✎ Revisar e assinar no site
+          </a>
+          ${(typeof publicOSLink === 'function' && os.id) ? `<div style="font-size:10.5px;color:#6b7184;margin-top:12px;word-break:break-all;font-family:'Courier New',monospace">${esc(publicOSLink(os.id))}</div>` : ''}
+          <div style="font-size:11px;color:#6b7184;margin-top:14px;line-height:1.5">
+            Dúvidas? Responda este e-mail para falar com <b>${esc(cs?.name||'o consultor')}</b>${cs?.email?` · <a href="mailto:${esc(cs.email)}" style="color:#b8895a;text-decoration:none">${esc(cs.email)}</a>`:''}.
+          </div>
         </td></tr>
         <tr><td style="padding:18px 32px;background:#14171f;color:#d0c6b1;text-align:center">
           <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase">Faktory Flow Agenda</div>
@@ -13803,7 +13810,14 @@ function osPlainTextBody(os, co){
     lines.push(os.notes);
   }
   lines.push('');
-  lines.push('Por favor, responda este contato confirmando o aceite ou solicitando ajustes.');
+  /* Link de assinatura digital no site */
+  if (os.id && typeof publicOSLink === 'function'){
+    const link = publicOSLink(os.id);
+    lines.push('✎ ASSINE NO SITE — revisar e assinar digitalmente:');
+    lines.push(link);
+    lines.push('');
+  }
+  lines.push('Em caso de dúvidas, responda este contato.');
   lines.push('');
   lines.push('Atenciosamente,');
   if (cs) lines.push(cs.name);
@@ -15874,6 +15888,7 @@ function offerSendScheduleToClient(scheduleId){
   const totalHoursStr = _formatHoursStr(_scheduleTotalMinutes(items));
   const docNumber = scheduleDocumentNumber(s);
 
+  const confirmLink = (typeof publicScheduleLink === 'function') ? publicScheduleLink(scheduleId) : '';
   const preview = `
     <b style="color:var(--ink);font-size:12.5px">Assunto:</b> Cronograma para aprovação — ${co.fantasia} · ${docNumber}<br>
     <b style="color:var(--ink);font-size:12.5px">Conteúdo:</b><br>
@@ -15884,6 +15899,11 @@ function offerSendScheduleToClient(scheduleId){
       • <b>${docNumber}.pdf</b> — cronograma completo para impressão/arquivo<br>
       • <b>${docNumber}.xlsx</b> — planilha com filtros e resumo executivo
     </div>
+    ${confirmLink?`<div style="margin-top:8px;padding:7px 10px;background:var(--champagne-4);border-left:3px solid var(--champagne);border-radius:2px;font-size:11.5px">
+      <b style="color:var(--champagne)">✓ Link de confirmação no site:</b><br>
+      <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);word-break:break-all">${confirmLink}</span><br>
+      <i style="color:var(--ink-3);font-size:10.5px">Já incluído como botão no corpo do email — cliente revisa e confirma direto.</i>
+    </div>`:''}
   `;
 
   /* Identifica destinatário: usa contato (responsável) da empresa */
@@ -15958,7 +15978,10 @@ Anexos:
   • ${filenameBase}.pdf   — documento oficial para impressão/arquivo
   • ${filenameBase}.xlsx  — planilha com filtros e resumo executivo
 
-Solicitamos sua revisão. Para aprovar, basta responder este e-mail confirmando o aceite. Para solicitar ajustes, descreva-os na resposta.
+✓ CONFIRMAÇÃO ONLINE — revisar e confirmar no site:
+${typeof publicScheduleLink === 'function' ? publicScheduleLink(s.id) : ''}
+
+Caso prefira solicitar ajustes, basta responder este e-mail.
 
 Atenciosamente,
 ${c?c.name:''}${c?.email?` · ${c.email}`:''}
@@ -16948,10 +16971,20 @@ function buildScheduleEmail(s, co, c){
         <div style="margin-top:10px;font-size:11.5px;color:#6b7184;font-style:italic;text-align:center">Os dois arquivos contêm a mesma informação — escolha o formato mais conveniente para você.</div>
       </td></tr>
 
-      <!-- ============ CTA ============ -->
-      <tr><td style="padding:24px 32px 6px;text-align:center">
-        <a href="mailto:${esc(c?.email||'')}?subject=Aprovado%20-%20Cronograma%20${encodeURIComponent(docNumber)}%20-%20${encodeURIComponent(co.fantasia)}&body=${encodeURIComponent('Confirmo a aprovação do cronograma referente ao documento '+docNumber+'.')}" style="display:inline-block;background:#2d5f3f;color:#fff;padding:13px 28px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.06em;font-family:Arial,sans-serif;border-radius:3px;text-transform:uppercase">Aprovar este cronograma</a>
-        <div style="margin-top:10px;font-size:11.5px;color:#6b7184">Ou descreva ajustes desejados na resposta deste e-mail.</div>
+      <!-- ============ CTA: confirmação no site ============ -->
+      <tr><td style="padding:30px 32px 18px;background:linear-gradient(180deg,#fff 0%,#f5ead2 100%);border-top:1px solid #ebe5d8;text-align:center">
+        <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#b8895a;font-weight:700;margin-bottom:8px">Confirmação online</div>
+        <div style="font-size:13.5px;color:#2a2e3a;margin-bottom:18px;line-height:1.55">
+          Para <b>revisar e confirmar</b> este cronograma, acesse o link abaixo.<br>
+          Você confere todas as sessões e aprova diretamente no site, sem precisar responder este e-mail.
+        </div>
+        <a href="${esc((typeof publicScheduleLink === 'function' && s.id) ? publicScheduleLink(s.id) : '#')}" style="display:inline-block;background:#14171f;color:#f4efe6;padding:14px 32px;text-decoration:none;font-family:'Courier New',monospace;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border-radius:6px;box-shadow:0 6px 18px -8px rgba(20,23,31,.5)">
+          ✓ Revisar e confirmar no site
+        </a>
+        ${(typeof publicScheduleLink === 'function' && s.id) ? `<div style="font-size:10.5px;color:#6b7184;margin-top:12px;word-break:break-all;font-family:'Courier New',monospace">${esc(publicScheduleLink(s.id))}</div>` : ''}
+        <div style="font-size:11px;color:#6b7184;margin-top:14px;line-height:1.5">
+          Caso prefira solicitar ajustes, basta responder este e-mail para <b>${esc(c?.name||'o consultor')}</b>.
+        </div>
       </td></tr>
 
       <!-- ============ Assinatura ============ -->

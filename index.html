@@ -13777,8 +13777,9 @@ function _osHoursForBilling(o){
   return 0;
 }
 
-/* Debita horas da carteira do cliente quando a OS é assinada.
-   Idempotente: se já debitou, não debita de novo. */
+/* Debita horas da carteira do cliente quando a OS é emitida (gerada/enviada).
+   Idempotente: se já debitou, não debita de novo — o que protege contra
+   uma segunda chamada feita por osMarkSigned em OSs antigas. */
 window.osDebitHours = (o) => {
   if (!o) return;
   if (o.hoursDebited) return;
@@ -13792,7 +13793,7 @@ window.osDebitHours = (o) => {
   hoursLogPush(card, {
     type:'debit',
     kind:o.kind || 'os',
-    description:`OS ${short} assinada — ${o.title||'(sem título)'}`,
+    description:`OS ${short} emitida — ${o.title||'(sem título)'}`,
     hours,
     recordId: o.itemSrc === 'record' ? o.itemId : null,
   });
@@ -13996,6 +13997,8 @@ document.getElementById('osSendEmailBtn').onclick = async () => {
     os.sentBy = CURRENT_USER?.id || null;
     os.sentMessageId = result.messageId || null;
     pushHistory(os, 'enviada', `via SMTP para ${os.clientEmail}${result.messageId?` · msgId: ${result.messageId.slice(0,30)}…`:''}`);
+    /* Débito automático de horas no saldo do cliente — disparado na emissão da OS */
+    if (typeof osDebitHours === 'function') osDebitHours(os);
     persist();
     toast('success','OS enviada por e-mail ✓', `${os.clientEmail} · entrega confirmada pelo SMTP`);
   } else {
@@ -14012,6 +14015,8 @@ document.getElementById('osSendEmailBtn').onclick = async () => {
       os.sentVia = 'email-mailto';
       os.sentBy = CURRENT_USER?.id || null;
       pushHistory(os, 'enviada', `via mailto: para ${os.clientEmail} (fallback — API indisponível)`);
+      /* Débito automático de horas no saldo do cliente — disparado na emissão da OS */
+      if (typeof osDebitHours === 'function') osDebitHours(os);
       persist();
     } else {
       toast('error','Falha no envio', `${result.error}${result.detail?` — ${result.detail}`:''}`);
@@ -14117,6 +14122,8 @@ document.getElementById('osSendWhatsBtn').onclick = () => {
   os.sentVia = 'whatsapp';
   os.sentBy = CURRENT_USER?.id || null;
   pushHistory(os, 'enviada', `via WhatsApp para ${os.clientWhatsapp}`);
+  /* Débito automático de horas no saldo do cliente — disparado na emissão da OS */
+  if (typeof osDebitHours === 'function') osDebitHours(os);
   persist();
 
   /* monta link wa.me — strip non-digits */

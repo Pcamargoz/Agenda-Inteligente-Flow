@@ -6,19 +6,21 @@ version: "1.0"
 ---
 ## Sumário (clique para abrir)
 
-- [Guia Operacional — Fluxo Resumido](#guia-operacional---fluxo-resumido) — [arquivo](docs/GUIDA_OPERACIONAL.md)
-- [Índice Navegável](#indice-navegavel) — [arquivo](docs/INDEX.md)
-- [Documentação Técnica — principal](#documentação-técnica-—-principal) — [arquivo](docs/DOCUMENTACAO_TECNICA.md)
-- [Parte 1 — Visual e Estilos](#parte-1-—-visual-e-estilos) — [arquivo](docs/01_visual_e_estilos.md)
-- [Parte 2 — Componentes utilizados](#parte-2-—-componentes-utilizados) — [arquivo](docs/02_componentes_utilizados.md)
-- [Parte 3 — Lógicas e Validações](#parte-3-—-lógicas-e-validações) — [arquivo](docs/03_logicas_e_validacoes.md)
-- [Parte 4 — Fluxo de Código (visão geral operacional)](#parte-4-—-fluxo-de-código-visão-geral-operacional) — [arquivo](docs/04_fluxo_codigo_geral.md)
-- [Parte 8 — Estrutura do Banco de Dados](#parte-8-estrutura-do-banco-de-dados) — [arquivo](docs/08_estrutura_banco_de_dados.md)
- - [Parte 9 — Estrutura do Banco de Dados (Postgres sugerido)](#parte-9-estrutura-do-banco-de-dados-postgres-sugerido) — [arquivo](docs/09_estrutura_banco_de_dados.md)
-- [Acceptance Checklists](#acceptance-checklists) — [arquivo](docs/ACCEPTANCE_CHECKLISTS.md)
-- [Envio de E-mails — Visão Geral](#envio-de-emails---visao-geral) — [arquivo](docs/EMAIL_ENVIO.md)
-- [Blueprint MVP — Documento Completo](#blueprint-mvp---documento-completo) — [arquivo](docs/MVP_BLUEPRINT.md)
-- [DOCS.md — Índice técnico e notas](#docsmd---indice-tecnico-e-notas) — [arquivo](docs/DOCS.md)
+Nota: este arquivo é uma compilação grande. Para evitar erros de preview no GitHub, abra os documentos individuais em `docs/` usando os links abaixo.
+
+- [Guia Operacional — Fluxo Resumido](docs/GUIDA_OPERACIONAL.md)
+- [Índice Navegável](docs/INDEX.md)
+- [Documentação Técnica — principal](docs/DOCUMENTACAO_TECNICA.md)
+- [Parte 1 — Visual e Estilos](docs/01_visual_e_estilos.md)
+- [Parte 2 — Componentes utilizados](docs/02_componentes_utilizados.md)
+- [Parte 3 — Lógicas e Validações](docs/03_logicas_e_validacoes.md)
+- [Parte 4 — Fluxo de Código (visão geral operacional)](docs/04_fluxo_codigo_geral.md)
+- [Parte 8 — Estrutura do Banco de Dados](docs/08_estrutura_banco_de_dados.md)
+- [Parte 9 — Estrutura do Banco de Dados (Postgres sugerido)](docs/09_estrutura_banco_de_dados.md)
+- [Acceptance Checklists](docs/ACCEPTANCE_CHECKLISTS.md)
+- [Envio de E-mails — Visão Geral](docs/EMAIL_ENVIO.md)
+- [Blueprint MVP — Documento Completo](docs/MVP_BLUEPRINT.md)
+- [DOCS.md — Índice técnico e notas](docs/DOCS.md)
 
 ---
 

@@ -2,7 +2,7 @@
 
 [![](https://img.shields.io/badge/Entrada-%C3%8Dndice-blue)](docs/INDEX.md)
 
-[![Guia Operacional](https://img.shields.io/badge/Guia-Operacional-blue)](docs/GUIDA_OPERACIONAL.md) [![Documentação](https://img.shields.io/badge/Documenta%C3%A7%C3%A3o-tecnica-lightgrey)](docs/DOCUMENTACAO_TECNICA.md) [![Índice](https://img.shields.io/badge/%E2%86%92-Índice-green)](docs/INDEX.md)
+[![Guia Operacional](https://img.shields.io/badge/Guia-Operacional-blue)](docs/GUIDA_OPERACIONAL.md) [![Documentação](https://img.shields.io/badge/Documenta%C3%A7%C3%A3o-tecnica-lightgrey)](docs/DOCUMENTACAO_TECNICA.stub.md) [![Índice](https://img.shields.io/badge/%E2%86%92-Índice-green)](docs/INDEX.md)
 
 Projeto SPA para gestão de agendas, cronogramas, registros operacionais e Ordens de Serviço (OS).
 
@@ -14,7 +14,7 @@ Visão rápida:
 Comece por:
 - 📘 [Guia Operacional](docs/GUIDA_OPERACIONAL.md) — guia prático (coordenador / consultor).
 - 🧭 [Índice Navegável](docs/INDEX.md) — índice navegável com os documentos por público.
-- 📗 [Documentação Técnica](docs/DOCUMENTACAO_TECNICA.md) — documentação técnica principal.
+- 📗 [Documentação Técnica (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md) — documentação técnica principal (stub).
  - 🗄️ [Estrutura do Banco de Dados (modelo sugerido - Postgres)](docs/09_estrutura_banco_de_dados.md) — modelo relacional sugerido.
 
 Entrada recomendada: [docs/INDEX.md](docs/INDEX.md) — use este índice leve como ponto de partida para navegar pela documentação.

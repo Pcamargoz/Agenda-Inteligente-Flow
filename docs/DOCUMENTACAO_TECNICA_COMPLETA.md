@@ -1,3 +1,221 @@
+---
+
+## Parte 8 — Estrutura do Banco de Dados (inserido de `08_estrutura_banco_de_dados.md`)
+
+Objetivo: descrever o modelo de dados sugerido/atual para o MVP/POC e qual tecnologia de banco usar.
+
+1. Tecnologia recomendada / usada
+- MVP/POC: Firestore (NoSQL) é adequado por agilidade e escalabilidade; pode ser substituído por Postgres conforme necessidade de consultas complexas.
+
+2. Coleções recomendadas (Firestore)
+- `companies` — documentos com dados da empresa/cliente
+  - campos: name, tradeName, cnpj, contactEmail, responsible, defaultConsultantId, projectName, typeOfSchedule, createdAt
+- `consultants` — dados dos consultores
+  - campos: userId, name, initials, role, specialty, email, phone, workDay {start, end, lunch}, availability {mon..sun}, active
+- `templates` — templates de agendamento
+  - campos: name, description, items: [{title,type,duration,durationUnit,resources,checklist}], active
+- `cronograms` (ou `cronograms`) — cronogramas por empresa
+  - campos: companyId, consultantId, period {start,end}, status, items: [ {templateItemId?, type, title, date, startTime, endTime, status, assignedTo, linkedTasks} ], createdBy, createdAt
+- `attendances` — registros de execução (treinamentos/atendimentos), também chamados `trainings` em algumas telas
+  - campos: cronogramId, cronogramItemId, companyId, consultantId, date, startTime, endTime, participants, status, notes
+- `tasks` — tarefas independentes ou vinculadas (subcoleção possível em `attendances`)
+  - campos: title, description, assignedTo, status, dueDate, linkedAttendanceId?, linkedCronogramItemId?
+- `orders` — Ordens de Serviço (OS)
+  - campos: title, scope, issueDate, consultantId, start, end, participants, internalPendencies, clientPendencies, linkedItems, attachments
+- `notifications` — histórico de envios (email/sms)
+  - fields: type, to, via, payload, sentAt, status
+
+3. Observações de modelagem
+- Subcoleções por `company` ou `cronogram` podem ajudar a limitar leituras quando listando itens por empresa.
+- Indexes: criar índices compostos por `companyId` + `period` / `consultantId` + `date` para consultas por intervalo.
+- Auditoria: manter `history` ou coleções de `changeLogs` para rastrear alterações (quem, quando, o quê).
+
+4. Snapshot de dados (exemplo simplificado)
+companies/{companyId}
+  - name: "ACME Ltda"
+  - contactEmail: "contato@acme.com"
+consultants/{consultantId}
+  - name: "Iago Rossan"
+cronograms/{cronogramId}
+  - companyId: "companyId"
+  - items: [ { title: "Onboarding", date: "2026-06-01", startTime: "11:30", endTime: "12:30" } ]
+
+5. Migração/Backup
+- Exportar coleções críticas (companies, cronograms, attendances, orders) periodicamente.
+
+---
+
+## Acceptance Checklists (inserido de `ACCEPTANCE_CHECKLISTS.md`)
+
+Objetivo: checklists concisos para validação funcional durante QA e homologação.
+
+1) Dashboard
+- [ ] Carregar filtros salvos (`DASH_VIEWS`).
+- [ ] Exibir métricas de clientes/OS/treinamentos corretamente.
+- [ ] Links funcionais para agenda, cronogramas e registros.
+
+2) Agenda (criar evento)
+- [ ] Selecionar consultor e empresa.
+- [ ] Validar horário inicial < horário final.
+- [ ] Detectar e sinalizar conflitos (`findConflicts`).
+- [ ] Persistir evento e aparecer na vista correta (mês/semana/dia).
+
+3) Cronogramas (criar/enviar)
+- [ ] Selecionar template ou builder.
+- [ ] Sugerir datas com base em disponibilidade do consultor.
+- [ ] Gerar PDF/Excel anexo corretamente.
+- [ ] Enviar e-mail com link de aprovação.
+- [ ] Após aprovação, cronograma bloqueado para edição e eventos gerados.
+
+4) Registro / Atendimento / Treinamento
+- [ ] Checklist salva corretamente (treinamento).
+- [ ] Marcar como realizado atualiza status e contabiliza horas.
+- [ ] Itens pendentes geram tarefas vinculadas.
+
+5) Ordem de Serviço (OS)
+- [ ] Gerar OS a partir de registro/treinamento com itens e horas.
+- [ ] PDF gerado contém horas detalhadas por item.
+- [ ] Envio por e-mail registra entrada no `NOTIFICATIONS_LOG`.
+- [ ] Marcar OS como assinada atualiza status do item de origem.
+
+6) Templates e Hub
+- [ ] Criar/editar itens do template e salvar alterações.
+- [ ] Itens com `suggestedDays` mostram sugestão em builder.
+
+7) Integridade de dados
+- [ ] `validateDataIntegrity()` não encontra órfãos críticos após migração.
+- [ ] `persist()` e `loadPersisted()` conservam versão e dados.
+
+Observação: use estes pontos como base — adaptar conforme fluxo operacional da empresa.
+
+---
+
+## Guia Operacional — Fluxo Resumido (inserido de `GUIDA_OPERACIONAL.md`)
+
+Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, com links para documentação técnica detalhada.
+
+Público: Coordenador de Atendimento, Consultor, Suporte Técnico.
+
+Sumário rápido
+- Propósito e papéis
+- Fluxo principal (resumido)
+- Principais ações por papel
+- Links rápidos para documentação detalhada
+
+Fluxo principal (resumido)
+1. Cadastrar consultor e empresa.
+2. Criar (ou aplicar) template → montar cronograma.
+3. Enviar cronograma para aprovação (PDF/Excel + e-mail).
+4. Cliente aprova → cronograma confirmado e bloqueado.
+5. Sistema gera eventos e registros; execução começa.
+6. Registrar atendimentos/treinamentos/tarefas; gerar OS quando necessário.
+7. Gerar e enviar OS (PDF + e-mail/WhatsApp); marcar como assinada.
+
+Ações rápidas por papel
+- Coordenador: cadastrar consultores/empresas, criar templates, revisar cronogramas, enviar para cliente.
+- Consultor: confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS.
+- Cliente: aprovar cronogramas, confirmar horários, assinar OS.
+
+Onde encontrar detalhes
+- Fluxo mestre: `FLUXO_AGENDAMENTO_IMPLANTACAO.md`
+- Visual e estilos: `docs/01_visual_e_estilos.md`
+- Componentes: `docs/02_componentes_utilizados.md`
+- Lógicas e validações: `docs/03_logicas_e_validacoes.md`
+- Fluxo de código (visão geral): `docs/04_fluxo_codigo_geral.md`
+- Estrutura de dados / DB: `docs/08_estrutura_banco_de_dados.md`
+- Índice navegável: `INDEX.md`
+
+Próximos artefatos recomendados
+- `docs/ACCEPTANCE_CHECKLISTS.md` — checklists por tela para QA/aceitação.
+
+---
+
+## Índice Navegável (inserido de `INDEX.md`)
+
+Este índice reúne os principais guias e referências do projeto para facilitar a implantação da POC/MVP.
+
+Leitura recomendada (ordem curta)
+- Operacional (obrigatório): `GUIDA_OPERACIONAL.md` — resumo acionável para coordenadores e consultores.
+- Visão geral / referência: `DOCS.md` — índice técnico com links para todos os documentos.
+- QA / Aceitação: `docs/ACCEPTANCE_CHECKLISTS.md`
+
+Guias operacionais
+- `GUIDA_OPERACIONAL.md` — Quickstart operacional (1 página).
+- `FLUXO_AGENDAMENTO_IMPLANTACAO.md` — Fluxo mestre detalhado (passo a passo).
+
+Documentos por público
+Operação / Implantação
+- `GUIDA_OPERACIONAL.md`
+- `docs/ACCEPTANCE_CHECKLISTS.md`
+
+Desenvolvimento / Referência técnica
+- `DOCS.md` — índice geral e instruções de deploy.
+- `Documentação Técnica — principal` (já presente neste arquivo)
+- `docs/01_visual_e_estilos.md`
+- `docs/02_componentes_utilizados.md`
+- `docs/03_logicas_e_validacoes.md`
+- `docs/04_fluxo_codigo_geral.md`
+- `docs/08_estrutura_banco_de_dados.md`
+
+Exportar para PDF (comando sugerido)
+```bash
+pandoc docs/GUIDA_OPERACIONAL.md docs/*.md -o Faktory-Flow-Docs.pdf
+```
+
+---
+
+## Envio de E-mails — Visão Geral (inserido de `EMAIL_ENVIO.md`)
+
+Este documento explica, de forma concisa, como funciona o fluxo de envio de e-mails (Ordens de Serviço e notificações) no projeto. Não contém instruções de configuração de provedores ou plataformas de deploy — essas informações foram removidas dos guias principais e centralizadas aqui para referência operacional.
+
+Resumo do fluxo
+
+- O front-end gera a Ordem de Serviço (HTML/PDF) e dispara uma chamada HTTP `POST` para o endpoint interno responsável pelo envio.
+- O endpoint é implementado como uma função serverless (conceitualmente uma rota `POST /api/send-os-email`) que: valida o payload (destinatário, assunto, corpo), prepara o remetente e dispara o envio ao provedor de SMTP ou serviço transacional.
+- Em caso de falha no envio (API indisponível ou sem configuração), o front-end possui fallback para `mailto:` (abertura do cliente de e-mail local) para facilitar envio manual.
+
+Comportamento e garantias
+
+- Validações: o servidor valida `to`, `subject` e `html/text` mínimos antes de tentar enviar.
+- Rate limiting: o envio aplica um limite simples por IP para evitar abuso (best-effort). Se o limite for excedido, o endpoint retorna erro apropriado e o front mostra mensagem ao usuário.
+- Idempotência: envios podem ser marcados com flags/ids para evitar duplicação em re-submits.
+- Timeout curto: a função de envio tem timeout reduzido para evitar travamentos na UI; operações de envio muito longas devem ser reencaminhadas a jobs assíncronos.
+- Logs: resultados de envio (sucesso/falha) devem ser registrados localmente no `NOTIFICATIONS_LOG` (no `localStorage`) e/ou enviados para um backend de logs quando existir.
+
+Boas práticas operacionais
+
+- Não incluir credenciais em arquivos públicos; manter segredos em um local seguro (cofre/env vars no deploy).
+- Para produção em escala, utilizar provedores transacionais (SendGrid, Postmark, Resend) e configurar SPF/DKIM/DMARC no DNS do domínio.
+- Monitorar filas de falha e implementar retries exponenciais quando apropriado.
+
+Onde está a implementação
+
+- Implementação de referência: `api/send-os-email.js` (função usada no repositório como exemplo). Use-a apenas como modelo — para produção prefira integrar um serviço transacional e mover lógica crítica de retry/log para um backend mais robusto.
+
+Observação
+
+- Este arquivo contém a explicação do fluxo e recomendações. As instruções passo-a-passo de deploy e configuração de plataformas (ex.: Vercel, variáveis de ambiente detalhadas) foram removidas dos documentos principais e não aparecem aqui; se precisar delas, posso restaurar um guia separado com passos controlados e sensíveis ao ambiente.
+
+---
+
+## Blueprint MVP — Documento Completo (inserido de `MVP_BLUEPRINT.md`)
+
+[Conteúdo completo do Blueprint MVP foi incorporado — inclui Resumo executivo, Escopo, Modelo de dados, Fluxo end-to-end, Regras de negócio, Stack recomendado, Arquitetura, Integrações, Variáveis sensíveis e Roteiro de reconstrução.]
+
+---
+
+## DOCS.md — Índice técnico e notas (inserido de `DOCS.md`)
+
+[Conteúdo do `docs/DOCS.md` incorporado aqui. Contém visão geral, integrações externas, automações, variáveis sensíveis e instruções gerais de execução, além de observações sobre persistência local, MSAL e html2pdf.]
+
+---
+
+## Fim do arquivo compilado
+
+Se desejar, posso:
+- Gerar uma versão PDF unificada e colocá-la na raiz (`Faktory-Flow-Docs.pdf`).
+- Remover trechos duplicados ou normalizar títulos/âncoras para facilitar indexação automática por agentes de IA.
+- Incluir metadados YAML no topo do arquivo para ajudar ferramentas de parsing.
 # Documentação Técnica — Única (compilada)
 
 Este arquivo reúne os documentos técnicos presentes em `docs/` num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy foram removidas e mantidas separadas; informações sobre o envio de e-mails estão em `docs/EMAIL_ENVIO.md`.

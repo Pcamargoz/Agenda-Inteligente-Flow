@@ -6256,7 +6256,7 @@ document.addEventListener('keydown', e => {
 /* ============ NAV ============ */
 const VIEW_META = {
   dashboard:    { crumb:'Operação · Dashboard',     title:'Dashboard <em>operacional</em>',         actions:'' },
-  agenda:       { crumb:'Operação · Agenda completa', title:'Agenda <em>completa</em>',             actions:`<button class="btn" id="btnAgFilter"><svg viewBox="0 0 24 24"><path d="M3 4h18l-7 9v6l-4 2v-8z"/></svg> Filtros</button><button class="btn btn-primary" id="btnAgNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo evento</button>` },
+  agenda:       { crumb:'Operação · Agenda completa', title:'Agenda <em>completa</em>',             actions:`<button class="btn" id="btnAgFilter"><svg viewBox="0 0 24 24"><path d="M3 4h18l-7 9v6l-4 2v-8z"/></svg> Filtros</button><button class="btn" id="btnAgTeamsSync" title="Verificar e enviar eventos da agenda para o Teams/Outlook"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-9-9"/><path d="M21 3v6h-6"/></svg> Sincronizar Teams</button><button class="btn btn-primary" id="btnAgNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo evento</button>` },
   cronogramas:  { crumb:'Operação · Cronogramas',    title:'Cronogramas <em>por empresa</em>',      actions:`<button class="btn btn-primary" id="btnCroNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo cronograma</button>` },
   registros:    { crumb:'Operação · Registros',      title:'Atendimentos · <em>Treinamentos · Tarefas</em>', actions:'' },
   cadastros:    { crumb:'Configuração · Cadastros',  title:'Cadastros <em>do sistema</em>',         actions:'' },
@@ -6281,6 +6281,8 @@ function wireTopActions(){
   if (newAg) newAg.onclick = () => openEventModal(null);
   const newCro = document.getElementById('btnCroNew');
   if (newCro) newCro.onclick = () => startNewCronograma();
+  const teamsSyncBtn = document.getElementById('btnAgTeamsSync');
+  if (teamsSyncBtn) teamsSyncBtn.onclick = () => teamsBulkSync();
 }
 
 /* ============ MASTER RENDER ============ */
@@ -14533,19 +14535,32 @@ if (_origDoConfirm){
   };
 }
 
-/* Também cria card ao apenas SALVAR rascunho/aguardando-cliente (para já aparecer no Kanban) */
+/* Também cria card ao apenas SALVAR rascunho/aguardando-cliente (para já aparecer no Kanban).
+   Regras de transição automática do status do card:
+     - card novo + cronograma rascunho      → nao-iniciada
+     - card novo + cronograma enviado       → aguardando
+     - card já em nao-iniciada + envio      → promove para aguardando
+     - card em em-andamento/concluida/etc   → preserva (só promove "pra cima")
+     - card.statusManual === true           → respeita escolha manual e não mexe */
 const _origSaveDraftSchedule = (typeof saveDraftSchedule === 'function') ? saveDraftSchedule : null;
 if (_origSaveDraftSchedule){
   saveDraftSchedule = function(opts = {}){
     const result = _origSaveDraftSchedule.apply(this, arguments);
-    /* depois do salvamento, garante card */
     const draftId = state.croDraftScheduleId;
     const lastSch = SCHEDULES.find(x => x.id === draftId) || SCHEDULES[SCHEDULES.length-1];
     if (lastSch){
-      ensureClientCard(lastSch.companyId, {
+      const sentToClient = lastSch.status === 'aguardando-cliente';
+      const card = ensureClientCard(lastSch.companyId, {
         scheduleId: lastSch.id,
-        status: lastSch.status === 'aguardando-cliente' ? 'aguardando' : 'nao-iniciada',
+        status: sentToClient ? 'aguardando' : 'nao-iniciada',
       });
+      /* Promove card existente quando cronograma vai pro cliente.
+         Só promove de nao-iniciada → aguardando (nunca demove). */
+      if (card && sentToClient && !card.statusManual && card.status === 'nao-iniciada'){
+        card.status = 'aguardando';
+        pushHistory(card, 'aguardando cliente', `cronograma ${lastSch.id} enviado para aprovação`);
+        if (typeof renderClientKanban === 'function') renderClientKanban();
+      }
     }
     return result;
   };
@@ -22762,8 +22777,72 @@ async function teamsSync(action, ev){
   }
 }
 
+/* ---------- Sincronização em lote (botão "Sincronizar Teams" na agenda) ----------
+   Necessário porque eventos criados via confirmação de cronograma (e quaisquer
+   eventos pré-existentes à integração) não passam pelo hook em saveEvent — ficam
+   sem graphEventId e portanto ausentes do Outlook/Teams. */
+function teamsUnsyncedEvents(){
+  const skipStatus = new Set(['cancelado','reagendado']);
+  return EVENTS.filter(ev => !ev.graphEventId && !skipStatus.has(ev.status));
+}
+
+async function teamsBulkSync(){
+  /* 1) Garantir login */
+  if (!teamsIsConnected()){
+    if (!confirm('Você ainda não está conectado ao Teams.\n\nConectar agora para sincronizar a agenda?')) return;
+    await teamsToggleConnect();
+    if (!teamsIsConnected()) return;
+  }
+
+  /* 2) Verificar o que está fora de sincronia */
+  const todo = teamsUnsyncedEvents();
+  if (!todo.length){
+    toast('success','Agenda em dia ✓','Todos os eventos válidos já estão no seu Teams/Outlook.');
+    return;
+  }
+
+  /* 3) Quebrar por período pra dar contexto ao usuário */
+  const today = new Date().toISOString().slice(0,10);
+  const futuros = todo.filter(e => (e.date||'') >= today).length;
+  const passados = todo.length - futuros;
+
+  const msg =
+    `Encontrei ${todo.length} evento(s) na agenda que ainda não estão no seu Teams/Outlook:\n\n` +
+    `• ${futuros} de hoje em diante\n` +
+    `• ${passados} no passado\n\n` +
+    `Deseja enviar todos agora?\n` +
+    `(eventos cancelados e reagendados são ignorados)`;
+  if (!confirm(msg)) return;
+
+  /* 4) Loop sequencial — teamsSync já é async/await + idempotente */
+  toast('info', `Sincronizando ${todo.length} eventos...`, 'Aguarde, isso pode levar alguns segundos.');
+  let ok = 0, fail = 0;
+  for (const ev of todo){
+    try {
+      await teamsSync('create', ev);
+      if (ev.graphEventId) ok++; else fail++;
+    } catch(e){
+      console.error('[teams] bulk: falha em', ev.id, e);
+      fail++;
+    }
+  }
+
+  /* 5) Persistir os graphEventId recém-atribuídos e re-renderizar */
+  if (typeof persist === 'function') persist();
+  if (typeof renderAll === 'function') renderAll();
+
+  if (fail === 0){
+    toast('success','Sincronização concluída ✓', `${ok} evento(s) enviados ao Teams/Outlook.`);
+  } else if (ok === 0){
+    toast('error','Sincronização falhou', `Nenhum evento foi enviado. Verifique o console (F12).`);
+  } else {
+    toast('warning','Sincronização parcial', `${ok} OK · ${fail} falharam. Veja o console para detalhes.`);
+  }
+}
+
 window.teamsToggleConnect = teamsToggleConnect;
 window.teamsSync = teamsSync;
+window.teamsBulkSync = teamsBulkSync;
 document.addEventListener('DOMContentLoaded', teamsUpdateBtn);
 teamsInitMsal();
 teamsUpdateBtn();

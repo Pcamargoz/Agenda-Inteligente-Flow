@@ -6,7 +6,7 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 - **Operacional (obrigatório):** [GUIDA_OPERACIONAL.md](../GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
 - **Visão geral / referência:** [DOCS.md](../DOCS.md) — índice técnico com links para todos os documentos.
 - **QA / Aceitação:** [docs/ACCEPTANCE_CHECKLISTS.md](ACCEPTANCE_CHECKLISTS.md)
-- **Modelos de e-mail:** [docs/email_templates.md](email_templates.md)
+-- **Modelos de e-mail:** *não aplicável*
 
 ---
 
@@ -18,12 +18,12 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 **Operação / Implantação**
 - [GUIDA_OPERACIONAL.md](../GUIDA_OPERACIONAL.md)
 - [docs/ACCEPTANCE_CHECKLISTS.md](ACCEPTANCE_CHECKLISTS.md)
-- [docs/email_templates.md](email_templates.md)
+ - *(Modelos de e-mail removidos)*
 
 **Desenvolvimento / Referência técnica**
 - [DOCS.md](../DOCS.md) — índice geral e instruções de deploy.
-- [DOCUMENTACAO_TECNICA.md](../DOCUMENTACAO_TECNICA.md)
-- [DOCUMENTACAO_TECNICA 2.md](../DOCUMENTACAO_TECNICA%202.md)
+- [Documentação Técnica — principal](../DOCUMENTACAO_TECNICA.md)
+- [Documentação Técnica — unificada (v2)](../DOCUMENTACAO_TECNICA_2.md)
 - [docs/01_visual_e_estilos.md](01_visual_e_estilos.md)
 - [docs/02_componentes_utilizados.md](02_componentes_utilizados.md)
 - [docs/03_logicas_e_validacoes.md](03_logicas_e_validacoes.md)

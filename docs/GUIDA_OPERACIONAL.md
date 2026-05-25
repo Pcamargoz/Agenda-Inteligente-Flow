@@ -4,6 +4,25 @@ Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, 
 
 Público: Coordenador de Atendimento, Consultor, Suporte Técnico.
 
+[![Guia](https://img.shields.io/badge/Guia-Operacional-blue)](../GUIDA_OPERACIONAL.md) [![Fluxo](https://img.shields.io/badge/Fluxo-Agendamento-green)](../FLUXO_AGENDAMENTO_IMPLANTACAO.md) [![Docs](https://img.shields.io/badge/Docs-Index-lightgrey)](../docs/INDEX.md)
+
+## Visual rápido
+
+- ✅ Leitura inicial: siga os passos do diagrama abaixo.
+- 🧭 Público: coordenador → consultor → cliente.
+
+```mermaid
+flowchart LR
+	A[1. Cadastrar consultor/empresa] --> B[2. Criar/aplicar template]
+	B --> C[3. Enviar cronograma (PDF/e-mail)]
+	C --> D[4. Aprovação do cliente]
+	D --> E[5. Gerar eventos e registros]
+	E --> F[6. Execução (atend./treino/tarefas)]
+	F --> G[7. Gerar & enviar OS]
+	G --> H[8. Assinatura e fechamento]
+```
+
+
 Sumário rápido
 - Propósito e papéis
 - Fluxo principal (resumido)
@@ -40,4 +59,3 @@ Sugestões de uso
 
 Próximos artefatos recomendados
 - `docs/ACCEPTANCE_CHECKLISTS.md` — checklists por tela para QA/aceitação.
-- `docs/email_templates.md` — modelos de e-mail para cronogramas, lembretes e OS.

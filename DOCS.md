@@ -106,6 +106,6 @@ Observação: os fluxos detalhados em `docs/05`—`docs/07` foram consolidados n
 
 - Guia operacional curto: [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — Resumo executivo para coordenadores e consultores.
 - Checklists de aceitação: [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md) — QA e homologação por tela.
-- Modelos de e-mail: [docs/email_templates.md](docs/email_templates.md) — Textos prontos para cronogramas, lembretes e OS.
+-- Modelos de e-mail: *não aplicável* (removido)
 
 Se quiser, posso também gerar um índice `docs/INDEX.md` e criar um PDF unificado com todos esses documentos.

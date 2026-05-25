@@ -9,8 +9,9 @@ Front-end estático + serverless function (Vercel) para envio de **Ordens de Ser
 - 📘 Guia operacional (leitura inicial): [GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
 - 🧭 Índice navegável: [docs/INDEX.md](docs/INDEX.md)
 - ⚙️ Deploy & Tech: [DOCS.md](DOCS.md)
+- 📗 Documentação técnica (unificada): [DOCUMENTACAO_TECNICA_2.md](DOCUMENTACAO_TECNICA_2.md)
 - ✅ QA / Checklists: [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
-- ✉️ Modelos de e-mail: [docs/email_templates.md](docs/email_templates.md)
+ - ✉️ Modelos de e-mail: *não aplicável* (removido)
 
 ---
 <!-- Índice visual rápido -->
@@ -19,7 +20,7 @@ Front-end estático + serverless function (Vercel) para envio de **Ordens de Ser
 - **Leitura obrigatória (Operacional):** [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
 - **Leitura técnica (Referência):** [DOCS.md](DOCS.md) — índice com links para documentação detalhada e endpoints.
 - **QA / Aceitação:** [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
-- **E-mails & Templates:** [docs/email_templates.md](docs/email_templates.md)
+- **E-mails & Templates:** *não aplicável*
 
 > Recomendo que a equipe de implantação leia apenas `GUIDA_OPERACIONAL.md` antes de começar; abra os documentos em `docs/` somente quando precisar de detalhes.
 

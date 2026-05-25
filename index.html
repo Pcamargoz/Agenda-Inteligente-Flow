@@ -22608,10 +22608,14 @@ window.copyFeedbackLink = (cardId) => {
    do usuário logado — aparece automaticamente no Teams + Outlook.
    ============================================ */
 const TEAMS_CFG = {
-  clientId: 'fd5f5b37-3b22-4cf4-93b0-2b1092982aef',
-  tenantId: '5a3fa073-cd74-4611-8c11-bcf60a4f5ca0',
+  // Tenant pessoal do Pedro (Default Directory) — ambiente de testes
+  clientId: '2082e19a-ff5f-4fbf-b4a6-e06e9f240d3b',
+  tenantId: 'ad83b7a6-05a4-467d-a7f0-7f9f48f78bf4',
   redirectUri: 'https://agenda-inteligente-flow.vercel.app',
-  scopes: ['User.Read','Calendars.ReadWrite','OnlineMeetings.ReadWrite','offline_access'],
+  // OnlineMeetings.ReadWrite exige licença M365 Business/Enterprise.
+  // Deixar de fora enquanto estiver em tenant pessoal de teste.
+  scopes: ['User.Read','Calendars.ReadWrite','offline_access'],
+  enableTeamsMeeting: false,
   timeZone: 'America/Sao_Paulo',
 };
 
@@ -22699,14 +22703,17 @@ function teamsBuildPayload(ev){
   if (ev.desc)    bodyLines.push('', ev.desc);
   if (ev.details) bodyLines.push('', ev.details);
   if (ev.notes)   bodyLines.push('', 'Notas: ' + ev.notes);
-  return {
+  const payload = {
     subject,
     body: { contentType: 'HTML', content: bodyLines.join('<br>') || '(sem descrição)' },
     start: { dateTime: `${ev.date}T${ev.timeStart}:00`, timeZone: TEAMS_CFG.timeZone },
     end:   { dateTime: `${ev.date}T${ev.timeEnd}:00`,   timeZone: TEAMS_CFG.timeZone },
-    isOnlineMeeting: true,
-    onlineMeetingProvider: 'teamsForBusiness',
   };
+  if (TEAMS_CFG.enableTeamsMeeting){
+    payload.isOnlineMeeting = true;
+    payload.onlineMeetingProvider = 'teamsForBusiness';
+  }
+  return payload;
 }
 
 async function teamsSync(action, ev){

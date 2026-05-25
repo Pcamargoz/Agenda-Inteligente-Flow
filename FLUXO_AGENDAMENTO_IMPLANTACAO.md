@@ -85,125 +85,90 @@ Documento resumido descrevendo o fluxo de uso para agendamento e implantação.
 ---
 Arquivo gerado automaticamente a partir do walkthrough interativo (imagens e telas fornecidas pelo usuário).
 
-**Documentação técnica detalhada (para equipe de desenvolvimento)**
+**Guia operacional detalhado — fluxo para consultores**
 
-1) Objetivo
-- Fornecer informações técnicas suficientes para que a equipe de desenvolvimento implemente ou melhore telas e comportamentos do módulo de agendamento e implantação.
+Objetivo: descrever passo a passo as ações operacionais que o consultor executa na plataforma para criar cronogramas, gerenciar treinamentos, registrar atendimentos e gerar Ordens de Serviço (OS), sem aspectos técnicos de implementação.
 
-2) Entidades e campos essenciais
-- `User` (interno)
-   - id, name, email, role (admin, coordinator, consultant), companyId
-- `Consultor`
-   - id, userId, name, initials, role, specialty, email, phone, workDay {start, end, lunchMinutes}, availability: [Mon..Sun] booleans
-- `Empresa` (Cliente)
-   - id, name, tradeName, cnpj, contactEmail, responsible, defaultConsultantId, projectName, typeOfSchedule
-- `Template`
-   - id, name, description, items: [TemplateItem], active
-- `TemplateItem`
-   - id, templateId, type (training|task), title, duration, durationUnit, suggestedTimes, resources, checklist: [taskTemplates]
-- `Cronograma`
-   - id, companyId, consultantId, period {start,end}, status (draft|provisioned|sent|awaiting_client|confirmed|cancelled), items: [CronogramaItem], createdBy, createdAt
-- `CronogramaItem`
-   - id, cronogramaId, templateItemId?, type (training|task), title, date, startTime, endTime, status (provisional|scheduled|in_progress|done|cancelled), assignedTo, linkedTasks: [taskId]
-- `Atendimento` / `Training` (runtime record)
-   - id, companyId, cronogramaItemId, type, date, startTime, endTime, consultantId, participants, status
-- `Tarefa`
-   - id, title, description, trainingId?, cronogramaItemId?, assignedTo, status (open|pending|done|cancelled), dueDate
-- `OS` (Ordem de Serviço)
-   - id, title, scope, issueDate, consultantId, startDateTime, endDateTime, participants, internalPendencies, clientPendencies, linkedItems: [trainingId|taskId|attendanceId], attachments
-- `Notification` (registro de envios)
-   - id, type (cronograma_sent|cronograma_confirmed|os_generated), to, via (email|sms|whatsapp), payload, sentAt, status
+1) Acesso e pré‑requisitos
+- Login com usuário válido (perfil `consultor` ou `admin`/`coordenador`).
+- O consultor deve estar cadastrado no sistema; a empresa/cliente deve existir no cadastro (coordenador pode criar se necessário).
 
-3) Relacionamentos chave
-- Cronograma → CronogramaItem(s) → TemplateItem? → Tarefa(s)
-- Treinamento (CronogramaItem type=training) possui checklist de Tarefas; Tarefa pode gerar/necessitar de Atendimento para conclusão.
-- OS vincula Treinamento/Tarefa/Atendimento e registra horas para consultor e cliente.
+2) Terminologia rápida
+- Cronograma: sequência de treinamentos/tarefas planejadas para um cliente.
+- Template: modelo reutilizável de treinamentos e tarefas.
+- Item: treinamento ou tarefa dentro do cronograma.
+- OS (Ordem de Serviço): registro formal do atendimento/treinamento realizado com horas e pendências.
 
-4) Fluxos de tela / interações (detalhado)
-- Cadastro Consultor (Configurações)
-   - Validações: `email` único, `inicial` única por empresa opcionalmente, jornada válida (start < end), lunchMinutes >=0.
-   - UI: campos + calendário de disponibilidade; salvar ativa/atualiza `Consultor`.
+3) Fluxo operacional (passo a passo)
 
-- Cadastro Empresa
-   - Campos obrigatórios: name, cnpj (formato), contactEmail.
-   - Escolher `Consultor Padrão` (dropdown com consultores ativos), `Tipo de agenda` (enum), `Projeto`.
+- 3.1 Abrir Kanban de Atendimentos
+   - Acesse `Atend. / Treino / Tarefas` → visualização `Kanban por cliente`.
+   - Verifique se o cliente já tem um card. Caso não, clique `+ Novo cliente` e selecione a empresa para adicioná‑la ao Kanban.
 
-- Criação de Template
-   - Permitir multi‑item; cada item pode ter checklist (tarefas internas) e marcações `data/hora obrigatórias`.
+- 3.2 Criar cronograma para o cliente
+   - Navegue em `Cronogramas → Cronogramas por empresa` e clique `+ Novo cronograma`.
+   - Selecione a empresa e confirme o consultor (geralmente auto‑preenchido pelo `Consultor Padrão`).
+   - Escolha o período (semana, mês, personalizado).
+   - Use `Usar templates` para preencher automaticamente os itens do cronograma ou `Sugerir dias livres` para que o sistema indique datas com base na disponibilidade do consultor.
 
-- Criação de Cronograma (builder)
-   - Selecionar período, empresa, consultor.
-   - Ações: `Sugerir dias livres` (calcula dias baseados na disponibilidade do consultor e bloqueios já existentes), `Usar templates` (mescla templateItems no preview), `Adicionar ao cronograma`.
-   - Preview: lista de dias com controles de hora; validações em tempo real:
-      - Overlap: sinalizar conflito com outros eventos do consultor → mostrar erro/vermelho.
-      - Fora da jornada do consultor → sinalizar (vermelho).
-      - Tudo ok → verde.
-   - Botão `Salvar rascunho` ou `Enviar para aprovação do cliente` (gera PDFs/Excel e cria Notification).
+- 3.3 Configurar itens do cronograma
+   - No preview, clique em cada item para abrir a tela de configuração.
+   - Defina: data, hora de início e fim, modalidade (presencial/online), local/link, instrutor, participantes e recursos.
+   - Adicione ou confirme tarefas vinculadas ao treinamento (checklist).
+   - Verificação visual: itens válidos aparecem em verde; itens com conflito/erro aparecem em vermelho (hover mostra motivo).
 
-- Envio e confirmação
-   - `Enviar` cria Notification: anexa PDF e Excel. Link público opcional para visualização.
-   - Confirmação do cliente: quando cliente clica no link ou confirma via interface, backend executa operação atômica:
-      - Transação: para cada CronogramaItem com data/hora definidos, criar `Atendimento`/`Training` registros e atualizar status para `scheduled`/`in_progress` conforme regras.
-      - Se qualquer passo falhar, rollback e notificar erro.
+- 3.4 Salvar e enviar para aprovação
+   - Você pode `Salvar rascunho` para voltar depois ou `Enviar para aprovação do cliente`.
+   - Ao enviar, o sistema gera anexos (PDF + Excel) e pergunta o destinatário (cliente e opcionalmente o consultor).
+   - Após envio, o status do cronograma muda para `Provisório` / `Aguardando cliente`.
 
-5) API proposta (exemplos)
-- POST /api/consultants → create consultor (body: consultor data)
-- POST /api/companies → create empresa
-- GET /api/templates
-- POST /api/cronograms → criar cronograma provisório (body: companyId, consultantId, period, items[])
-- PUT /api/cronograms/:id/preview → aplicar template / ajustar itens
-- POST /api/cronograms/:id/send → gerar anexos, criar Notification, status => sent
-- POST /api/cronograms/:id/confirm → confirmar cronograma (executa operação atômica e cria atendimentos)
-- POST /api/trainings/:id/generate-os → cria OS vinculada
-- GET /api/companies/:id/attendance‑summary → extrato de horas por cliente
+- 3.5 Aprovação do cliente
+   - O cliente recebe o e‑mail com link para revisar e aprovar. Quando aprovado, o consultor recebe notificação por e‑mail.
+   - Alternativamente, se o cliente confirmar verbalmente, o consultor pode clicar `Confirmar com cliente` na interface — isso também notifica o sistema e muda status para `Em andamento`.
 
-Exemplo payload (criar cronograma):
-{
-   "companyId": "cmp_123",
-   "consultantId": "c_456",
-   "period": {"start":"2026-06-01","end":"2026-06-30"},
-   "items": [
-      {"templateItemId":"t_1","type":"training","title":"Onboarding","date":"2026-06-01","startTime":"11:30","endTime":"12:30"}
-   ]
-}
+- 3.6 Execução dos treinamentos e atendimentos
+   - Em `Atendimentos` expanda o card do cliente para ver a lista de treinamentos.
+   - Para cada item: marque `Realizado` ou `Não realizado` após a sessão; se necessário, clique `Reagendar` para alterar data/hora ou `Cancelar` para encerrar.
+   - Em cada treinamento você pode:
+      - Adicionar/editar tarefas do checklist.
+      - Marcar tarefas como `Concluídas`, `Pendente` (se algo ficou faltando) ou `Cancelar`.
+      - Registrar observações e anexar arquivos.
 
-6) Regras de negócio críticas
-- Contabilização de horas: sempre armazenar start/end em UTC + timezone do cliente; duração calculada em minutos.
-- Banco de horas: agregado por `companyId` e por `consultantId`. Inserções: treinamentos + tarefas vinculadas + atendimentos avulsos.
-- Bloqueios: evitar double‑booking por `consultantId` e por `room/resource` se aplicável.
-- Limpeza/edição: cronograma provisionado permite edição; após confirmação (atomic) campos validados ficam bloqueados.
+- 3.7 Gerar Ordem de Serviço (OS)
+   - Ao lado do treinamento/tarefa há o botão `Gerar OS`.
+   - Preencha a OS: título, escopo/descrição, participantes, pendências internas e pendências do cliente.
+   - Escolha quais tarefas/atendimentos serão contabilizados nesta OS (além do próprio treinamento), e confirme horas efetivas.
+   - Gere o PDF e envie por e‑mail ou WhatsApp ao cliente e ao consultor.
 
-7) Estados e transições (simplificado)
-- Cronograma: draft → provisioned → sent → awaiting_client → confirmed | cancelled
-- CronogramaItem: provisional → scheduled → in_progress → done | cancelled
-- Training/Tarefa: open → pending → done | cancelled
+- 3.8 Pós‑execução e relatórios
+   - OS gravada alimenta o extrato de horas do cliente e do consultor.
+   - É possível exportar relatórios (PDF, Excel/CSV) por cliente, período e consultor.
 
-8) Notificações / e‑mails
-- Template de e‑mail de envio de cronograma: subject, body com link, anexos PDF/Excel.
-- Notificação para consultor ao confirmar cronograma e ao gerar OS.
-- Registrar `Notification` com status e tentar re‑envio em caso de falha.
+4) Regras operacionais e boas práticas
+- Sempre verificar conflitos (double booking) no preview antes de salvar. Use a opção `Sugerir dias livres` se estiver em dúvida.
+- Marque tarefas pendentes claramente; vincule pendências à OS para rastreabilidade.
+- Se ocorrer alteração após aprovação, documente no histórico de alterações e notifique o cliente quando necessário.
+- Ao gerar OS, confirme participantes e horas para evitar retrabalho.
 
-9) Concurrency e atomicidade
-- Use transações (DB) ou filas + compensações para confirmar cronograma. Garantir idempotência para endpoint `confirm` (retry safe).
+5) Mapeamento de status visuais
+- Verde: item validado (data/hora dentro da jornada, sem conflito).
+- Vermelho: conflito ou erro (sobreposição, fora da jornada, horário inválido).
+- Laranja / Amarelo: provisório / aguardando aprovação.
+- Azul: confirmado / em andamento.
 
-10) Validações e checks automatizados (lista de testes)
-- Criar integração/end‑to‑end tests para:
-   - Evitar double booking (simular dois cronogramas concorrentes)
-   - Confirmar atomicidade (simular falha parcial durante confirmação)
-   - Geração de anexos e conteúdo do PDF/Excel (incluir horas corretas)
-   - Fluxo de reenvio e notificação para consultor
+6) Cenários comuns e solução rápida
+- Cliente pede reagendamento de um item:
+   - Na aba `Atendimentos`, selecione o treinamento → clique `Reagendar` → escolha nova data/hora → salve e envie notificação ao cliente.
+- Falta de recursos (sala/link): adicione observação no item e registre a pendência; mover para OS se a pendência impactar execução.
+- Tarefa não concluída após treinamento: marque como `Pendente` e crie um atendimento avulso vinculado para finalizar a tarefa; inclua a pendência na OS.
 
-11) Observações para UI/UX
-- Mostrar cor de validação por item (verde/vermelho) e tooltip explicando o erro.
-- No builder, permitir operações em massa: aplicar mesmo horário para todos treinamentos, distribuir em dias livres.
-- Histórico: registrar todas alterações (quem, quando, campo alterado) para auditoria.
-
-12) Checklist de entrega para desenvolvimento
-- API endpoints implementados com contratos.
-- Banco de dados: migrations para entidades acima.
-- Worker para gerar PDFs/Excel e enviar notificações assíncronas.
-- Jobs para recalcular bancos de horas quando datas/horas são alteradas.
-- Testes unitários e E2E cobrindo os casos críticos.
+7) Checklist rápido antes de enviar o cronograma
+- Confirmar consultor e participantes.
+- Verificar disponibilidade do consultor (sem conflitos).
+- Conferir horários e fusos (se aplicável).
+- Garantir que tarefas essenciais estejam vinculadas e anotadas como pendências se necessário.
 
 ---
-Se quiser, gero um arquivo separado `FLUXO_TECNICO_API.md` com os exemplos completos de payloads, contratos OpenAPI e mock responses.
+Atualizei o documento para focar no fluxo operacional do consultor. Se quiser, posso:
+- Inserir este resumo no `DOCS.md` com um link direto.
+- Gerar PDF pronto para imprimir e compartilhar com a equipe.

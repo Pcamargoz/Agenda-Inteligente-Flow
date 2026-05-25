@@ -13,13 +13,13 @@ Público: Coordenador de Atendimento, Consultor, Suporte Técnico.
 
 ```mermaid
 flowchart LR
-	A[1. Cadastrar consultor/empresa] --> B[2. Criar/aplicar template]
-	B --> C[3. Enviar cronograma (PDF/e-mail)]
-	C --> D[4. Aprovação do cliente]
-	D --> E[5. Gerar eventos e registros]
-	E --> F[6. Execução (atend./treino/tarefas)]
-	F --> G[7. Gerar & enviar OS]
-	G --> H[8. Assinatura e fechamento]
+	A["1. Cadastrar consultor/empresa"] --> B["2. Criar/aplicar template"]
+	B --> C["3. Enviar cronograma (PDF e-mail)"]
+	C --> D["4. Aprovação do cliente"]
+	D --> E["5. Gerar eventos e registros"]
+	E --> F["6. Execução (atend./treino/tarefas)"]
+	F --> G["7. Gerar e enviar OS"]
+	G --> H["8. Assinatura e fechamento"]
 ```
 
 

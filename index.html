@@ -9722,13 +9722,22 @@ window.openDistributeDaysModal = () => {
   const c = consultantById(consId);
   if (!c){ toast('error','Consultor inválido','Selecione um consultor no cronograma.'); return; }
 
-  /* Defaults baseados no cronograma + jornada do consultor */
-  const from = document.getElementById('croFrom')?.value || (new Date()).toISOString().slice(0,10);
+  /* Defaults baseados no cronograma + jornada do consultor.
+     A data inicial nunca pode ser no passado — usa hoje (data local da máquina)
+     se o cronograma estiver desatualizado. */
+  const _now = new Date();
+  const todayISO = fmtDate(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  const croFrom = document.getElementById('croFrom')?.value || todayISO;
+  const from = (croFrom < todayISO) ? todayISO : croFrom;
   const toDate = document.getElementById('croTo')?.value || (() => {
-    const d = new Date(); d.setDate(d.getDate()+30); return d.toISOString().slice(0,10);
+    const d = new Date(_now); d.setDate(d.getDate()+30);
+    return fmtDate(d.getFullYear(), d.getMonth(), d.getDate());
   })();
-  document.getElementById('distFrom').value = from;
+  const distFromEl = document.getElementById('distFrom');
+  distFromEl.value = from;
+  distFromEl.min = todayISO;          /* HTML5: bloqueia escolha manual de data passada */
   document.getElementById('distTo').value = toDate;
+  document.getElementById('distTo').min = todayISO;
   document.getElementById('distTimeStart').value = c.workStart || '09:00';
   document.getElementById('distTimeEnd').value = c.workEnd || '18:00';
 
@@ -9786,8 +9795,14 @@ function buildDistSlots(prefs, consultant){
   const endMin   = timeToMin(prefs.timeEnd);
   if (endMin <= startMin) return slots;
   const step = prefs.duration + prefs.gap;
-  let d = parseISO(prefs.from);
+  /* Validação: data atual da máquina como piso. Nunca sugere dias passados,
+     mesmo que o usuário burle o input HTML. */
+  const _now = new Date();
+  const todayISO = fmtDate(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  const effectiveFrom = (prefs.from < todayISO) ? todayISO : prefs.from;
+  let d = parseISO(effectiveFrom);
   const last = parseISO(prefs.to);
+  if (d > last) return slots;
   while (d <= last){
     const iso = fmtDate(d.getFullYear(), d.getMonth(), d.getDate());
     const dow = d.getDay();
@@ -14756,6 +14771,8 @@ if (_origDoConfirm){
       pushHistory(card, 'cronograma confirmado', `${(s.items||[]).length} itens entraram no card`);
       toast('info','Card do cliente atualizado',
         `${companyById(s.companyId)?.fantasia} · ${(s.items||[]).length} itens disponíveis em Atend./Treino/Tarefas`);
+      /* Replica todos os eventos do cronograma no Teams do usuário logado (se conectado) */
+      if (typeof teamsSyncSchedule === 'function') teamsSyncSchedule(s);
     }
     return result;
   };
@@ -22488,6 +22505,13 @@ window.pubConfirmSchedule = (sId, token) => {
     }
   } catch(e){ console.warn('ensureClientCard falhou', e); }
 
+  /* Replica eventos do cronograma no Teams do usuário logado (se houver).
+     Em modo público o viewer pode ser o próprio cliente — nesse caso
+     teamsIsConnected() retorna false e a função sai silenciosamente. */
+  try {
+    if (typeof teamsSyncSchedule === 'function') teamsSyncSchedule(s);
+  } catch(e){ console.warn('teamsSyncSchedule falhou', e); }
+
   /* Limpa picks da memória */
   window._pubScheduleDayPicks = {};
   persist();
@@ -23066,8 +23090,46 @@ async function teamsBulkSync(){
   }
 }
 
+/* ---------- Sincronização automática de cronograma confirmado ----------
+   Disparada quando um cronograma vai para status 'confirmado' (interno ou
+   via link público). Replica TODOS os eventos do cronograma no calendário
+   Outlook/Teams do usuário logado. Silencioso se Teams não estiver conectado
+   (ex: viewer do link público que é o cliente — não tem nosso Teams). */
+async function teamsSyncSchedule(sch){
+  if (!sch || !teamsIsConnected()) return;
+  const ids = new Set(sch.eventIds || []);
+  /* Considera tanto eventIds explícitos quanto eventos com seriesId === sch.id */
+  const targets = EVENTS.filter(e =>
+    (ids.has(e.id) || e.seriesId === sch.id) &&
+    !e.graphEventId &&
+    e.status !== 'cancelado' && e.status !== 'reagendado'
+  );
+  if (!targets.length) return;
+
+  toast('info', `Replicando ${targets.length} evento(s) no Teams...`, 'Cronograma confirmado — aguarde alguns segundos.');
+  let ok = 0, fail = 0;
+  for (const ev of targets){
+    try {
+      await teamsSync('create', ev);
+      if (ev.graphEventId) ok++; else fail++;
+    } catch(e){
+      console.error('[teams] schedule sync falhou em', ev.id, e);
+      fail++;
+    }
+  }
+  if (typeof persist === 'function') persist();
+  if (fail === 0){
+    toast('success','Cronograma replicado no Teams ✓', `${ok} evento(s) adicionados ao seu calendário.`);
+  } else if (ok === 0){
+    toast('warning','Falha ao replicar no Teams', `Tente o botão "Sincronizar Teams" na agenda.`);
+  } else {
+    toast('warning','Sincronização parcial do cronograma', `${ok} OK · ${fail} falharam — use "Sincronizar Teams" para tentar de novo.`);
+  }
+}
+
 window.teamsToggleConnect = teamsToggleConnect;
 window.teamsSync = teamsSync;
+window.teamsSyncSchedule = teamsSyncSchedule;
 window.teamsBulkSync = teamsBulkSync;
 document.addEventListener('DOMContentLoaded', teamsUpdateBtn);
 teamsInitMsal();

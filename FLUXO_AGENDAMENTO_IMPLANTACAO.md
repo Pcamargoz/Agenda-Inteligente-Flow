@@ -172,3 +172,156 @@ Objetivo: descrever passo a passo as ações operacionais que o consultor execut
 Atualizei o documento para focar no fluxo operacional do consultor. Se quiser, posso:
 - Inserir este resumo no `DOCS.md` com um link direto.
 - Gerar PDF pronto para imprimir e compartilhar com a equipe.
+
+---
+
+## Anexos — Fluxos operacionais (conteúdo mesclado)
+
+Seguem os fluxos operacionais derivados dos documentos auxiliares (criar empresa / criar cronograma / tarefas e atendimentos). Estes trechos foram mesclados aqui para centralizar o material de operação.
+
+### Fluxo: Criar empresa e adicionar card no Kanban
+
+1. Registrar empresa (coordenador)
+- Acesse `Configuração → Cadastros → Empresas` → `+ Nova empresa`.
+- Preencha: Razão Social, Nome Fantasia, CNPJ, Responsável, Contato (e‑mail), Consultor Padrão, Tipo de agenda, Projeto associado.
+- Salvar: cria registro da `Empresa` com `id`.
+
+2. Adicionar empresa ao Kanban de Atendimentos
+- Acesse `Atend. / Treino / Tarefas` → `Kanban por cliente`.
+- Clique `+ Novo cliente` → busca por empresa cadastrada → selecione e confirme.
+- Sistema cria `ClientCard` no Kanban com resumo e botão `+ Novo cronograma`.
+
+3. Observações práticas
+- Se a empresa ainda não tiver um `Consultor Padrão`, sugerir seleção obrigatória ou exibir aviso.
+- Card criado já mostra resumo: total de itens, treinamentos e pendências (inicialmente zeros).
+
+### Processo detalhado para criar e editar cronograma
+
+1. Iniciar novo cronograma
+- Entrar em `Cronogramas → Cronogramas por empresa` → `+ Novo cronograma`.
+- Selecionar: Empresa, Consultor, Período (start/end).
+
+2. Preencher usando templates ou manualmente
+- `Usar templates`: selecionar template(s) → `Adicionar ao cronograma` → os itens aparecem no preview.
+- `Sugerir dias livres`: o sistema sugere datas baseadas na disponibilidade do consultor.
+
+3. Configurar cada item (CronogramaItem)
+- Abrir o editor do item:
+   - Campos: Nome do treinamento, Modalidade, Local/Link, Instrutor, Recursos, Observações.
+   - Data/hora (obrigatórias quando marcado): selecionar data e hora de início/fim.
+   - Checklist: adicionar tarefas vinculadas ao treinamento.
+   - Recorrência: opcional (ex.: toda segunda por 4 semanas).
+
+4. Validações em tempo real
+- Conflito com outros eventos do consultor → mostrar validação vermelha.
+- Fora da jornada do consultor → aviso e bloqueio até corrigir.
+- Itens sem data/hora → não permitem `Enviar para aprovação`.
+
+5. Ações em massa
+- `Marcar todos livres` / `Distribuir nos dias livres` / `Mesmo horário p/ treinamentos` — aplicar alterações em lote para agilizar.
+
+6. Salvar / Enviar
+- `Salvar rascunho`: persiste o cronograma no backend como rascunho (status draft).
+- `Salvar e enviar para aprovação do cliente`: gera anexos (PDF/Excel), cria notification e marca cronograma como `sent`.
+
+7. Editar cronograma provisionado
+- Antes da confirmação do cliente: qualquer item pode ser editado; histórico de alterações deve ser mantido.
+- Após confirmação: campos validados ficam bloqueados; para alterar é necessário reabrir processo (nova versão ou pedir reaprovação).
+
+### Como funcionam Tarefas, Atendimentos e Treinamentos
+
+1. Treinamento
+- Definição: item principal planejado no cronograma (geralmente parte de um template).
+- Ações possíveis: Confirmar data/hora, marcar `Realizado`/`Não realizado`, reagendar, cancelar, abrir checklist de tarefas.
+
+2. Tarefas (checklist)
+- São subtarefas vinculadas a um treinamento.
+- Usos: validar passos (ex.: validar acesso do usuário, configurar parâmetros), coletar pendências.
+- Status: `Open` → `Pending` → `Done` / `Cancelled`.
+- Uma tarefa pode gerar um `Atendimento` para conclusão (se for necessária interação com cliente no campo).
+
+3. Atendimento
+- Definição: registro de execução (runtime) de um treinamento ou ação avulsa.
+- Pode ser:
+   - Vinculado a um treinamento (para concluir tarefas)
+   - Avulso (não vinculado) — ex.: atendimento pontual do cliente
+- Ações: gerar OS, registrar horas, adicionar participantes, anexar evidências.
+
+4. Pendências e rastreabilidade
+- Pendências internas: anotadas pelo consultor (ex.: falta documento) — visíveis na OS.
+- Pendências do cliente: geram follow‑ups e podem abrir atendimentos avulsos.
+
+5. Boas práticas de uso
+- Sempre marcar tarefas concluídas imediatamente após verificação.
+- Se tarefa ficar pendente, criar atendimento vinculado e registrar na OS para contabilização.
+- Use observações e anexos para evidências (fotos, logs, arquivos de configuração).
+
+## Endpoints (agrupados por fluxo operacional)
+
+Nota: estes endpoints são sugestões/contratos para quando o MVP evoluir para um backend REST/HTTP. Inclua autenticação (JWT/oauth) e validações conforme roles.
+
+1) Fluxo: Criar Empresa
+- POST /api/companies
+   - Cria novo cliente/empresa. Body: { name, tradeName, cnpj, contactEmail, responsible, defaultConsultantId, typeOfSchedule, projectName }
+   - Retorna: { companyId }
+- GET /api/companies/:companyId
+   - Retorna dados da empresa.
+
+2) Fluxo: Adicionar empresa ao Kanban / criar card
+- POST /api/companies/:companyId/kanban
+   - Adiciona empresa ao Kanban (cria card). Body: { addedBy }
+   - Retorna: { cardId }
+
+3) Fluxo: Criar Cronograma
+- POST /api/cronograms
+   - Cria cronograma provisório. Body: { companyId, consultantId, period: {start,end}, items: [ { templateItemId?, type, title, date?, startTime?, endTime?, resources? } ] }
+   - Retorna: { cronogramId, preview: [...] }
+- PUT /api/cronograms/:id/items/:itemId
+   - Atualiza item do cronograma (data/hora/recorrência/checklist).
+- POST /api/cronograms/:id/preview-apply-template
+   - Aplica template(s) e retorna preview com sugestões de datas.
+- POST /api/cronograms/:id/send
+   - Gera anexos (PDF/Excel), cria notification e marca cronograma como `sent`.
+
+4) Fluxo: Confirmar Cronograma (cliente)
+- POST /api/cronograms/:id/confirm
+   - Endpoint idempotente para confirmação. Executa operação atômica que cria `attendances`/`trainings` para itens com data/hora definidos e atualiza status.
+   - Retorna relatório de resultados e quaisquer falhas.
+
+5) Fluxo: Criar/Editar Treinamento (Atendimento runtime)
+- POST /api/attendances
+   - Cria um atendimento/treinamento (pode ser manual ou criado automaticamente na confirmação). Body: { cronogramId?, cronogramItemId?, companyId, consultantId, date, startTime, endTime, participants }
+- PUT /api/attendances/:id
+   - Atualiza status (realizado, reagendado, cancelado), anotações e anexos.
+- POST /api/attendances/:id/generate-os
+   - Cria OS vinculada às horas e itens selecionados; retorna osId e PDF anexo.
+
+6) Fluxo: Tarefas (checklist)
+- POST /api/tasks
+   - Cria tarefa (vinculada a training ou independente). Body: { title, description, trainingId?, cronogramItemId?, assignedTo }
+- PUT /api/tasks/:id/status
+   - Atualiza status (concluir, pendência, cancelar).
+
+7) Fluxo: Ordens de Serviço (OS)
+- POST /api/orders
+   - Cria OS manualmente (ou via generate-os). Body: { title, scope, issueDate, consultantId, start, end, participants, internalPendencies, clientPendencies, linkedItems }
+- GET /api/orders/:id/pdf
+   - Retorna PDF pronto para envio.
+
+8) Fluxo: Notificações / Envio
+- POST /api/notifications/send
+   - Envia notificação por email/sms/whatsapp. Body: { type, to, via, payload }
+- GET /api/notifications/:id/status
+   - Checa status de envio.
+
+9) Relatórios e extratos
+- GET /api/companies/:id/hours-summary?from=&to=
+   - Retorna extrato consolidado de horas do cliente (treinamentos, tarefas, atendimentos) no período.
+- GET /api/consultants/:id/hours-summary?from=&to=
+   - Extrato por consultor.
+
+Observações finais:
+- Todos endpoints de criação/alteração devem validar conflitos de horário (overlap) quando relevante e retornar códigos de erro detalhados (ex.: 409 CONFLICT com payload explicando conflito).
+- Endpoints de confirmação (`/confirm`, `/send`) devem ser idempotentes e transacionais.
+
+

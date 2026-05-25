@@ -85,3 +85,19 @@ Se for testar a integração com Teams local, adicionar `http://localhost:3000` 
 **Single-file `index.html` (~22k linhas, sem build/bundler)** → edição direta, sem toolchain, sem dependency tree. Risco se mudar: introduzir Vite/React quebra o fluxo de hot-edit e exige refatorar todo o estado global imperativo em componentes/state management.
 
 **MSAL Public Client (PKCE) no browser, sem backend de auth** → integração com Teams/Outlook sem rodar servidor OAuth. Risco se mudar (ex.: introduzir backend de tokens): refresh tokens de longa duração precisam de armazenamento seguro server-side e nova rota; o `clientId`/`tenantId` atuais foram registrados como **SPA** no Entra — registro `Web` exige client secret.
+
+## Documentação do Fluxo de Agendamento e Implantação
+
+Abaixo estão os documentos detalhados que descrevem o fluxo operacional, visual e as recomendações para a equipe:
+
+- [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Guia operacional completo (passo a passo para consultores).
+- [docs/01_visual_e_estilos.md](docs/01_visual_e_estilos.md) — Parte visual, páginas/abas e frameworks/estilos.
+- [docs/02_componentes_utilizados.md](docs/02_componentes_utilizados.md) — Lista de componentes reutilizáveis.
+- [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md) — Regras de validação e lógica de negócio.
+- [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md) — Fluxo operacional (visão geral para desenvolvimento).
+- [docs/05_fluxo_criar_empresa_e_card.md](docs/05_fluxo_criar_empresa_e_card.md) — Fluxo para criar empresa e adicionar card no Kanban.
+- [docs/06_fluxo_criar_editar_cronograma.md](docs/06_fluxo_criar_editar_cronograma.md) — Processo detalhado para criar/editar cronogramas.
+- [docs/07_tarefas_atendimentos_treinamentos.md](docs/07_tarefas_atendimentos_treinamentos.md) — Como funcionam tarefas, atendimentos e treinamentos.
+- [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md) — Estrutura/coleções do banco de dados (recomendações).
+
+Se quiser, posso também gerar um índice `docs/INDEX.md` e criar um PDF unificado com todos esses documentos.

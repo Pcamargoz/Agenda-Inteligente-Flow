@@ -5224,11 +5224,7 @@
           </div>
         </div>
         <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-primary" id="croBuildBtn">
-            <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
-            Sugerir dias livres
-          </button>
-          <button class="btn" id="croPickTplBtn">
+          <button class="btn btn-primary" id="croPickTplBtn">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
             Usar templates
           </button>
@@ -5768,6 +5764,67 @@
   </div>
 </div>
 
+<!-- ============ MODAL: DISTRIBUIR DIAS LIVRES (preferências + auto-fill do hub) ============ -->
+<div class="overlay" id="modalDistribute">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div>
+        <h3>Distribuir <em>dias livres</em></h3>
+        <p>PREFERÊNCIAS DO CONSULTOR</p>
+      </div>
+      <button class="modal-close" data-close="modalDistribute">&times;</button>
+    </div>
+    <div class="modal-body" id="distBody">
+      <div class="modal-section-title">Período</div>
+      <div class="grid-2" style="margin-bottom:14px">
+        <div class="field"><label>De</label><input type="date" id="distFrom"></div>
+        <div class="field"><label>Até</label><input type="date" id="distTo"></div>
+      </div>
+
+      <div class="modal-section-title">Dias preferenciais</div>
+      <div id="distDows" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
+
+      <div class="modal-section-title">Faixa de horários preferenciais</div>
+      <div class="grid-2" style="margin-bottom:14px">
+        <div class="field"><label>Início</label><input type="time" id="distTimeStart" value="09:00"></div>
+        <div class="field"><label>Término</label><input type="time" id="distTimeEnd" value="18:00"></div>
+      </div>
+
+      <div class="modal-section-title">Regras de distribuição</div>
+      <div class="grid-3" style="margin-bottom:14px">
+        <div class="field"><label>Duração por item (min)</label><input type="number" id="distDuration" min="15" step="15" value="60"></div>
+        <div class="field"><label>Intervalo entre itens (min)</label><input type="number" id="distGap" min="0" step="5" value="15"></div>
+        <div class="field"><label>Máx. itens por dia</label><input type="number" id="distMaxPerDay" min="0" step="1" value="1" title="0 = sem limite"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="distSkipEvents" checked>
+          Pular horários com eventos já existentes
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="distSkipBlocked" checked>
+          Pular datas bloqueadas do consultor
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="distOverwrite">
+          Sobrescrever itens que já têm data definida
+        </label>
+      </div>
+
+      <div id="distPreview" style="margin-top:14px;padding:10px 12px;background:var(--paper-2);border:1px dashed var(--line-2);font-size:12px;color:var(--ink-3);font-family:var(--font-mono)"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close="modalDistribute">Cancelar</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-primary" id="distConfirmBtn">
+        <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+        Distribuir
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ MODAL: TEMPLATE (composite: itens + dias) ============ -->
 <div class="overlay" id="modalTemplate">
   <div class="modal xl">
@@ -6256,7 +6313,7 @@ document.addEventListener('keydown', e => {
 /* ============ NAV ============ */
 const VIEW_META = {
   dashboard:    { crumb:'Operação · Dashboard',     title:'Dashboard <em>operacional</em>',         actions:'' },
-  agenda:       { crumb:'Operação · Agenda completa', title:'Agenda <em>completa</em>',             actions:`<button class="btn" id="btnAgFilter"><svg viewBox="0 0 24 24"><path d="M3 4h18l-7 9v6l-4 2v-8z"/></svg> Filtros</button><button class="btn btn-primary" id="btnAgNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo evento</button>` },
+  agenda:       { crumb:'Operação · Agenda completa', title:'Agenda <em>completa</em>',             actions:`<button class="btn" id="btnAgFilter"><svg viewBox="0 0 24 24"><path d="M3 4h18l-7 9v6l-4 2v-8z"/></svg> Filtros</button><button class="btn" id="btnAgTeamsSync" title="Verificar e enviar eventos da agenda para o Teams/Outlook"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-9-9"/><path d="M21 3v6h-6"/></svg> Sincronizar Teams</button><button class="btn btn-primary" id="btnAgNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo evento</button>` },
   cronogramas:  { crumb:'Operação · Cronogramas',    title:'Cronogramas <em>por empresa</em>',      actions:`<button class="btn btn-primary" id="btnCroNew"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Novo cronograma</button>` },
   registros:    { crumb:'Operação · Registros',      title:'Atendimentos · <em>Treinamentos · Tarefas</em>', actions:'' },
   cadastros:    { crumb:'Configuração · Cadastros',  title:'Cadastros <em>do sistema</em>',         actions:'' },
@@ -6281,6 +6338,8 @@ function wireTopActions(){
   if (newAg) newAg.onclick = () => openEventModal(null);
   const newCro = document.getElementById('btnCroNew');
   if (newCro) newCro.onclick = () => startNewCronograma();
+  const teamsSyncBtn = document.getElementById('btnAgTeamsSync');
+  if (teamsSyncBtn) teamsSyncBtn.onclick = () => teamsBulkSync();
 }
 
 /* ============ MASTER RENDER ============ */
@@ -7552,13 +7611,17 @@ function startNewCronograma(){
   const dim = new Date(state.viewYear, state.viewMonth+1, 0).getDate();
   document.getElementById('croTo').value = fmtDate(state.viewYear, state.viewMonth, dim);
   renderCroPreview();
-  toast('info','Novo cronograma','Configure empresa, consultor e período, depois clique em "Sugerir dias livres".');
+  toast('info','Novo cronograma','Configure empresa, consultor e período, depois clique em "Usar templates".');
   document.querySelector('#view-cronogramas .crono-builder').scrollIntoView({behavior:'smooth'});
 }
 window.startNewCronograma = startNewCronograma;
 
-document.getElementById('croBuildBtn').onclick = buildCroPreview;
 document.getElementById('cmConfirmAllBtn').onclick = confirmAllSchedule;
+/* wire-up do botão "Distribuir" dentro do modal de preferências */
+(function wireDistributeModal(){
+  const btn = document.getElementById('distConfirmBtn');
+  if (btn) btn.onclick = () => confirmDistributeDays();
+})();
 document.getElementById('cmExportPdfBtn').onclick = () => state.croCurrentScheduleId && exportSchedule(state.croCurrentScheduleId,'pdf');
 document.getElementById('cmExportXlsBtn').onclick = () => state.croCurrentScheduleId && exportSchedule(state.croCurrentScheduleId,'csv');
 document.getElementById('croOpenSavedBtn').onclick = () => document.querySelector('#view-cronogramas .panel').scrollIntoView({behavior:'smooth'});
@@ -9484,9 +9547,9 @@ function renderCroHub(){
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
           Mesmo horário p/ tarefas (${tasks.length})
         </button>
-        <button class="btn btn-xs" onclick="hubBulkSpreadDates()">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="1"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          Distribuir nos dias livres
+        <button class="btn btn-xs" onclick="openDistributeDaysModal()">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="1"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="8" cy="15" r="1.5"/><circle cx="16" cy="15" r="1.5"/></svg>
+          Distribuir dias livres
         </button>
         <div class="toolbar-spacer"></div>
         <span style="font-size:10.5px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.04em">
@@ -9644,10 +9707,190 @@ window.hubBulkApplyTime = (kind) => {
   renderCroHub();
 };
 
+/* ============================================
+   DISTRIBUIR DIAS LIVRES — modal de preferências + algoritmo
+   ============================================
+   Lê EVENTS, blockedDates e jornada do consultor pra encontrar slots livres
+   dentro dos filtros do usuário, e aplica diretamente em state.croTplItems. */
+const DOW_LABELS = ['D','S','T','Q','Q','S','S'];
+const DOW_FULL = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+window.openDistributeDaysModal = () => {
+  const items = state.croTplItems || [];
+  if (!items.length){ toast('warn','Nenhum item','Adicione um template primeiro.'); return; }
+  const consId = document.getElementById('croConsultant')?.value;
+  const c = consultantById(consId);
+  if (!c){ toast('error','Consultor inválido','Selecione um consultor no cronograma.'); return; }
+
+  /* Defaults baseados no cronograma + jornada do consultor.
+     A data inicial nunca pode ser no passado — usa hoje (data local da máquina)
+     se o cronograma estiver desatualizado. */
+  const _now = new Date();
+  const todayISO = fmtDate(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  const croFrom = document.getElementById('croFrom')?.value || todayISO;
+  const from = (croFrom < todayISO) ? todayISO : croFrom;
+  const toDate = document.getElementById('croTo')?.value || (() => {
+    const d = new Date(_now); d.setDate(d.getDate()+30);
+    return fmtDate(d.getFullYear(), d.getMonth(), d.getDate());
+  })();
+  const distFromEl = document.getElementById('distFrom');
+  distFromEl.value = from;
+  distFromEl.min = todayISO;          /* HTML5: bloqueia escolha manual de data passada */
+  document.getElementById('distTo').value = toDate;
+  document.getElementById('distTo').min = todayISO;
+  document.getElementById('distTimeStart').value = c.workStart || '09:00';
+  document.getElementById('distTimeEnd').value = c.workEnd || '18:00';
+
+  /* Pílulas de dias da semana — pré-seleciona a partir de c.freeDays */
+  const dowWrap = document.getElementById('distDows');
+  const selected = new Set(Array.isArray(c.freeDays) ? c.freeDays : [1,2,3,4,5]);
+  dowWrap.innerHTML = DOW_LABELS.map((lbl, i) => `
+    <button type="button" class="btn btn-xs ${selected.has(i)?'btn-primary':''}"
+            data-dow="${i}" style="min-width:38px"
+            title="${DOW_FULL[i]}">${lbl}</button>
+  `).join('');
+  dowWrap.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      const isOn = btn.classList.toggle('btn-primary');
+      btn.dataset.selected = isOn ? '1' : '0';
+      updateDistPreview();
+    };
+    btn.dataset.selected = selected.has(parseInt(btn.dataset.dow)) ? '1' : '0';
+  });
+
+  /* Listeners pra atualizar preview ao vivo */
+  ['distFrom','distTo','distTimeStart','distTimeEnd','distDuration','distGap','distMaxPerDay','distSkipEvents','distSkipBlocked','distOverwrite'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.oninput = el.onchange = updateDistPreview;
+  });
+
+  updateDistPreview();
+  openModal('modalDistribute');
+};
+
+function readDistPrefs(){
+  const dows = Array.from(document.querySelectorAll('#distDows button'))
+    .filter(b => b.dataset.selected === '1')
+    .map(b => parseInt(b.dataset.dow));
+  return {
+    from: document.getElementById('distFrom').value,
+    to:   document.getElementById('distTo').value,
+    timeStart: document.getElementById('distTimeStart').value || '09:00',
+    timeEnd:   document.getElementById('distTimeEnd').value   || '18:00',
+    daysOfWeek: dows,
+    duration:  Math.max(15, parseInt(document.getElementById('distDuration').value)  || 60),
+    gap:       Math.max(0,  parseInt(document.getElementById('distGap').value)       || 0),
+    maxPerDay: Math.max(0,  parseInt(document.getElementById('distMaxPerDay').value) || 0),
+    skipEvents:  document.getElementById('distSkipEvents').checked,
+    skipBlocked: document.getElementById('distSkipBlocked').checked,
+    overwrite:   document.getElementById('distOverwrite').checked,
+  };
+}
+
+/* Gera os slots candidatos respeitando todos os filtros. */
+function buildDistSlots(prefs, consultant){
+  const slots = [];
+  if (!prefs.from || !prefs.to || !prefs.daysOfWeek.length) return slots;
+  const startMin = timeToMin(prefs.timeStart);
+  const endMin   = timeToMin(prefs.timeEnd);
+  if (endMin <= startMin) return slots;
+  const step = prefs.duration + prefs.gap;
+  /* Validação: data atual da máquina como piso. Nunca sugere dias passados,
+     mesmo que o usuário burle o input HTML. */
+  const _now = new Date();
+  const todayISO = fmtDate(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  const effectiveFrom = (prefs.from < todayISO) ? todayISO : prefs.from;
+  let d = parseISO(effectiveFrom);
+  const last = parseISO(prefs.to);
+  if (d > last) return slots;
+  while (d <= last){
+    const iso = fmtDate(d.getFullYear(), d.getMonth(), d.getDate());
+    const dow = d.getDay();
+    const skip = !prefs.daysOfWeek.includes(dow)
+              || (prefs.skipBlocked && consultant.blockedDates.includes(iso));
+    if (!skip){
+      const existing = prefs.skipEvents ? EVENTS.filter(e =>
+        e.consultantId === consultant.id && e.date === iso && e.status !== 'cancelado' && e.status !== 'reagendado'
+      ) : [];
+      let countDay = 0;
+      for (let t = startMin; t + prefs.duration <= endMin; t += step){
+        const tEnd = t + prefs.duration;
+        const conflict = existing.some(e =>
+          timeToMin(e.timeStart) < tEnd && t < timeToMin(e.timeEnd)
+        );
+        if (!conflict){
+          slots.push({ date: iso, timeStart: minToTime(t), timeEnd: minToTime(tEnd) });
+          countDay++;
+          if (prefs.maxPerDay && countDay >= prefs.maxPerDay) break;
+        }
+      }
+    }
+    d = new Date(d); d.setDate(d.getDate()+1);
+  }
+  return slots;
+}
+
+function updateDistPreview(){
+  const prefs = readDistPrefs();
+  const consId = document.getElementById('croConsultant')?.value;
+  const c = consultantById(consId);
+  const el = document.getElementById('distPreview');
+  if (!c){ el.textContent = '— consultor inválido —'; return; }
+  if (!prefs.daysOfWeek.length){ el.textContent = '⚠ Selecione ao menos 1 dia da semana'; return; }
+  const slots = buildDistSlots(prefs, c);
+  const items = state.croTplItems.filter(it => it._userStatus !== 'pulado' && (prefs.overwrite || !it.date));
+  const willFit = Math.min(slots.length, items.length);
+  el.innerHTML = `
+    ${slots.length} slot(s) disponíveis · ${items.length} item(ns) a distribuir · <b>${willFit}</b> serão preenchidos
+    ${slots.length < items.length ? `<br>⚠ ${items.length - slots.length} item(ns) ficarão sem data (slots insuficientes)` : ''}
+  `;
+}
+
+window.confirmDistributeDays = () => {
+  const prefs = readDistPrefs();
+  if (!prefs.daysOfWeek.length){ toast('error','Sem dias selecionados','Marque ao menos 1 dia da semana.'); return; }
+  if (timeToMin(prefs.timeEnd) <= timeToMin(prefs.timeStart)){
+    toast('error','Faixa de horário inválida','Término deve ser maior que início.'); return;
+  }
+  const consId = document.getElementById('croConsultant')?.value;
+  const c = consultantById(consId);
+  if (!c){ toast('error','Consultor inválido'); return; }
+
+  const slots = buildDistSlots(prefs, c);
+  const target = state.croTplItems.filter(it => it._userStatus !== 'pulado' && (prefs.overwrite || !it.date));
+  if (!target.length){ toast('info','Nada a distribuir','Todos os itens já têm data — marque "Sobrescrever" se quiser realocar.'); return; }
+  if (!slots.length){ toast('warn','Nenhum slot livre','Amplie o período ou afrouxe as preferências.'); return; }
+
+  if (slots.length < target.length){
+    if (!confirm(`Encontrei ${slots.length} slot(s) livres para ${target.length} item(s).\n\nDistribuir parcialmente (os ${target.length - slots.length} item(ns) restante(s) ficarão sem data)?`)) return;
+  }
+
+  let applied = 0;
+  target.forEach((it, idx) => {
+    if (idx >= slots.length) return;
+    const s = slots[idx];
+    it.date = s.date;
+    it.timeStart = s.timeStart;
+    it.timeEnd = s.timeEnd;
+    if (!it.responsibleId) it.responsibleId = consId;
+    it._touched = true;
+    if (it._userStatus === 'aguardando-agendar') it._userStatus = undefined;
+    applied++;
+  });
+
+  closeModal('modalDistribute');
+  if (typeof renderCroHub === 'function') renderCroHub();
+  if (typeof persist === 'function') persist();
+  toast('success', `${applied} item(ns) distribuído(s)`,
+    `${c.name} · ${prefs.daysOfWeek.length} dia(s) da semana · ${prefs.duration}min cada`);
+};
+
+/* Função legada — mantida pra retrocompatibilidade; redireciona pro modal novo. */
 window.hubBulkSpreadDates = () => {
+  if (typeof openDistributeDaysModal === 'function') return openDistributeDaysModal();
   const freeDays = state.croPreview.filter(d => d.isFree && d.selected).map(d => d.iso);
   if (!freeDays.length){
-    toast('warn','Sem dias livres','Use "Sugerir dias livres" primeiro para gerar a lista de candidatos.');
+    toast('warn','Sem dias livres','Abra o modal "Distribuir dias livres" no hub para configurar.');
     return;
   }
   let idx = 0;
@@ -13125,7 +13368,7 @@ window.ccCreateNewSchedule = (companyId) => {
     state.croPreview = [];
     state.croDraftScheduleId = null;
     if (typeof renderCroHub === 'function') renderCroHub();
-    toast('info','Novo cronograma', `Pré-preenchido para ${co.fantasia}. Use "Usar templates" ou "Sugerir dias livres".`);
+    toast('info','Novo cronograma', `Pré-preenchido para ${co.fantasia}. Clique em "Usar templates" para montar.`);
     document.querySelector('#view-cronogramas .crono-builder')?.scrollIntoView({behavior:'smooth'});
   }, 200);
 };
@@ -14528,24 +14771,39 @@ if (_origDoConfirm){
       pushHistory(card, 'cronograma confirmado', `${(s.items||[]).length} itens entraram no card`);
       toast('info','Card do cliente atualizado',
         `${companyById(s.companyId)?.fantasia} · ${(s.items||[]).length} itens disponíveis em Atend./Treino/Tarefas`);
+      /* Replica todos os eventos do cronograma no Teams do usuário logado (se conectado) */
+      if (typeof teamsSyncSchedule === 'function') teamsSyncSchedule(s);
     }
     return result;
   };
 }
 
-/* Também cria card ao apenas SALVAR rascunho/aguardando-cliente (para já aparecer no Kanban) */
+/* Também cria card ao apenas SALVAR rascunho/aguardando-cliente (para já aparecer no Kanban).
+   Regras de transição automática do status do card:
+     - card novo + cronograma rascunho      → nao-iniciada
+     - card novo + cronograma enviado       → aguardando
+     - card já em nao-iniciada + envio      → promove para aguardando
+     - card em em-andamento/concluida/etc   → preserva (só promove "pra cima")
+     - card.statusManual === true           → respeita escolha manual e não mexe */
 const _origSaveDraftSchedule = (typeof saveDraftSchedule === 'function') ? saveDraftSchedule : null;
 if (_origSaveDraftSchedule){
   saveDraftSchedule = function(opts = {}){
     const result = _origSaveDraftSchedule.apply(this, arguments);
-    /* depois do salvamento, garante card */
     const draftId = state.croDraftScheduleId;
     const lastSch = SCHEDULES.find(x => x.id === draftId) || SCHEDULES[SCHEDULES.length-1];
     if (lastSch){
-      ensureClientCard(lastSch.companyId, {
+      const sentToClient = lastSch.status === 'aguardando-cliente';
+      const card = ensureClientCard(lastSch.companyId, {
         scheduleId: lastSch.id,
-        status: lastSch.status === 'aguardando-cliente' ? 'aguardando' : 'nao-iniciada',
+        status: sentToClient ? 'aguardando' : 'nao-iniciada',
       });
+      /* Promove card existente quando cronograma vai pro cliente.
+         Só promove de nao-iniciada → aguardando (nunca demove). */
+      if (card && sentToClient && !card.statusManual && card.status === 'nao-iniciada'){
+        card.status = 'aguardando';
+        pushHistory(card, 'aguardando cliente', `cronograma ${lastSch.id} enviado para aprovação`);
+        if (typeof renderClientKanban === 'function') renderClientKanban();
+      }
     }
     return result;
   };
@@ -22247,6 +22505,13 @@ window.pubConfirmSchedule = (sId, token) => {
     }
   } catch(e){ console.warn('ensureClientCard falhou', e); }
 
+  /* Replica eventos do cronograma no Teams do usuário logado (se houver).
+     Em modo público o viewer pode ser o próprio cliente — nesse caso
+     teamsIsConnected() retorna false e a função sai silenciosamente. */
+  try {
+    if (typeof teamsSyncSchedule === 'function') teamsSyncSchedule(s);
+  } catch(e){ console.warn('teamsSyncSchedule falhou', e); }
+
   /* Limpa picks da memória */
   window._pubScheduleDayPicks = {};
   persist();
@@ -22762,8 +23027,110 @@ async function teamsSync(action, ev){
   }
 }
 
+/* ---------- Sincronização em lote (botão "Sincronizar Teams" na agenda) ----------
+   Necessário porque eventos criados via confirmação de cronograma (e quaisquer
+   eventos pré-existentes à integração) não passam pelo hook em saveEvent — ficam
+   sem graphEventId e portanto ausentes do Outlook/Teams. */
+function teamsUnsyncedEvents(){
+  const skipStatus = new Set(['cancelado','reagendado']);
+  return EVENTS.filter(ev => !ev.graphEventId && !skipStatus.has(ev.status));
+}
+
+async function teamsBulkSync(){
+  /* 1) Garantir login */
+  if (!teamsIsConnected()){
+    if (!confirm('Você ainda não está conectado ao Teams.\n\nConectar agora para sincronizar a agenda?')) return;
+    await teamsToggleConnect();
+    if (!teamsIsConnected()) return;
+  }
+
+  /* 2) Verificar o que está fora de sincronia */
+  const todo = teamsUnsyncedEvents();
+  if (!todo.length){
+    toast('success','Agenda em dia ✓','Todos os eventos válidos já estão no seu Teams/Outlook.');
+    return;
+  }
+
+  /* 3) Quebrar por período pra dar contexto ao usuário */
+  const today = new Date().toISOString().slice(0,10);
+  const futuros = todo.filter(e => (e.date||'') >= today).length;
+  const passados = todo.length - futuros;
+
+  const msg =
+    `Encontrei ${todo.length} evento(s) na agenda que ainda não estão no seu Teams/Outlook:\n\n` +
+    `• ${futuros} de hoje em diante\n` +
+    `• ${passados} no passado\n\n` +
+    `Deseja enviar todos agora?\n` +
+    `(eventos cancelados e reagendados são ignorados)`;
+  if (!confirm(msg)) return;
+
+  /* 4) Loop sequencial — teamsSync já é async/await + idempotente */
+  toast('info', `Sincronizando ${todo.length} eventos...`, 'Aguarde, isso pode levar alguns segundos.');
+  let ok = 0, fail = 0;
+  for (const ev of todo){
+    try {
+      await teamsSync('create', ev);
+      if (ev.graphEventId) ok++; else fail++;
+    } catch(e){
+      console.error('[teams] bulk: falha em', ev.id, e);
+      fail++;
+    }
+  }
+
+  /* 5) Persistir os graphEventId recém-atribuídos e re-renderizar */
+  if (typeof persist === 'function') persist();
+  if (typeof renderAll === 'function') renderAll();
+
+  if (fail === 0){
+    toast('success','Sincronização concluída ✓', `${ok} evento(s) enviados ao Teams/Outlook.`);
+  } else if (ok === 0){
+    toast('error','Sincronização falhou', `Nenhum evento foi enviado. Verifique o console (F12).`);
+  } else {
+    toast('warning','Sincronização parcial', `${ok} OK · ${fail} falharam. Veja o console para detalhes.`);
+  }
+}
+
+/* ---------- Sincronização automática de cronograma confirmado ----------
+   Disparada quando um cronograma vai para status 'confirmado' (interno ou
+   via link público). Replica TODOS os eventos do cronograma no calendário
+   Outlook/Teams do usuário logado. Silencioso se Teams não estiver conectado
+   (ex: viewer do link público que é o cliente — não tem nosso Teams). */
+async function teamsSyncSchedule(sch){
+  if (!sch || !teamsIsConnected()) return;
+  const ids = new Set(sch.eventIds || []);
+  /* Considera tanto eventIds explícitos quanto eventos com seriesId === sch.id */
+  const targets = EVENTS.filter(e =>
+    (ids.has(e.id) || e.seriesId === sch.id) &&
+    !e.graphEventId &&
+    e.status !== 'cancelado' && e.status !== 'reagendado'
+  );
+  if (!targets.length) return;
+
+  toast('info', `Replicando ${targets.length} evento(s) no Teams...`, 'Cronograma confirmado — aguarde alguns segundos.');
+  let ok = 0, fail = 0;
+  for (const ev of targets){
+    try {
+      await teamsSync('create', ev);
+      if (ev.graphEventId) ok++; else fail++;
+    } catch(e){
+      console.error('[teams] schedule sync falhou em', ev.id, e);
+      fail++;
+    }
+  }
+  if (typeof persist === 'function') persist();
+  if (fail === 0){
+    toast('success','Cronograma replicado no Teams ✓', `${ok} evento(s) adicionados ao seu calendário.`);
+  } else if (ok === 0){
+    toast('warning','Falha ao replicar no Teams', `Tente o botão "Sincronizar Teams" na agenda.`);
+  } else {
+    toast('warning','Sincronização parcial do cronograma', `${ok} OK · ${fail} falharam — use "Sincronizar Teams" para tentar de novo.`);
+  }
+}
+
 window.teamsToggleConnect = teamsToggleConnect;
 window.teamsSync = teamsSync;
+window.teamsSyncSchedule = teamsSyncSchedule;
+window.teamsBulkSync = teamsBulkSync;
 document.addEventListener('DOMContentLoaded', teamsUpdateBtn);
 teamsInitMsal();
 teamsUpdateBtn();

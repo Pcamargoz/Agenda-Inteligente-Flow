@@ -1,50 +1,27 @@
 ---
+title: "DOCUMENTACAO_TECNICA_COMPLETA"
+author: "Auto-compiled"
+date: "2026-05-25"
+version: "1.0"
+---
+## Sumário (clique para abrir)
 
-## Parte 8 — Estrutura do Banco de Dados (inserido de `08_estrutura_banco_de_dados.md`)
-
-Objetivo: descrever o modelo de dados sugerido/atual para o MVP/POC e qual tecnologia de banco usar.
-
-1. Tecnologia recomendada / usada
-- MVP/POC: Firestore (NoSQL) é adequado por agilidade e escalabilidade; pode ser substituído por Postgres conforme necessidade de consultas complexas.
-
-2. Coleções recomendadas (Firestore)
-- `companies` — documentos com dados da empresa/cliente
-  - campos: name, tradeName, cnpj, contactEmail, responsible, defaultConsultantId, projectName, typeOfSchedule, createdAt
-- `consultants` — dados dos consultores
-  - campos: userId, name, initials, role, specialty, email, phone, workDay {start, end, lunch}, availability {mon..sun}, active
-- `templates` — templates de agendamento
-  - campos: name, description, items: [{title,type,duration,durationUnit,resources,checklist}], active
-- `cronograms` (ou `cronograms`) — cronogramas por empresa
-  - campos: companyId, consultantId, period {start,end}, status, items: [ {templateItemId?, type, title, date, startTime, endTime, status, assignedTo, linkedTasks} ], createdBy, createdAt
-- `attendances` — registros de execução (treinamentos/atendimentos), também chamados `trainings` em algumas telas
-  - campos: cronogramId, cronogramItemId, companyId, consultantId, date, startTime, endTime, participants, status, notes
-- `tasks` — tarefas independentes ou vinculadas (subcoleção possível em `attendances`)
-  - campos: title, description, assignedTo, status, dueDate, linkedAttendanceId?, linkedCronogramItemId?
-- `orders` — Ordens de Serviço (OS)
-  - campos: title, scope, issueDate, consultantId, start, end, participants, internalPendencies, clientPendencies, linkedItems, attachments
-- `notifications` — histórico de envios (email/sms)
-  - fields: type, to, via, payload, sentAt, status
-
-3. Observações de modelagem
-- Subcoleções por `company` ou `cronogram` podem ajudar a limitar leituras quando listando itens por empresa.
-- Indexes: criar índices compostos por `companyId` + `period` / `consultantId` + `date` para consultas por intervalo.
-- Auditoria: manter `history` ou coleções de `changeLogs` para rastrear alterações (quem, quando, o quê).
-
-4. Snapshot de dados (exemplo simplificado)
-companies/{companyId}
-  - name: "ACME Ltda"
-  - contactEmail: "contato@acme.com"
-consultants/{consultantId}
-  - name: "Iago Rossan"
-cronograms/{cronogramId}
-  - companyId: "companyId"
-  - items: [ { title: "Onboarding", date: "2026-06-01", startTime: "11:30", endTime: "12:30" } ]
-
-5. Migração/Backup
-- Exportar coleções críticas (companies, cronograms, attendances, orders) periodicamente.
+- [Guia Operacional — Fluxo Resumido](#guia-operacional---fluxo-resumido) — [arquivo](docs/GUIDA_OPERACIONAL.md)
+- [Índice Navegável](#indice-navegavel) — [arquivo](docs/INDEX.md)
+- [Documentação Técnica — principal](#documentação-técnica-—-principal) — [arquivo](docs/DOCUMENTACAO_TECNICA.md)
+- [Parte 1 — Visual e Estilos](#parte-1-—-visual-e-estilos) — [arquivo](docs/01_visual_e_estilos.md)
+- [Parte 2 — Componentes utilizados](#parte-2-—-componentes-utilizados) — [arquivo](docs/02_componentes_utilizados.md)
+- [Parte 3 — Lógicas e Validações](#parte-3-—-lógicas-e-validações) — [arquivo](docs/03_logicas_e_validacoes.md)
+- [Parte 4 — Fluxo de Código (visão geral operacional)](#parte-4-—-fluxo-de-código-visão-geral-operacional) — [arquivo](docs/04_fluxo_codigo_geral.md)
+- [Parte 8 — Estrutura do Banco de Dados](#parte-8-estrutura-do-banco-de-dados) — [arquivo](docs/08_estrutura_banco_de_dados.md)
+- [Acceptance Checklists](#acceptance-checklists) — [arquivo](docs/ACCEPTANCE_CHECKLISTS.md)
+- [Envio de E-mails — Visão Geral](#envio-de-emails---visao-geral) — [arquivo](docs/EMAIL_ENVIO.md)
+- [Blueprint MVP — Documento Completo](#blueprint-mvp---documento-completo) — [arquivo](docs/MVP_BLUEPRINT.md)
+- [DOCS.md — Índice técnico e notas](#docsmd---indice-tecnico-e-notas) — [arquivo](docs/DOCS.md)
 
 ---
 
+<a id="acceptance-checklists"></a>
 ## Acceptance Checklists (inserido de `ACCEPTANCE_CHECKLISTS.md`)
 
 Objetivo: checklists concisos para validação funcional durante QA e homologação.
@@ -90,7 +67,9 @@ Observação: use estes pontos como base — adaptar conforme fluxo operacional 
 
 ---
 
+<a id="guia-operacional---fluxo-resumido"></a>
 ## Guia Operacional — Fluxo Resumido (inserido de `GUIDA_OPERACIONAL.md`)
+Ver original: [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
 
 Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, com links para documentação técnica detalhada.
 
@@ -117,45 +96,47 @@ Ações rápidas por papel
 - Cliente: aprovar cronogramas, confirmar horários, assinar OS.
 
 Onde encontrar detalhes
-- Fluxo mestre: `FLUXO_AGENDAMENTO_IMPLANTACAO.md`
-- Visual e estilos: `docs/01_visual_e_estilos.md`
-- Componentes: `docs/02_componentes_utilizados.md`
-- Lógicas e validações: `docs/03_logicas_e_validacoes.md`
-- Fluxo de código (visão geral): `docs/04_fluxo_codigo_geral.md`
-- Estrutura de dados / DB: `docs/08_estrutura_banco_de_dados.md`
-- Índice navegável: `INDEX.md`
+- Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md)
+- Visual e estilos: [docs/01_visual_e_estilos.md](docs/01_visual_e_estilos.md)
+- Componentes: [docs/02_componentes_utilizados.md](docs/02_componentes_utilizados.md)
+- Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md)
+- Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md)
+- Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
+- Índice navegável: [docs/INDEX.md](docs/INDEX.md)
 
 Próximos artefatos recomendados
-- `docs/ACCEPTANCE_CHECKLISTS.md` — checklists por tela para QA/aceitação.
+- [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md) — checklists por tela para QA/aceitação.
 
 ---
 
+<a id="indice-navegavel"></a>
 ## Índice Navegável (inserido de `INDEX.md`)
+Ver original: [docs/INDEX.md](docs/INDEX.md)
 
 Este índice reúne os principais guias e referências do projeto para facilitar a implantação da POC/MVP.
 
 Leitura recomendada (ordem curta)
-- Operacional (obrigatório): `GUIDA_OPERACIONAL.md` — resumo acionável para coordenadores e consultores.
-- Visão geral / referência: `DOCS.md` — índice técnico com links para todos os documentos.
-- QA / Aceitação: `docs/ACCEPTANCE_CHECKLISTS.md`
+- Operacional (obrigatório): [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
+- Visão geral / referência: [docs/DOCS.md](docs/DOCS.md) — índice técnico com links para todos os documentos.
+- QA / Aceitação: [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
 
 Guias operacionais
-- `GUIDA_OPERACIONAL.md` — Quickstart operacional (1 página).
-- `FLUXO_AGENDAMENTO_IMPLANTACAO.md` — Fluxo mestre detalhado (passo a passo).
+- [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
+- [docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Fluxo mestre detalhado (passo a passo).
 
 Documentos por público
 Operação / Implantação
-- `GUIDA_OPERACIONAL.md`
-- `docs/ACCEPTANCE_CHECKLISTS.md`
+- [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
+- [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
 
 Desenvolvimento / Referência técnica
-- `DOCS.md` — índice geral e instruções de deploy.
+- [docs/DOCS.md](docs/DOCS.md) — índice geral e instruções de deploy.
 - `Documentação Técnica — principal` (já presente neste arquivo)
-- `docs/01_visual_e_estilos.md`
-- `docs/02_componentes_utilizados.md`
-- `docs/03_logicas_e_validacoes.md`
-- `docs/04_fluxo_codigo_geral.md`
-- `docs/08_estrutura_banco_de_dados.md`
+- [docs/01_visual_e_estilos.md](docs/01_visual_e_estilos.md)
+- [docs/02_componentes_utilizados.md](docs/02_componentes_utilizados.md)
+- [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md)
+- [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md)
+- [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
 
 Exportar para PDF (comando sugerido)
 ```bash
@@ -164,6 +145,7 @@ pandoc docs/GUIDA_OPERACIONAL.md docs/*.md -o Faktory-Flow-Docs.pdf
 
 ---
 
+<a id="envio-de-emails---visao-geral"></a>
 ## Envio de E-mails — Visão Geral (inserido de `EMAIL_ENVIO.md`)
 
 Este documento explica, de forma concisa, como funciona o fluxo de envio de e-mails (Ordens de Serviço e notificações) no projeto. Não contém instruções de configuração de provedores ou plataformas de deploy — essas informações foram removidas dos guias principais e centralizadas aqui para referência operacional.
@@ -198,18 +180,21 @@ Observação
 
 ---
 
+<a id="blueprint-mvp---documento-completo"></a>
 ## Blueprint MVP — Documento Completo (inserido de `MVP_BLUEPRINT.md`)
 
 [Conteúdo completo do Blueprint MVP foi incorporado — inclui Resumo executivo, Escopo, Modelo de dados, Fluxo end-to-end, Regras de negócio, Stack recomendado, Arquitetura, Integrações, Variáveis sensíveis e Roteiro de reconstrução.]
 
 ---
 
+<a id="docsmd---indice-tecnico-e-notas"></a>
 ## DOCS.md — Índice técnico e notas (inserido de `DOCS.md`)
 
-[Conteúdo do `docs/DOCS.md` incorporado aqui. Contém visão geral, integrações externas, automações, variáveis sensíveis e instruções gerais de execução, além de observações sobre persistência local, MSAL e html2pdf.]
+[Conteúdo do [docs/DOCS.md](docs/DOCS.md) incorporado aqui. Contém visão geral, integrações externas, automações, variáveis sensíveis e instruções gerais de execução, além de observações sobre persistência local, MSAL e html2pdf.]
 
 ---
 
+<a id="fim-do-arquivo-compilado"></a>
 ## Fim do arquivo compilado
 
 Se desejar, posso:
@@ -218,7 +203,7 @@ Se desejar, posso:
 - Incluir metadados YAML no topo do arquivo para ajudar ferramentas de parsing.
 # Documentação Técnica — Única (compilada)
 
-Este arquivo reúne os documentos técnicos presentes em `docs/` num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy foram removidas e mantidas separadas; informações sobre o envio de e-mails estão em `docs/EMAIL_ENVIO.md`.
+Este arquivo reúne os documentos técnicos presentes em [docs/](docs/) num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy foram removidas e mantidas separadas; informações sobre o envio de e-mails estão em [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
 
 Sumário
 - [Documentação Técnica — principal](#documentação-técnica-—-principal)
@@ -239,9 +224,11 @@ Sumário
 
 <!-- Include main technical doc -->
 
+Ver original: [docs/DOCUMENTACAO_TECNICA.md](docs/DOCUMENTACAO_TECNICA.md)
+
 <!-- START: DOCUMENTACAO_TECNICA.md -->
 
-(Conteúdo completo de `docs/DOCUMENTACAO_TECNICA.md`)
+(Conteúdo completo de [docs/DOCUMENTACAO_TECNICA.md](docs/DOCUMENTACAO_TECNICA.md))
 
 
 *A seguir está o conteúdo principal consolidado.*
@@ -307,7 +294,7 @@ Usuário → SPA (index.html) → localStorage (dados)
 O back-end consiste em pontos mínimos utilizados pelo front-end para operações que dependem de segredos ou de serviços externos (por exemplo, envio de e-mail). Por segurança e separação de responsabilidades a implementação exemplar disponível no repositório é simples — para produção, recomenda‑se migrar a lógica crítica para um serviço backend mais robusto.
 
 - Implementação de referência: existe uma função exemplo que recebe o payload da OS e encaminha para um serviço de envio (SMTP ou transacional).
-- Para a descrição do fluxo de envio de e-mails e recomendações operacionais, veja `docs/EMAIL_ENVIO.md`.
+- Para a descrição do fluxo de envio de e-mails e recomendações operacionais, veja [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
 
 ## 8. Front-end
 
@@ -530,6 +517,6 @@ Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, 
 
 ## Referências e próximos passos
 
-- A versão compacta para leitura rápida é `docs/GUIDA_OPERACIONAL.md`.
+- A versão compacta para leitura rápida é [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md).
 - Para questões operacionais de deploy e configuração sensível solicite acesso ao responsável pela infraestrutura.
-- Para detalhes do fluxo de envio de e-mails veja `docs/EMAIL_ENVIO.md`.
+- Para detalhes do fluxo de envio de e-mails veja [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).

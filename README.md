@@ -10,8 +10,8 @@ Visão rápida:
 - Envio de e-mails: fluxo tratado por um endpoint dedicado — detalhes em [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
 
 Comece por:
-- 📘 `docs/GUIDA_OPERACIONAL.md` — guia prático (coordenador / consultor).
-- 🧭 `docs/INDEX.md` — índice navegável com os documentos por público.
-- 📗 `docs/DOCUMENTACAO_TECNICA.md` — documentação técnica principal.
+- 📘 [Guia Operacional](docs/GUIDA_OPERACIONAL.md) — guia prático (coordenador / consultor).
+- 🧭 [Índice Navegável](docs/INDEX.md) — índice navegável com os documentos por público.
+- 📗 [Documentação Técnica](docs/DOCUMENTACAO_TECNICA.md) — documentação técnica principal.
 
 Para operações sensíveis (configuração de provedores, deploys e variáveis secretas), consulte a equipe responsável pela infraestrutura; detalhes operacionais foram removidos do README e centralizados nos arquivos de `docs/`.

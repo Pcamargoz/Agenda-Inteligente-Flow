@@ -22608,12 +22608,14 @@ window.copyFeedbackLink = (cardId) => {
    do usuário logado — aparece automaticamente no Teams + Outlook.
    ============================================ */
 const TEAMS_CFG = {
-  // Tenant pessoal do Pedro (Default Directory) — ambiente de testes
+  // App registrado no tenant pessoal do Pedro
   clientId: '2082e19a-ff5f-4fbf-b4a6-e06e9f240d3b',
-  tenantId: 'ad83b7a6-05a4-467d-a7f0-7f9f48f78bf4',
+  // 'common' = autoridade multi-conta: aceita MSA (outlook.com/hotmail)
+  // E qualquer conta corporativa M365. Necessário pra emitir token contra
+  // o calendário consumer real (não a identidade B2B vazia do tenant).
+  tenantId: 'common',
   redirectUri: 'https://agenda-inteligente-flow.vercel.app',
   // OnlineMeetings.ReadWrite exige licença M365 Business/Enterprise.
-  // Deixar de fora enquanto estiver em tenant pessoal de teste.
   scopes: ['User.Read','Calendars.ReadWrite','offline_access'],
   enableTeamsMeeting: false,
   timeZone: 'America/Sao_Paulo',

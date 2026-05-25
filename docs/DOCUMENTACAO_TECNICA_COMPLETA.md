@@ -14,6 +14,7 @@ version: "1.0"
 - [Parte 3 — Lógicas e Validações](#parte-3-—-lógicas-e-validações) — [arquivo](docs/03_logicas_e_validacoes.md)
 - [Parte 4 — Fluxo de Código (visão geral operacional)](#parte-4-—-fluxo-de-código-visão-geral-operacional) — [arquivo](docs/04_fluxo_codigo_geral.md)
 - [Parte 8 — Estrutura do Banco de Dados](#parte-8-estrutura-do-banco-de-dados) — [arquivo](docs/08_estrutura_banco_de_dados.md)
+ - [Parte 9 — Estrutura do Banco de Dados (Postgres sugerido)](#parte-9-estrutura-do-banco-de-dados-postgres-sugerido) — [arquivo](docs/09_estrutura_banco_de_dados.md)
 - [Acceptance Checklists](#acceptance-checklists) — [arquivo](docs/ACCEPTANCE_CHECKLISTS.md)
 - [Envio de E-mails — Visão Geral](#envio-de-emails---visao-geral) — [arquivo](docs/EMAIL_ENVIO.md)
 - [Blueprint MVP — Documento Completo](#blueprint-mvp---documento-completo) — [arquivo](docs/MVP_BLUEPRINT.md)
@@ -102,6 +103,7 @@ Onde encontrar detalhes
 - Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md)
 - Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md)
 - Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
+ - Estrutura de dados / DB (modelo Postgres sugerido): [docs/09_estrutura_banco_de_dados.md](docs/09_estrutura_banco_de_dados.md)
 - Índice navegável: [docs/INDEX.md](docs/INDEX.md)
 
 Próximos artefatos recomendados

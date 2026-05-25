@@ -29,6 +29,7 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 - [docs/03_logicas_e_validacoes.md](03_logicas_e_validacoes.md)
 - [docs/04_fluxo_codigo_geral.md](04_fluxo_codigo_geral.md)
 - [docs/08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
+ - [docs/09_estrutura_banco_de_dados.md](09_estrutura_banco_de_dados.md)
 
 ---
 

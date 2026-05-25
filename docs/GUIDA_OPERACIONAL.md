@@ -50,6 +50,7 @@ Onde encontrar detalhes
 - Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md#L1)
 - Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md#L1)
 - Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md#L1)
+ - Estrutura de dados / DB (modelo Postgres sugerido): [docs/09_estrutura_banco_de_dados.md](docs/09_estrutura_banco_de_dados.md#L1)
 - Índice navegável: [INDEX.md](INDEX.md) — sumário por público (Operação / Dev / QA).
 
 Sugestões de uso

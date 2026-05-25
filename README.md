@@ -13,5 +13,6 @@ Comece por:
 - 📘 [Guia Operacional](docs/GUIDA_OPERACIONAL.md) — guia prático (coordenador / consultor).
 - 🧭 [Índice Navegável](docs/INDEX.md) — índice navegável com os documentos por público.
 - 📗 [Documentação Técnica](docs/DOCUMENTACAO_TECNICA.md) — documentação técnica principal.
+ - 🗄️ [Estrutura do Banco de Dados (modelo sugerido - Postgres)](docs/09_estrutura_banco_de_dados.md) — modelo relacional sugerido.
 
 Para operações sensíveis (configuração de provedores, deploys e variáveis secretas), consulte a equipe responsável pela infraestrutura; detalhes operacionais foram removidos do README e centralizados nos arquivos de `docs/`.

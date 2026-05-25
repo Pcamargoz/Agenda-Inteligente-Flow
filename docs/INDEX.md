@@ -3,7 +3,7 @@
 Este índice reúne os principais guias e referências do projeto para facilitar a implantação da POC/MVP.
 
 **Leitura recomendada (ordem curta)**
-- **Operacional (obrigatório):** [GUIDA_OPERACIONAL.md](../GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
+-- **Operacional (obrigatório):** [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
 - **Visão geral / referência:** [DOCS.md](../DOCS.md) — índice técnico com links para todos os documentos.
 - **QA / Aceitação:** [docs/ACCEPTANCE_CHECKLISTS.md](ACCEPTANCE_CHECKLISTS.md)
 -- **Modelos de e-mail:** *não aplicável*
@@ -11,19 +11,19 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 ---
 
 ## Guias operacionais
-- [GUIDA_OPERACIONAL.md](../GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
+- [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
 - [FLUXO_AGENDAMENTO_IMPLANTACAO.md](../FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Fluxo mestre detalhado (passo a passo).
 
 ## Documentos por público
 **Operação / Implantação**
-- [GUIDA_OPERACIONAL.md](../GUIDA_OPERACIONAL.md)
+- [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md)
 - [docs/ACCEPTANCE_CHECKLISTS.md](ACCEPTANCE_CHECKLISTS.md)
  - *(Modelos de e-mail removidos)*
 
 **Desenvolvimento / Referência técnica**
 - [DOCS.md](../DOCS.md) — índice geral e instruções de deploy.
-- [Documentação Técnica — principal](../DOCUMENTACAO_TECNICA.md)
-- [Documentação Técnica — unificada (v2)](../DOCUMENTACAO_TECNICA_2.md)
+- [Documentação Técnica — principal](DOCUMENTACAO_TECNICA.md)
+- [Documentação Técnica — unificada (v2)](DOCUMENTACAO_TECNICA.md)
 - [docs/01_visual_e_estilos.md](01_visual_e_estilos.md)
 - [docs/02_componentes_utilizados.md](02_componentes_utilizados.md)
 - [docs/03_logicas_e_validacoes.md](03_logicas_e_validacoes.md)
@@ -42,7 +42,7 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 Se quiser gerar um PDF único (Linux/WSL/Mac com `pandoc`):
 
 ```bash
-pandoc ../GUIDA_OPERACIONAL.md docs/*.md -o Faktory-Flow-Docs.pdf
+pandoc docs/GUIDA_OPERACIONAL.md docs/*.md -o Faktory-Flow-Docs.pdf
 ```
 
 ---

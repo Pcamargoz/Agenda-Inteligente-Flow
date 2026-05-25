@@ -4,7 +4,7 @@ Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, 
 
 Público: Coordenador de Atendimento, Consultor, Suporte Técnico.
 
-[![Guia](https://img.shields.io/badge/Guia-Operacional-blue)](../GUIDA_OPERACIONAL.md) [![Fluxo](https://img.shields.io/badge/Fluxo-Agendamento-green)](../FLUXO_AGENDAMENTO_IMPLANTACAO.md) [![Docs](https://img.shields.io/badge/Docs-Index-lightgrey)](../docs/INDEX.md)
+[![Guia](https://img.shields.io/badge/Guia-Operacional-blue)](GUIDA_OPERACIONAL.md) [![Fluxo](https://img.shields.io/badge/Fluxo-Agendamento-green)](../FLUXO_AGENDAMENTO_IMPLANTACAO.md) [![Docs](https://img.shields.io/badge/Docs-Index-lightgrey)](INDEX.md)
 
 ## Visual rápido
 
@@ -50,7 +50,7 @@ Onde encontrar detalhes
 - Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md#L1)
 - Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md#L1)
 - Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md#L1)
- - Índice navegável: [docs/INDEX.md](docs/INDEX.md) — sumário por público (Operação / Dev / QA).
+- Índice navegável: [INDEX.md](INDEX.md) — sumário por público (Operação / Dev / QA).
 
 Sugestões de uso
 - Ler este guia antes de abrir o fluxo mestre completo.

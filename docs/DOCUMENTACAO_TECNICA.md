@@ -14,11 +14,11 @@ Empresas de consultoria precisam controlar compromissos, status de execução, p
 Consultorias e equipes internas que gerenciam agendas, treinamentos, tarefas e relacionamento com clientes, com necessidade de cronogramas e emissão de OS.
 
 ### Como a aplicação funciona em alto nível
-O front-end é uma SPA em um único arquivo `index.html`, com persistência local total via `localStorage`. O back-end é uma única função serverless (Vercel) responsável por enviar e-mails SMTP e manter credenciais fora do navegador. Fluxo geral:
+O front-end é uma SPA em um único arquivo `index.html`, com persistência local total via `localStorage`. O back-end é opcional e, quando presente, implementa operações que exigem segredos (por exemplo, envio de e-mails). Fluxo geral (simplificado):
 
 ```
 Usuário → SPA (index.html) → localStorage (dados)
-                    └─ fetch → /api/send-os-email → SMTP
+                    └─ fetch → endpoint de envio (ex.: /api/send-os-email) → serviço de entrega
 ```
 
 ### Principais módulos e responsabilidades gerais
@@ -247,9 +247,7 @@ Campos de item de template: `kind`, `name`, `desc`, `checklist`, `suggestedDays`
 | HTML/CSS/JS puro | Zero build e deploy simples | `index.html` | SPA sem dependências | Código centralizado |
 | `localStorage` | Persistência sem servidor | Todos os dados | Mantém operação offline | Sem multiusuário |
 | `html2pdf.js` | Geração de PDF client-side | OS e cronograma | Evita backend de documentos | Depende de CDN |
-| Vercel Serverless | Deploy rápido e seguro | `/api/send-os-email` | Envio SMTP sem expor credenciais | Escala sob demanda |
-| `nodemailer` | Padrão SMTP no Node | Função serverless | Envio confiável de e-mails | Configuração simples |
-| Vercel CLI | Ambiente local igual ao deploy | `vercel dev` | Desenvolvimento local do serverless | Consistência de execução |
+| Serverless (opcional) | Função de envio | `/api/send-os-email` (exemplo) | Operações confidenciais movidas para backend | Ver `docs/EMAIL_ENVIO.md` |
 
 ## 5. Arquitetura geral do sistema
 
@@ -294,51 +292,19 @@ O front-end concentra interface, regras de negócio e persistência local. O bac
 | Caminho | Responsabilidade | Conteúdo | Relação com o sistema |
 |---|---|---|---|
 | `index.html` | SPA completa | HTML, CSS, JS e regras de negócio | Núcleo de toda a aplicação |
-| `api/send-os-email.js` | API serverless | Envio SMTP, validações, CORS | Integração de e-mails |
-| `package.json` | Dependências e scripts | `nodemailer`, `vercel dev` | Suporte ao backend |
-| `vercel.json` | Configuração de deploy | Headers e `maxDuration` | Controle de execução |
-| `.env.example` | Variáveis SMTP | Template de `.env` | Configuração segura |
+| `api/send-os-email.js` | Exemplo de implementação | Roteiro de envio (modelo) | Veja `docs/EMAIL_ENVIO.md` para operações e recomendações |
+| `package.json` | Dependências e scripts | Scripts de desenvolvimento | Dependendo da infra escolhida |
+| `vercel.json` | Exemplo de configuração | Arquivo de exemplo para Vercel | Opcional — gerenciado pela infra |
+| `.env.example` | Arquivo de exemplo | Demonstra variáveis sensíveis | Não inclua segredos em repositórios públicos |
 | `README.md` | Instruções básicas | Uso e deploy | Onboarding inicial |
 
 ## 7. Back-end
 
-### Estrutura dos módulos
-O backend é apenas a função `api/send-os-email.js`. Não há controllers, serviços ou repositórios adicionais.
+O back-end consiste em pontos mínimos utilizados pelo front-end para operações que dependem de segredos ou de serviços externos (por exemplo, envio de e-mail). Por segurança e separação de responsabilidades a implementação exemplar disponível no repositório é simples — para produção, recomenda‑se migrar a lógica crítica para um serviço backend mais robusto.
 
-### Endpoints e comportamento
-| Método | Rota | Função |
-|---|---|---|
-| `GET` | `/api/send-os-email` | Health check do SMTP |
-| `POST` | `/api/send-os-email` | Envio de e-mail |
-| `OPTIONS` | `/api/send-os-email` | Resposta CORS |
+- Implementação de referência: existe uma função exemplo que recebe o payload da OS e encaminha para um serviço de envio (SMTP ou transacional).
+- Para a descrição do fluxo de envio de e-mails e recomendações operacionais, veja `docs/EMAIL_ENVIO.md`.
 
-O endpoint responde com headers CORS para permitir chamadas diretas do front-end, incluindo preflight `OPTIONS`.
-
-### Validações e regras
-| Validação | Motivo |
-|---|---|
-| `to` e formato de e-mail | Evita envios inválidos |
-| `subject` obrigatório | Evita mensagens incompletas |
-| `html` ou `text` obrigatório | Garante corpo |
-| Payload máximo ~9MB | Limite de segurança |
-| Rate limit 20 req/min/IP | Proteção contra abuso |
-
-### Autenticação e autorização
-Não existe autenticação. A proteção está no rate limit e na exposição restrita da URL pelo próprio sistema.
-
-### Tratamento de erros
-Erros são retornados com códigos HTTP apropriados e mensagens JSON. Falhas de SMTP retornam erro e são registradas no log do front-end.
-
-### Integrações externas
-| Integração | Função |
-|---|---|
-| SMTP | Transporte de e-mails |
-
-### Variáveis de ambiente
-`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_FROM_NAME`, `SMTP_BCC`
-
-### Limites de execução
-Timeout da function: 15s (configurado em `vercel.json`). Timeouts de socket e conexão no `nodemailer`.
 
 ## 8. Front-end
 
@@ -549,9 +515,9 @@ Envio de e-mail é assíncrono via serverless. Em falha, há fallback para `mail
 5. Criar cronogramas (builder simples e template V2).
 6. Implementar registros e regras específicas de atendimento e treinamento.
 7. Adicionar dashboard e kanban por cliente.
-8. Implementar OS com geração de PDF e envio via API SMTP.
-9. Criar serverless `/api/send-os-email` com `nodemailer` e validações.
-10. Configurar Vercel, variáveis de ambiente e headers.
+8. Implementar OS com geração de PDF e fluxo de envio (API ou transacional) conforme a arquitetura escolhida.
+9. Se necessário, implementar um componente backend responsável por envio de e-mails com validações e healthcheck — veja `docs/EMAIL_ENVIO.md`.
+10. Configurar deployment e gerenciamento de segredos conforme a plataforma de infraestrutura adotada.
 
 ## Atualizações recentes
 

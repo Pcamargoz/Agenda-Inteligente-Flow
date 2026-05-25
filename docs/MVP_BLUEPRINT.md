@@ -1,3 +1,4 @@
+ 
 # Blueprint MVP — Sistema de Agendas de Consultoria
 
 Documento único para **replicar** este sistema (Faktory Flow Agenda) em outro projeto. Cobre escopo mínimo, modelo de dados, fluxos, integrações e passo-a-passo de reconstrução. Não documenta o código existente — orienta como construí-lo de novo.
@@ -108,7 +109,7 @@ Definir transições em uma tabela `STATUS_TRANSITIONS` e validar com `canTransi
 | Front | HTML/CSS/JS puro em **um arquivo** | Zero build, edição direta, deploy estático |
 | Persistência | `localStorage` com chave versionada (ex: `app_v2`) | Offline, custo zero, simples |
 | Persistência (alternativa enterprise) | Substituir por IndexedDB ou backend REST | Quando precisar multi-usuário ou volume |
-| Serverless | Vercel Functions (Node 18+) | 1 só endpoint, deploy automático, free tier |
+| Serverless | Functions (Node 18+) | 1 só endpoint, deploy automático (ex.: Vercel/Netlify) |
 | SMTP | `nodemailer` | Padrão de fato no Node |
 | PDF client | `html2pdf.js` via CDN | Sem backend de documentos |
 | Auth Microsoft | `@azure/msal-browser` via CDN (PKCE) | Sem servidor OAuth |
@@ -158,13 +159,11 @@ Definir transições em uma tabela `STATUS_TRANSITIONS` e validar com `canTransi
 
 ## 8. Integrações externas
 
-### 8.1 SMTP via Nodemailer (serverless POST)
-- **Endpoint:** `POST /api/send-os-email`
-- **Finalidade:** envio real de OS por e-mail; mantém credenciais fora do browser.
-- **Env vars:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_FROM_NAME`, opcional `SMTP_BCC`.
-- **Healthcheck:** `GET /api/send-os-email` retorna `{ ready: bool, configured: {...} }`.
-- **Limites:** rate limit in-memory 20 req/min por IP; payload máx ~9MB; timeout 15s.
-- **Se cair:** front faz fallback para `mailto:` (abre cliente local).
+### 8.1 Envio de e-mails (visão geral)
+
+O envio de Ordens de Serviço (OS) pode ser realizado por um componente de backend que mantém segredos fora do navegador. Este repositório inclui uma função de exemplo para demonstração — para detalhes operacionais, variáveis e recomendações de produção, consulte `docs/EMAIL_ENVIO.md`.
+
+Durante falhas do serviço de envio, a interface possui fallback para abrir o cliente de e-mail (`mailto:`) como alternativa de menor custo.
 
 ### 8.2 Microsoft Graph via MSAL.js (browser, PKCE)
 - **SDK:** `@azure/msal-browser` v2.38+ via CDN jsDelivr.
@@ -186,20 +185,11 @@ Definir transições em uma tabela `STATUS_TRANSITIONS` e validar com `canTransi
 
 ---
 
-## 9. Variáveis de ambiente
+## 9. Variáveis sensíveis
 
-| Nome | Obrigatória | Descrição |
-|---|---|---|
-| `SMTP_HOST` | sim | Host do servidor SMTP |
-| `SMTP_PORT` | não (default 587) | Porta SMTP |
-| `SMTP_SECURE` | não (default auto por porta) | `true` para 465, `false` para 587/STARTTLS |
-| `SMTP_USER` | sim | Usuário SMTP |
-| `SMTP_PASS` | sim | Senha (use senha-de-app no Gmail/Outlook) |
-| `SMTP_FROM` | não | Remetente; default = `SMTP_USER` |
-| `SMTP_FROM_NAME` | não | Nome exibido; default `"Faktory Flow Agenda"` |
-| `SMTP_BCC` | não | BCC fixo para auditoria |
+As variáveis e segredos relacionados a envio de e-mail e provedores transacionais estão documentados em `docs/EMAIL_ENVIO.md`. Para ambientes de produção, gerencie secrets via o sistema de infraestrutura adotado (ex.: secrets de projeto, Vault, etc.).
 
-**Microsoft Graph** não usa env var — `clientId`/`tenantId` ficam em `TEAMS_CFG` no front. Ao replicar para outro tenant, editar o objeto direto.
+**Microsoft Graph**: o `clientId` e `tenantId` são configurados em `TEAMS_CFG` no front para uso SPA; redirect URIs e políticas devem ser ajustadas conforme o tenant e as regras da organização.
 
 ---
 
@@ -207,16 +197,14 @@ Definir transições em uma tabela `STATUS_TRANSITIONS` e validar com `canTransi
 
 ### 10.1 Pré-requisitos
 - Node ≥ 18
-- Vercel CLI (`npm i -g vercel`) — obrigatório, pois a função serverless **não** roda com servidor estático.
+- CLI/ ferramentas de execução conforme a plataforma escolhida (ex.: Vercel CLI, Netlify CLI, etc.).
 - Conta Microsoft (corporativa ou pessoal) com acesso ao [Microsoft Entra ID](https://entra.microsoft.com) para registrar o app.
 
-### 10.2 Setup
-```bash
-cp .env.example .env.local      # editar SMTP_*
-npm install
-npm run dev                     # vercel dev → http://localhost:3000
-npm run deploy                  # vercel --prod
-```
+### 10.2 Setup (visão geral)
+1. Instalar dependências: `npm install`.
+2. Ajustar variáveis sensíveis via o sistema de segredos da plataforma escolhida.
+3. Executar o ambiente de desenvolvimento conforme a plataforma: `npm run dev` (script ajustável).
+4. Deploy conforme a infraestrutura adotada (ex.: `npm run deploy` que chama o CLI apropriado).
 
 ### 10.3 Registro Microsoft Entra (se for usar Teams sync)
 1. https://entra.microsoft.com → **Registros de aplicativo** → **+ Novo registro**.
@@ -236,10 +224,10 @@ npm run deploy                  # vercel --prod
 6. Módulo **Registros**: kinds com regras específicas (atendimento, treinamento, tarefa).
 7. Módulo **OS**: modal, geração de PDF (html2pdf), envio SMTP/WhatsApp/mailto, link público de assinatura (canvas).
 8. **Saldo de horas**: `hoursDebited` idempotente, débito na emissão, estorno no cancelamento.
-9. Serverless `/api/send-os-email` com `nodemailer` + rate limit + healthcheck GET.
+9. Endpoint de envio (ex.: `/api/send-os-email`) com validações e healthcheck — ver `docs/EMAIL_ENVIO.md`.
 10. **Microsoft Graph**: MSAL via CDN, botão "Conectar", `teamsSync(action, ev)` em `saveEvent`/`deleteEvent`.
 11. `validateDataIntegrity()` para detectar/corrigir órfãos.
-12. Configurar `vercel.json` (headers, `maxDuration`).
+12. Configurar arquivo de deploy conforme a plataforma adotada (ex.: `vercel.json` como exemplo). 
 
 ---
 

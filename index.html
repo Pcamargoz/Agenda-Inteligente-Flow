@@ -14174,7 +14174,8 @@ document.getElementById('osSaveBtn').onclick = () => {
   renderClientKanban();
 };
 
-/* ---------- Envio: e-mail (via API serverless do Vercel + fallback mailto:) ---------- */
+/* ---------- Envio: e-mail (via endpoint server-side + fallback mailto:) ---------- */
+/* Consulte docs/EMAIL_ENVIO.md para detalhes operacionais e recomendações. */
 async function sendOsEmailViaAPI(os, co){
   const cs = consultantById(os.consultantId);
   const subject = `Ordem de Serviço — ${os.title}`;
@@ -14190,7 +14191,7 @@ async function sendOsEmailViaAPI(os, co){
     osId: os.id,
   };
 
-  /* tenta a API serverless do Vercel */
+  /* tenta o endpoint server-side (veja docs/EMAIL_ENVIO.md) */
   try {
     const resp = await fetch('/api/send-os-email', {
       method: 'POST',
@@ -22886,7 +22887,7 @@ const TEAMS_CFG = {
   // E qualquer conta corporativa M365. Necessário pra emitir token contra
   // o calendário consumer real (não a identidade B2B vazia do tenant).
   tenantId: 'common',
-  redirectUri: 'https://agenda-inteligente-flow.vercel.app',
+  redirectUri: 'https://agenda-inteligente-flow.vercel.app', // Exemplo: ajuste para o domínio do seu deploy
   // OnlineMeetings.ReadWrite exige licença M365 Business/Enterprise.
   scopes: ['User.Read','Calendars.ReadWrite','offline_access'],
   enableTeamsMeeting: false,

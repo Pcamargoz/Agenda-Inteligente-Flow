@@ -1,6 +1,8 @@
 // ============================================================
-// Serverless Function — Vercel (Node.js runtime)
-// Envia OS por email usando SMTP configurado em variáveis de ambiente
+// Serverless Function (exemplo) — Node.js runtime
+// Envia OS por email usando SMTP configurado em variáveis de ambiente.
+// Este arquivo é um exemplo; para recomendações operacionais e variáveis,
+// consulte `docs/EMAIL_ENVIO.md`.
 // Endpoint: POST /api/send-os-email
 // ============================================================
 
@@ -36,8 +38,8 @@ function stripHtml(html) {
 
 // ---------- Handler ----------
 export default async function handler(req, res) {
-  // CORS: mesma origem (Vercel serve front + api no mesmo domínio).
-  // Liberado para qualquer origem porque você pode querer testar de outro lugar.
+  // CORS: liberado para permitir testes locais/remotos. Ajuste conforme a política
+  // de segurança da sua infraestrutura de deploy (veja docs/EMAIL_ENVIO.md).
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -61,7 +63,7 @@ export default async function handler(req, res) {
       configured: cfg,
       hint: ready
         ? 'API pronta. Faça POST com { to, subject, html, text } para enviar.'
-        : 'Configure as variáveis de ambiente SMTP_* no Vercel.',
+        : 'SMTP não configurado. Veja docs/EMAIL_ENVIO.md para orientações sobre variáveis e operação.',
       timestamp: new Date().toISOString(),
     });
   }
@@ -111,7 +113,7 @@ export default async function handler(req, res) {
     if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
       return res.status(500).json({
         error: 'SMTP não configurado no servidor',
-        detail: 'Defina SMTP_HOST, SMTP_USER e SMTP_PASS nas variáveis de ambiente do Vercel.',
+        detail: 'Defina SMTP_HOST, SMTP_USER e SMTP_PASS nas variáveis de ambiente da sua plataforma (veja docs/EMAIL_ENVIO.md).',
       });
     }
 

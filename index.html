@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- html2pdf.js: gera PDFs no browser a partir de HTML (bundle inclui jsPDF + html2canvas) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- MSAL.js: login Microsoft (Entra ID) para integração com Teams/Outlook via Graph -->
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <style>
   :root{
     --ink:#14171f; --ink-2:#2a2e3a; --ink-3:#4a4f5e; --ink-4:#6b7184;
@@ -4940,6 +4942,10 @@
         <span>Log de notificações</span>
         <span class="sb-log-count" id="sbNotifCount">0</span>
       </button>
+      <button id="btnTeamsConnect" onclick="teamsToggleConnect()" style="margin-top:6px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.borderColor='#4555a3';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
+        <span id="teamsDot" style="width:6px;height:6px;border-radius:50%;background:#6b7184;display:inline-block"></span>
+        <span id="teamsBtnLabel">Conectar com Teams</span>
+      </button>
       <button onclick="runIntegrityCheck()" style="margin-top:6px;width:100%;padding:7px 10px;background:transparent;border:1px solid rgba(244,239,230,.18);color:rgba(244,239,230,.65);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;transition:all .18s ease" onmouseover="this.style.borderColor='#d4a574';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(244,239,230,.18)';this.style.color='rgba(244,239,230,.65)'">
         Verificar integridade
       </button>
@@ -7037,6 +7043,7 @@ function saveEvent(){
         date: state.evSelectedDates[0],
       };
       toast('success','Evento atualizado', `${title} · ${isoToBR(EVENTS[idx].date)}`);
+      try { if (typeof teamsSync === 'function') teamsSync('update', EVENTS[idx]); } catch(e){}
     }
   } else {
     let seriesId = null;
@@ -7046,6 +7053,7 @@ function saveEvent(){
       const ev = { id:uid('e'), consultantId:consId, companyId, date, timeStart, timeEnd, typeId, title, period, recurrence, status:state.evStatus, desc, details, notes, priority, seriesId };
       EVENTS.push(ev);
       created++;
+      try { if (typeof teamsSync === 'function') teamsSync('create', ev); } catch(e){}
       if (recurrence !== 'none' && recurrence !== 'custom'){
         const step = recurrence==='weekly'?7 : recurrence==='biweekly'?14 : recurrence==='monthly'?30 : 0;
         if (step){
@@ -7053,8 +7061,10 @@ function saveEvent(){
           for (let i=1; i<=4; i++){
             d = new Date(d); d.setDate(d.getDate()+step);
             const iso = fmtDate(d.getFullYear(), d.getMonth(), d.getDate());
-            EVENTS.push({ ...ev, id:uid('e'), date:iso });
+            const evRec = { ...ev, id:uid('e'), date:iso };
+            EVENTS.push(evRec);
             created++;
+            try { if (typeof teamsSync === 'function') teamsSync('create', evRec); } catch(e){}
           }
         }
       }
@@ -7068,7 +7078,9 @@ function saveEvent(){
 function deleteEvent(){
   if (!state.evEditingId) return;
   if (!confirm('Excluir este evento?')) return;
+  const evToDel = EVENTS.find(e => e.id === state.evEditingId);
   EVENTS = EVENTS.filter(e => e.id !== state.evEditingId);
+  try { if (evToDel && typeof teamsSync === 'function') teamsSync('delete', evToDel); } catch(e){}
   toast('success','Evento excluído','O agendamento foi removido.');
   closeModal('modalEvent');
   renderAll();
@@ -22587,6 +22599,158 @@ window.copyFeedbackLink = (cardId) => {
     } catch(e){}
   };
 })();
+
+/* ============================================
+   INTEGRAÇÃO MICROSOFT TEAMS / OUTLOOK (Graph)
+   ============================================
+   Autenticação via MSAL.js (PKCE/SPA) + chamadas REST ao Microsoft Graph.
+   Toda criação/edição/exclusão de evento na agenda é replicada no calendário
+   do usuário logado — aparece automaticamente no Teams + Outlook.
+   ============================================ */
+const TEAMS_CFG = {
+  clientId: 'fd5f5b37-3b22-4cf4-93b0-2b1092982aef',
+  tenantId: '5a3fa073-cd74-4611-8c11-bcf60a4f5ca0',
+  redirectUri: 'https://agenda-inteligente-flow.vercel.app',
+  scopes: ['User.Read','Calendars.ReadWrite','OnlineMeetings.ReadWrite','offline_access'],
+  timeZone: 'America/Sao_Paulo',
+};
+
+let _msalApp = null;
+let _msalAccount = null;
+
+function teamsInitMsal(){
+  if (_msalApp) return _msalApp;
+  if (typeof msal === 'undefined'){ console.warn('[teams] MSAL não carregou'); return null; }
+  // Em dev local (file:// ou localhost) o redirect público não vai bater — usa origin atual.
+  const here = (location.protocol === 'http:' || location.protocol === 'https:') ? location.origin : TEAMS_CFG.redirectUri;
+  _msalApp = new msal.PublicClientApplication({
+    auth: {
+      clientId: TEAMS_CFG.clientId,
+      authority: `https://login.microsoftonline.com/${TEAMS_CFG.tenantId}`,
+      redirectUri: here,
+    },
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false },
+  });
+  const accounts = _msalApp.getAllAccounts();
+  if (accounts.length) _msalAccount = accounts[0];
+  return _msalApp;
+}
+
+async function teamsToggleConnect(){
+  const app = teamsInitMsal();
+  if (!app){ toast('error','MSAL indisponível','Verifique sua conexão e recarregue.'); return; }
+  if (_msalAccount){
+    if (!confirm(`Desconectar ${_msalAccount.username} do Teams?`)) return;
+    try { await app.logoutPopup({ account: _msalAccount, mainWindowRedirectUri: TEAMS_CFG.redirectUri }); } catch(e){}
+    _msalAccount = null;
+    teamsUpdateBtn();
+    toast('info','Teams desconectado','Eventos novos não serão mais sincronizados.');
+    return;
+  }
+  try {
+    const res = await app.loginPopup({ scopes: TEAMS_CFG.scopes, prompt: 'select_account' });
+    _msalAccount = res.account;
+    teamsUpdateBtn();
+    toast('success','Conectado ao Teams', `Login: ${_msalAccount.username}`);
+  } catch(err){
+    console.error('[teams] login falhou', err);
+    toast('error','Falha ao conectar', err.message || 'Tente novamente.');
+  }
+}
+
+function teamsIsConnected(){ return !!_msalAccount; }
+
+function teamsUpdateBtn(){
+  const dot = document.getElementById('teamsDot');
+  const lbl = document.getElementById('teamsBtnLabel');
+  if (!dot || !lbl) return;
+  if (teamsIsConnected()){
+    dot.style.background = '#4a7d5d';
+    lbl.textContent = 'Teams conectado';
+  } else {
+    dot.style.background = '#6b7184';
+    lbl.textContent = 'Conectar com Teams';
+  }
+}
+
+async function teamsAcquireToken(){
+  const app = teamsInitMsal();
+  if (!app || !_msalAccount) return null;
+  try {
+    const res = await app.acquireTokenSilent({ scopes: TEAMS_CFG.scopes, account: _msalAccount });
+    return res.accessToken;
+  } catch(err){
+    try {
+      const res = await app.acquireTokenPopup({ scopes: TEAMS_CFG.scopes, account: _msalAccount });
+      return res.accessToken;
+    } catch(e){ console.error('[teams] token falhou', e); return null; }
+  }
+}
+
+function teamsBuildPayload(ev){
+  const t = (typeof typeById === 'function') ? typeById(ev.typeId) : null;
+  const co = (typeof companyById === 'function') ? companyById(ev.companyId) : null;
+  const cn = (typeof consultantById === 'function') ? consultantById(ev.consultantId) : null;
+  const subject = `${ev.title || (t?.label || 'Evento')}${co ? ' · ' + (co.name || co.label || '') : ''}`;
+  const bodyLines = [];
+  if (cn) bodyLines.push(`Consultor: ${cn.name || cn.label || ''}`);
+  if (co) bodyLines.push(`Empresa: ${co.name || co.label || ''}`);
+  if (t)  bodyLines.push(`Tipo: ${t.label || ''}`);
+  if (ev.desc)    bodyLines.push('', ev.desc);
+  if (ev.details) bodyLines.push('', ev.details);
+  if (ev.notes)   bodyLines.push('', 'Notas: ' + ev.notes);
+  return {
+    subject,
+    body: { contentType: 'HTML', content: bodyLines.join('<br>') || '(sem descrição)' },
+    start: { dateTime: `${ev.date}T${ev.timeStart}:00`, timeZone: TEAMS_CFG.timeZone },
+    end:   { dateTime: `${ev.date}T${ev.timeEnd}:00`,   timeZone: TEAMS_CFG.timeZone },
+    isOnlineMeeting: true,
+    onlineMeetingProvider: 'teamsForBusiness',
+  };
+}
+
+async function teamsSync(action, ev){
+  if (!teamsIsConnected()) return;
+  const token = await teamsAcquireToken();
+  if (!token) return;
+  const base = 'https://graph.microsoft.com/v1.0/me/events';
+  try {
+    if (action === 'create'){
+      const r = await fetch(base, {
+        method:'POST',
+        headers:{ 'Authorization':`Bearer ${token}`, 'Content-Type':'application/json' },
+        body: JSON.stringify(teamsBuildPayload(ev)),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}: ${await r.text()}`);
+      const json = await r.json();
+      const local = EVENTS.find(x => x.id === ev.id);
+      if (local) local.graphEventId = json.id;
+    } else if (action === 'update'){
+      if (!ev.graphEventId){ return teamsSync('create', ev); }
+      const r = await fetch(`${base}/${encodeURIComponent(ev.graphEventId)}`, {
+        method:'PATCH',
+        headers:{ 'Authorization':`Bearer ${token}`, 'Content-Type':'application/json' },
+        body: JSON.stringify(teamsBuildPayload(ev)),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}: ${await r.text()}`);
+    } else if (action === 'delete'){
+      if (!ev.graphEventId) return;
+      const r = await fetch(`${base}/${encodeURIComponent(ev.graphEventId)}`, {
+        method:'DELETE', headers:{ 'Authorization':`Bearer ${token}` },
+      });
+      if (!r.ok && r.status !== 404) throw new Error(`HTTP ${r.status}: ${await r.text()}`);
+    }
+  } catch(err){
+    console.error('[teams] sync falhou', action, err);
+    if (typeof toast === 'function') toast('warning','Teams não sincronizou', `${action}: ${err.message || err}`);
+  }
+}
+
+window.teamsToggleConnect = teamsToggleConnect;
+window.teamsSync = teamsSync;
+document.addEventListener('DOMContentLoaded', teamsUpdateBtn);
+teamsInitMsal();
+teamsUpdateBtn();
 
 /* === Boot da SPA: só faz switchView se NÃO estiver em modo público === */
 if (!_pubRouter()){

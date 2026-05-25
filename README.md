@@ -1,6 +1,27 @@
 # Faktory Flow Agenda
 
+[![Guia Operacional](https://img.shields.io/badge/Guia-Operacional-blue)](docs/GUIDA_OPERACIONAL.md) [![Documentação](https://img.shields.io/badge/Documenta%C3%A7%C3%A3o-tecnica-lightgrey)](DOCS.md) [![Índice](https://img.shields.io/badge/%E2%86%92-Índice-green)](docs/INDEX.md) [![QA Checklists](https://img.shields.io/badge/QA-Checklists-yellow)](docs/ACCEPTANCE_CHECKLISTS.md)
+
 Front-end estático + serverless function (Vercel) para envio de **Ordens de Serviço** por e-mail SMTP real.
+
+## Sumário rápido
+
+- 📘 Guia operacional (leitura inicial): [GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
+- 🧭 Índice navegável: [docs/INDEX.md](docs/INDEX.md)
+- ⚙️ Deploy & Tech: [DOCS.md](DOCS.md)
+- ✅ QA / Checklists: [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
+- ✉️ Modelos de e-mail: [docs/email_templates.md](docs/email_templates.md)
+
+---
+<!-- Índice visual rápido -->
+## Guia rápido (leitura inicial)
+
+- **Leitura obrigatória (Operacional):** [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
+- **Leitura técnica (Referência):** [DOCS.md](DOCS.md) — índice com links para documentação detalhada e endpoints.
+- **QA / Aceitação:** [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
+- **E-mails & Templates:** [docs/email_templates.md](docs/email_templates.md)
+
+> Recomendo que a equipe de implantação leia apenas `GUIDA_OPERACIONAL.md` antes de começar; abra os documentos em `docs/` somente quando precisar de detalhes.
 
 ---
 

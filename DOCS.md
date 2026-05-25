@@ -100,4 +100,12 @@ Abaixo estão os documentos detalhados que descrevem o fluxo operacional, visual
 - [docs/07_tarefas_atendimentos_treinamentos.md](docs/07_tarefas_atendimentos_treinamentos.md) — Como funcionam tarefas, atendimentos e treinamentos.
 - [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md) — Estrutura/coleções do banco de dados (recomendações).
 
+- Índice navegável: [docs/INDEX.md](docs/INDEX.md) — sumário navegável com links por público (Operação / Dev / QA).
+
+Observação: os fluxos detalhados em `docs/05`—`docs/07` foram consolidados no documento mestre [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md). Os arquivos originais podem ter sido removidos ou mesclados; consulte o fluxo mestre para o passo a passo completo.
+
+- Guia operacional curto: [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — Resumo executivo para coordenadores e consultores.
+- Checklists de aceitação: [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md) — QA e homologação por tela.
+- Modelos de e-mail: [docs/email_templates.md](docs/email_templates.md) — Textos prontos para cronogramas, lembretes e OS.
+
 Se quiser, posso também gerar um índice `docs/INDEX.md` e criar um PDF unificado com todos esses documentos.

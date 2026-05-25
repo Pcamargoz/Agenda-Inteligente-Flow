@@ -17,6 +17,10 @@ Comece por:
 - 📗 [Documentação Técnica (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md) — documentação técnica principal (stub).
  - 🗄️ [Estrutura do Banco de Dados (modelo sugerido - Postgres)](docs/09_estrutura_banco_de_dados.md) — modelo relacional sugerido.
 
+- 📘 [Documentação Técnica — Completa (resumo)](docs/DOCUMENTACAO_TECNICA_COMPLETA.stub.md) — versão compilada (stub).
+- 📘 [Fluxo Mestre — Agendamento (resumo)](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.stub.md) — fluxo mestre (stub).
+- 📘 [MVP Blueprint (resumo)](docs/MVP_BLUEPRINT.stub.md) — blueprint (stub).
+
 Entrada recomendada: [docs/INDEX.md](docs/INDEX.md) — use este índice leve como ponto de partida para navegar pela documentação.
 
 Para operações sensíveis (configuração de provedores, deploys e variáveis secretas), consulte a equipe responsável pela infraestrutura; detalhes operacionais foram removidos do README e centralizados nos arquivos de `docs/`.

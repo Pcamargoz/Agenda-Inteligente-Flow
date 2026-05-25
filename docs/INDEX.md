@@ -32,8 +32,8 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 
 **Desenvolvimento / Referência técnica**
 - [DOCS.md](DOCS.md) — índice geral e instruções de deploy.
-- [Documentação Técnica — principal](DOCUMENTACAO_TECNICA.md)
-- [Documentação Técnica — unificada (v2)](DOCUMENTACAO_TECNICA.md)
+- [Documentação Técnica — principal (resumo)](DOCUMENTACAO_TECNICA.stub.md)
+- [Documentação Técnica — unificada (v2, resumo)](DOCUMENTACAO_TECNICA.stub.md)
 - [docs/01_visual_e_estilos.md](01_visual_e_estilos.md)
 - [docs/02_componentes_utilizados.md](02_componentes_utilizados.md)
 - [docs/03_logicas_e_validacoes.md](03_logicas_e_validacoes.md)

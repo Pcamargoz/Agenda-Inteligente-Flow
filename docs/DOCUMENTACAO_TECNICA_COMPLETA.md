@@ -10,7 +10,7 @@ Nota: este arquivo é uma compilação grande. Para evitar erros de preview no G
 
 - [Guia Operacional — Fluxo Resumido](docs/GUIDA_OPERACIONAL.md)
 - [Índice Navegável](docs/INDEX.md)
-- [Documentação Técnica — principal](docs/DOCUMENTACAO_TECNICA.md)
+- [Documentação Técnica — principal (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md)
 - [Parte 1 — Visual e Estilos](docs/01_visual_e_estilos.md)
 - [Parte 2 — Componentes utilizados](docs/02_componentes_utilizados.md)
 - [Parte 3 — Lógicas e Validações](docs/03_logicas_e_validacoes.md)
@@ -238,11 +238,11 @@ Sumário
 
 <!-- Include main technical doc -->
 
-Ver original: [docs/DOCUMENTACAO_TECNICA.md](docs/DOCUMENTACAO_TECNICA.md)
+Ver original (resumo): [docs/DOCUMENTACAO_TECNICA.stub.md](docs/DOCUMENTACAO_TECNICA.stub.md)
 
 <!-- START: DOCUMENTACAO_TECNICA.md -->
 
-(Conteúdo completo de [docs/DOCUMENTACAO_TECNICA.md](docs/DOCUMENTACAO_TECNICA.md))
+(Conteúdo completo de [docs/DOCUMENTACAO_TECNICA.stub.md](docs/DOCUMENTACAO_TECNICA.stub.md))
 
 
 *A seguir está o conteúdo principal consolidado.*

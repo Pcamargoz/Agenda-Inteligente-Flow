@@ -22,6 +22,16 @@ version: "1.0"
 
 ---
 
+## Ordem de leitura (IA / Equipe)
+
+- **Para IA (indexação / análise automática):**
+  1. Leia `docs/DOCUMENTACAO_TECNICA_COMPLETA.md` do topo para baixo; use o Sumário (TOC) para saltar para seções relevantes.
+  2. Priorize as seções: `Guia Operacional` → `Índice Navegável` → `Parte 4 — Fluxo de Código` → `Parte 9 — Estrutura do Banco de Dados (Postgres)` → `Envio de E-mails`.
+
+- **Para a equipe (implantação e operação):**
+  1. Comece por `docs/GUIDA_OPERACIONAL.md` (resumo prático).  
+  2. Abra `docs/INDEX.md` para localizar documentos por público e, conforme necessário, leia `docs/09_estrutura_banco_de_dados.md`, `docs/04_fluxo_codigo_geral.md` e `docs/EMAIL_ENVIO.md`.
+
 <a id="acceptance-checklists"></a>
 ## Acceptance Checklists (inserido de `ACCEPTANCE_CHECKLISTS.md`)
 

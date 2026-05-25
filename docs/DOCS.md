@@ -80,5 +80,5 @@ Observação: os fluxos detalhados em `docs/05`—`docs/07` foram consolidados n
 
 
 Se quiser, posso também gerar um índice `docs/INDEX.md` e criar um PDF unificado com todos esses documentos.
--- - [FLUXO_AGENDAMENTO_IMPLANTACAO.md](../FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Guia operacional completo (passo a passo para consultores).
+- [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Guia operacional completo (passo a passo para consultores).
 - [docs/07_tarefas_atendimentos_treinamentos.md](docs/07_tarefas_atendimentos_treinamentos.md) — Como funcionam tarefas, atendimentos e treinamentos.

@@ -4,7 +4,7 @@ Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, 
 
 Público: Coordenador de Atendimento, Consultor, Suporte Técnico.
 
-[![Guia](https://img.shields.io/badge/Guia-Operacional-blue)](GUIDA_OPERACIONAL.md) [![Fluxo](https://img.shields.io/badge/Fluxo-Agendamento-green)](../FLUXO_AGENDAMENTO_IMPLANTACAO.md) [![Docs](https://img.shields.io/badge/Docs-Index-lightgrey)](INDEX.md)
+[![Guia](https://img.shields.io/badge/Guia-Operacional-blue)](GUIDA_OPERACIONAL.md) [![Fluxo](https://img.shields.io/badge/Fluxo-Agendamento-green)](FLUXO_AGENDAMENTO_IMPLANTACAO.md) [![Docs](https://img.shields.io/badge/Docs-Index-lightgrey)](INDEX.md)
 
 ## Visual rápido
 

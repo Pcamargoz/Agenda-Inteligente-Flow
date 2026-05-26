@@ -11,7 +11,6 @@ Nota: este arquivo é uma compilação grande. Para evitar erros de preview no G
  - [Guia Operacional — Fluxo Resumido](GUIDA_OPERACIONAL.md)
  - [Índice Navegável](INDEX.md)
  - [Documentação Técnica — principal (resumo)](DOCUMENTACAO_TECNICA.stub.md)
- - [Manual Unificado — Partes 1–4](01_04_manual_unificado.md)
  - [Manual Unificado — Partes 1–5 (inclui Estrutura do Banco de Dados)](01_04_manual_unificado.md)
 
 ---

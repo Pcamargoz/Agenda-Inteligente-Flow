@@ -12,15 +12,15 @@ Nota: este arquivo é uma compilação grande. Para evitar erros de preview no G
  - [Índice Navegável](INDEX.md)
  - [Documentação Técnica — principal (resumo)](DOCUMENTACAO_TECNICA.stub.md)
  - [Manual Unificado — Partes 1–4](01_04_manual_unificado.md)
-  [Parte 8 — Estrutura do Banco de Dados](08_estrutura_banco_de_dados.md)
+ - [Manual Unificado — Partes 1–5 (inclui Estrutura do Banco de Dados)](01_04_manual_unificado.md)
 
 ---
 
 ## Ordem de leitura (IA / Equipe)
 
 - **Para IA (indexação / análise automática):**
-  1. Leia `docs/DOCUMENTACAO_TECNICA_COMPLETA.md` do topo para baixo; use o Sumário (TOC) para saltar para seções relevantes.
-  2. Priorize as seções: `Guia Operacional` → `Índice Navegável` → `Parte 4 — Fluxo de Código` → `Parte 9 — Estrutura do Banco de Dados (Postgres)` → `Envio de E-mails`.
+  1. Leia DOCUMENTACAO_TECNICA_COMPLETA.md do topo para baixo; use o Sumário (TOC) para saltar para seções relevantes.
+  2. Priorize as seções: `Guia Operacional` → `Índice Navegável` → `Parte 4 — Fluxo de Código` → `Parte 5 — Estrutura do Banco de Dados (Postgres)` → `Envio de E-mails`.
 
 - **Para a equipe (implantação e operação):**
   1. Comece por `docs/GUIDA_OPERACIONAL.md` (resumo prático).  

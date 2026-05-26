@@ -11,7 +11,7 @@ SPA para gestão de agendas, cronogramas, registros operacionais e Ordens de Ser
 | [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) | Guia operacional — fluxo resumido por papel |
 | [docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md) | Fluxo mestre de implantação (passo a passo) |
 | [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md) | Manual unificado — Visual, Componentes, Lógicas e Fluxo |
-| [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md) | Estrutura de dados |
+| [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md) | Manual Unificado — inclui Estrutura de Dados (Parte 5) |
 | [docs/DOCUMENTACAO_TECNICA_COMPLETA.md](docs/DOCUMENTACAO_TECNICA_COMPLETA.md) | Compilado mestre — referência completa para IA e equipe |
 
 ---

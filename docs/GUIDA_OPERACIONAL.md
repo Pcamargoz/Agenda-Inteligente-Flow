@@ -43,7 +43,7 @@ Ações rápidas por papel
 - Consultor: confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS.
 - Cliente: aprovar cronogramas, confirmar horários, assinar OS.
 
- - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md#L1)
+ - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [01_04_manual_unificado.md](01_04_manual_unificado.md)
 
 Sugestões de uso
 - Ler este guia antes de abrir o fluxo mestre completo.

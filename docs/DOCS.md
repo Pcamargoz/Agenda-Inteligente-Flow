@@ -20,7 +20,7 @@ Central de agendas de consultoria: cadastros, eventos, cronogramas, registros (a
 ## 3. Integrações Externas
 
 **Envio de e-mails**
-O sistema possui um fluxo para envio de Ordens de Serviço (OS) e notificações por e-mail. A descrição do fluxo, recomendações e comportamentos (retries, rate-limits, fallback) está consolidada em `docs/EMAIL_ENVIO.md`.
+O sistema envia OS e notificações por e-mail via `api/send-os-email.js` (função serverless de exemplo). Para configuração de produção, contate o responsável de infraestrutura.
 
 **Microsoft Graph via MSAL.js (SPA browser, sem backend)**
 Replica eventos da agenda no calendário Outlook/Teams do usuário logado.
@@ -45,13 +45,13 @@ Nenhuma automação de filas/worker adicional identificada no repositório. Oper
 
 ## 5. Operações sensíveis e variáveis
 
-Algumas operações (envio de e-mails, integrações transacionais) dependem de credenciais e configurações sensíveis. A descrição do fluxo, recomendações operacionais e as variáveis envolvidas estão consolidadas em `docs/EMAIL_ENVIO.md`.
+Algumas operações (envio de e-mails, integrações transacionais) dependem de credenciais e configurações sensíveis.
 
-Para questões de deploy e configuração de secrets, contate a equipe de infraestrutura responsável — este repositório inclui uma implementação de exemplo, mas a configuração de produção varia conforme o ambiente.
+Para questões de deploy e configuração de secrets, contate a equipe de infraestrutura responsável — este repositório inclui uma implementação de exemplo (`api/send-os-email.js`), mas a configuração de produção varia conforme o ambiente.
 
 ## 6. Como Rodar Localmente (visão geral)
 
-O projeto pode ser executado localmente para desenvolvimento da interface. Implementações de funções serverless são opcionais e a forma de rodá-las depende da plataforma escolhida; veja `docs/EMAIL_ENVIO.md` para detalhes operacionais sobre integrações de envio de e-mail.
+O projeto pode ser executado localmente para desenvolvimento da interface. Implementações de funções serverless são opcionais e a forma de rodá-las depende da plataforma escolhida.
 
 Comandos típicos para desenvolvimento da interface:
 
@@ -81,4 +81,3 @@ Observação: os fluxos detalhados em `docs/05`—`docs/07` foram consolidados n
 
 Se quiser, posso também gerar um índice `docs/INDEX.md` e criar um PDF unificado com todos esses documentos.
 - [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Guia operacional completo (passo a passo para consultores).
-- [docs/07_tarefas_atendimentos_treinamentos.md](docs/07_tarefas_atendimentos_treinamentos.md) — Como funcionam tarefas, atendimentos e treinamentos.

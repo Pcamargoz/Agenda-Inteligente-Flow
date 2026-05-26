@@ -144,7 +144,7 @@ Resumo operacional extraído do guia completo `docs/DETALHAR_PROCESSO_CRONOGRAMA
 - Salvar/Enviar: `Salvar rascunho` ou `Enviar para aprovação do cliente` (gera anexos e notifica o cliente).
 - Pós‑envio: edição limitada enquanto `Aguardando cliente`; após `Confirmado` o cronograma é bloqueado e alterações exigem re‑agendamento formal.
 
-Para o fluxo passo a passo completo e telas, consulte: [docs/DETALHAR_PROCESSO_CRONOGRAMA.md](DETALHAR_PROCESSO_CRONOGRAMA.md)
+Para o fluxo passo a passo completo e telas, consulte: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md)
 
 
 ## Histórico

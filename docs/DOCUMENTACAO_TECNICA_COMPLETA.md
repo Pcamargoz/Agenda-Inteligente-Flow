@@ -8,11 +8,11 @@ version: "1.0"
 
 Nota: este arquivo é uma compilação grande. Para evitar erros de preview no GitHub, abra os documentos individuais em `docs/` usando os links abaixo.
 
-- [Guia Operacional — Fluxo Resumido](docs/GUIDA_OPERACIONAL.md)
-- [Índice Navegável](docs/INDEX.md)
-- [Documentação Técnica — principal (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md)
-- [Manual Unificado — Partes 1–4](docs/01_04_manual_unificado.md)
- [Parte 8 — Estrutura do Banco de Dados](docs/08_estrutura_banco_de_dados.md)
+ - [Guia Operacional — Fluxo Resumido](GUIDA_OPERACIONAL.md)
+ - [Índice Navegável](INDEX.md)
+ - [Documentação Técnica — principal (resumo)](DOCUMENTACAO_TECNICA.stub.md)
+ - [Manual Unificado — Partes 1–4](01_04_manual_unificado.md)
+  [Parte 8 — Estrutura do Banco de Dados](08_estrutura_banco_de_dados.md)
 
 ---
 
@@ -24,7 +24,7 @@ Nota: este arquivo é uma compilação grande. Para evitar erros de preview no G
 
 - **Para a equipe (implantação e operação):**
   1. Comece por `docs/GUIDA_OPERACIONAL.md` (resumo prático).  
-  2. Abra `docs/INDEX.md` para localizar documentos por público e, conforme necessário, leia `docs/08_estrutura_banco_de_dados.md`, `docs/04_fluxo_codigo_geral.md` e `docs/EMAIL_ENVIO.md`.
+  2. Abra [INDEX.md](INDEX.md) para localizar documentos por público e, conforme necessário, leia [08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md).
 
 <!-- Acceptance Checklists removed (moved/obsolete). -->
 
@@ -58,40 +58,44 @@ Ações rápidas por papel
 - Consultor: confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS.
 - Cliente: aprovar cronogramas, confirmar horários, assinar OS.
 
- Onde encontrar detalhes
  - Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md)
  - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md)
  - Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
  - Índice navegável: [docs/INDEX.md](docs/INDEX.md)
+ Onde encontrar detalhes
+ - Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md)
+ - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [01_04_manual_unificado.md](01_04_manual_unificado.md)
+ - Estrutura de dados / DB: [08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
+ - Índice navegável: [INDEX.md](INDEX.md)
 
-Próximos artefatos recomendados
+ Próximos artefatos recomendados
 <!-- Acceptance checklists removed -->
 
 ---
 
 <a id="indice-navegavel"></a>
 ## Índice Navegável (inserido de `INDEX.md`)
-Ver original: [docs/INDEX.md](docs/INDEX.md)
+Ver original: [INDEX.md](INDEX.md)
 
 Este índice reúne os principais guias e referências do projeto para facilitar a implantação da POC/MVP.
 
 Leitura recomendada (ordem curta)
-- Operacional (obrigatório): [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
-- Visão geral / referência: [docs/DOCS.md](docs/DOCS.md) — índice técnico com links para todos os documentos.
+ - Operacional (obrigatório): [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
+ - Visão geral / referência: [DOCS.md](DOCS.md) — índice técnico com links para todos os documentos.
 
 Guias operacionais
-- [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
-- [docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Fluxo mestre detalhado (passo a passo).
+ - [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
+ - [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Fluxo mestre detalhado (passo a passo).
 
 Documentos por público
 Operação / Implantação
-- [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
+ - [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md)
 
 Desenvolvimento / Referência técnica
- - [docs/DOCS.md](docs/DOCS.md) — índice geral e instruções de deploy.
+ - [DOCS.md](DOCS.md) — índice geral e instruções de deploy.
  - `Documentação Técnica — principal` (já presente neste arquivo)
- - [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md)
- - [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
+ - [01_04_manual_unificado.md](01_04_manual_unificado.md)
+ - [08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
 
 Exportar para PDF (comando sugerido)
 ```bash
@@ -101,7 +105,7 @@ pandoc docs/GUIDA_OPERACIONAL.md docs/*.md -o Faktory-Flow-Docs.pdf
 ---
 
 <a id="envio-de-emails---visao-geral"></a>
-## Envio de E-mails — Visão Geral (inserido de `EMAIL_ENVIO.md`)
+## Envio de E-mails — Visão Geral
 
 Este documento explica, de forma concisa, como funciona o fluxo de envio de e-mails (Ordens de Serviço e notificações) no projeto. Não contém instruções de configuração de provedores ou plataformas de deploy — essas informações foram removidas dos guias principais e centralizadas aqui para referência operacional.
 
@@ -300,7 +304,7 @@ Observação
 
  ### 8.1 Envio de e-mails (visão geral)
 
- O envio de Ordens de Serviço (OS) pode ser realizado por um componente de backend que mantém segredos fora do navegador. Este repositório inclui uma função de exemplo para demonstração — para detalhes operacionais, variáveis e recomendações de produção, consulte `docs/EMAIL_ENVIO.md`.
+ O envio de Ordens de Serviço (OS) pode ser realizado por um componente de backend que mantém segredos fora do navegador. Este repositório inclui uma função de exemplo (`api/send-os-email.js`). Para configuração de produção, contate o responsável de infraestrutura.
 
  Durante falhas do serviço de envio, a interface possui fallback para abrir o cliente de e-mail (`mailto:`) como alternativa de menor custo.
 
@@ -326,7 +330,7 @@ Observação
 
  ## 9. Variáveis sensíveis
 
- As variáveis e segredos relacionados a envio de e-mail e provedores transacionais estão documentados em `docs/EMAIL_ENVIO.md`. Para ambientes de produção, gerencie secrets via o sistema de infraestrutura adotado (ex.: secrets de projeto, Vault, etc.).
+ As variáveis e segredos relacionados a envio de e-mail e provedores transacionais devem ser gerenciadas via o sistema de infraestrutura adotado (ex.: secrets de projeto, Vault, etc.). Consulte `api/send-os-email.js` como referência de implementação.
 
  **Microsoft Graph**: o `clientId` e `tenantId` são configurados em `TEAMS_CFG` no front para uso SPA; redirect URIs e políticas devem ser ajustadas conforme o tenant e as regras da organização.
 
@@ -363,7 +367,7 @@ Observação
  6. Módulo **Registros**: kinds com regras específicas (atendimento, treinamento, tarefa).
  7. Módulo **OS**: modal, geração de PDF (html2pdf), envio SMTP/WhatsApp/mailto, link público de assinatura (canvas).
  8. **Saldo de horas**: `hoursDebited` idempotente, débito na emissão, estorno no cancelamento.
- 9. Endpoint de envio (ex.: `/api/send-os-email`) com validações e healthcheck — ver `docs/EMAIL_ENVIO.md`.
+ 9. Endpoint de envio (ex.: `/api/send-os-email`) com validações e healthcheck.
  10. **Microsoft Graph**: MSAL via CDN, botão "Conectar", `teamsSync(action, ev)` em `saveEvent`/`deleteEvent`.
  11. `validateDataIntegrity()` para detectar/corrigir órfãos.
  12. Configurar arquivo de deploy conforme a plataforma adotada (ex.: `vercel.json` como exemplo). 
@@ -408,7 +412,7 @@ Se desejar, posso:
 - Incluir metadados YAML no topo do arquivo para ajudar ferramentas de parsing.
 # Documentação Técnica — Única (compilada)
 
-Este arquivo reúne os documentos técnicos presentes em [docs/](docs/) num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy foram removidas e mantidas separadas; informações sobre o envio de e-mails estão em [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+Este arquivo reúne os documentos técnicos presentes em [docs/](docs/) num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy devem ser gerenciadas via infraestrutura interna.
 
 Sumário
 - [Documentação Técnica — principal](#documentação-técnica-—-principal)
@@ -499,7 +503,7 @@ Usuário → SPA (index.html) → localStorage (dados)
 O back-end consiste em pontos mínimos utilizados pelo front-end para operações que dependem de segredos ou de serviços externos (por exemplo, envio de e-mail). Por segurança e separação de responsabilidades a implementação exemplar disponível no repositório é simples — para produção, recomenda‑se migrar a lógica crítica para um serviço backend mais robusto.
 
 - Implementação de referência: existe uma função exemplo que recebe o payload da OS e encaminha para um serviço de envio (SMTP ou transacional).
-- Para a descrição do fluxo de envio de e-mails e recomendações operacionais, veja [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+- Para a implementação de envio de e-mails, consulte `api/send-os-email.js`.
 
 ## 8. Front-end
 
@@ -724,6 +728,6 @@ Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, 
 
 ## Referências e próximos passos
 
-- A versão compacta para leitura rápida é [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md).
+- A versão compacta para leitura rápida é [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md).
 - Para questões operacionais de deploy e configuração sensível solicite acesso ao responsável pela infraestrutura.
-- Para detalhes do fluxo de envio de e-mails veja [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+- Para implementação de envio de e-mails, consulte `api/send-os-email.js`.

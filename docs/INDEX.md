@@ -5,18 +5,18 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 **Leitura recomendada (ordem curta)**
 -- **Operacional (obrigatório):** [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
 - **Visão geral / referência:** [DOCS.md](DOCS.md) — índice técnico com links para todos os documentos.
-- **QA / Aceitação:** [docs/ACCEPTANCE_CHECKLISTS.md](ACCEPTANCE_CHECKLISTS.md)
+ 
 -- **Modelos de e-mail:** *não aplicável*
 
 ## Ordem de leitura (IA / Equipe)
 
 - **Para IA (análise automatizada / indexação):**
 	1. Abra `docs/DOCUMENTACAO_TECNICA_COMPLETA.md` e percorra o Sumário (TOC) do topo para baixo.
-	2. Siga os links do TOC por seção conforme o caso de uso (ex.: Parte 9 — estrutura de banco, Parte 4 — fluxo de código, Envios de e-mail).
+	2. Siga os links do TOC por seção conforme o caso de uso (ex.: Parte 8 — estrutura de banco, Parte 4 — fluxo de código, Envios de e-mail).
 
 - **Para a equipe (implantação / operação):**
 	1. Leia `docs/GUIDA_OPERACIONAL.md` (fluxo resumido) para entender papéis e passos operacionais.
-	2. Use `docs/INDEX.md` como mapa e abra os documentos detalhados conforme a necessidade: `docs/09_estrutura_banco_de_dados.md`, `docs/04_fluxo_codigo_geral.md`, `docs/EMAIL_ENVIO.md`.
+	2. Use `docs/INDEX.md` como mapa e abra os documentos detalhados conforme a necessidade: `docs/08_estrutura_banco_de_dados.md`, `docs/04_fluxo_codigo_geral.md`, `docs/EMAIL_ENVIO.md`.
 
 ---
 
@@ -27,19 +27,15 @@ Este índice reúne os principais guias e referências do projeto para facilitar
 ## Documentos por público
 **Operação / Implantação**
 - [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md)
-- [docs/ACCEPTANCE_CHECKLISTS.md](ACCEPTANCE_CHECKLISTS.md)
  - *(Modelos de e-mail removidos)*
 
 **Desenvolvimento / Referência técnica**
 - [DOCS.md](DOCS.md) — índice geral e instruções de deploy.
 - [Documentação Técnica — principal (resumo)](DOCUMENTACAO_TECNICA.stub.md)
 - [Documentação Técnica — unificada (v2, resumo)](DOCUMENTACAO_TECNICA.stub.md)
-- [docs/01_visual_e_estilos.md](01_visual_e_estilos.md)
-- [docs/02_componentes_utilizados.md](02_componentes_utilizados.md)
-- [docs/03_logicas_e_validacoes.md](03_logicas_e_validacoes.md)
-- [docs/04_fluxo_codigo_geral.md](04_fluxo_codigo_geral.md)
+- [docs/01_04_manual_unificado.md](01_04_manual_unificado.md)
 - [docs/08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
- - [docs/09_estrutura_banco_de_dados.md](09_estrutura_banco_de_dados.md)
+ - [docs/08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
 
 ---
 

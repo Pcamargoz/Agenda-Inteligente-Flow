@@ -1,26 +1,40 @@
 # Faktory Flow Agenda
 
-[![](https://img.shields.io/badge/Entrada-%C3%8Dndice-blue)](docs/INDEX.md)
-
-[![Guia Operacional](https://img.shields.io/badge/Guia-Operacional-blue)](docs/GUIDA_OPERACIONAL.md) [![Documentação](https://img.shields.io/badge/Documenta%C3%A7%C3%A3o-tecnica-lightgrey)](docs/DOCUMENTACAO_TECNICA.stub.md) [![Índice](https://img.shields.io/badge/%E2%86%92-Índice-green)](docs/INDEX.md)
-
 Projeto SPA para gestão de agendas, cronogramas, registros operacionais e Ordens de Serviço (OS).
 
-Visão rápida:
+Quick links
+- **Guia Operacional:** [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — resumo prático para coordenadores e consultores.
+- **Índice Navegável:** [docs/INDEX.md](docs/INDEX.md) — mapa por público e documentos.
+- **Manual Unificado (Partes 1–4):** [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md) — Visual, Componentes, Lógicas e Fluxo.
+- **Documentação Técnica — Completa:** [docs/DOCUMENTACAO_TECNICA_COMPLETA.md](docs/DOCUMENTACAO_TECNICA_COMPLETA.md) — compilado mestre (inclui Blueprint MVP e apêndices).
+- **Estrutura do Banco de Dados:** [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md).
+- **Detalhar processo (cronograma):** [docs/DETALHAR_PROCESSO_CRONOGRAMA.md](docs/DETALHAR_PROCESSO_CRONOGRAMA.md) — guia passo a passo do builder.
+- **Envio de e-mails / OS:** [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+- **Fluxo mestre (implantação):** [docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md).
+
+Visão rápida
 - Front-end: `index.html` (SPA, persistência via `localStorage`).
-- Docs organizadas em `docs/` para leitura por tópicos.
-- Envio de e-mails: fluxo tratado por um endpoint dedicado — detalhes em [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+- Endpoint de exemplo para envio de OS: `api/send-os-email.js`.
 
-Comece por:
-- 📘 [Guia Operacional](docs/GUIDA_OPERACIONAL.md) — guia prático (coordenador / consultor).
-- 🧭 [Índice Navegável](docs/INDEX.md) — índice navegável com os documentos por público.
-- 📗 [Documentação Técnica (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md) — documentação técnica principal (stub).
- - 🗄️ [Estrutura do Banco de Dados (modelo sugerido - Postgres)](docs/09_estrutura_banco_de_dados.md) — modelo relacional sugerido.
+Leitura recomendada (ordem curta)
+1. [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
+2. [docs/INDEX.md](docs/INDEX.md)
+3. [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md)
+4. [docs/DOCUMENTACAO_TECNICA_COMPLETA.md](docs/DOCUMENTACAO_TECNICA_COMPLETA.md)
 
-- 📘 [Documentação Técnica — Completa (resumo)](docs/DOCUMENTACAO_TECNICA_COMPLETA.stub.md) — versão compilada (stub).
-- 📘 [Fluxo Mestre — Agendamento (resumo)](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.stub.md) — fluxo mestre (stub).
-- 📘 [MVP Blueprint (resumo)](docs/MVP_BLUEPRINT.stub.md) — blueprint (stub).
+Como rodar localmente (modo rápido)
+Usando Python 3 (porta 8000):
+```bash
+python -m http.server 8000
+```
+Ou com `npx`:
+```bash
+npx serve . -l 8000
+```
 
-Entrada recomendada: [docs/INDEX.md](docs/INDEX.md) — use este índice leve como ponto de partida para navegar pela documentação.
+Contribuindo / editando docs
+- Atualize os arquivos em `docs/` e o compilado `docs/DOCUMENTACAO_TECNICA_COMPLETA.md` será refeito manualmente quando necessário.
+- Para mudanças operacionais (deploy, segredos), contate o responsável de infraestrutura antes de commitar.
 
-Para operações sensíveis (configuração de provedores, deploys e variáveis secretas), consulte a equipe responsável pela infraestrutura; detalhes operacionais foram removidos do README e centralizados nos arquivos de `docs/`.
+Contato
+- Para dúvidas sobre o conteúdo técnico ou o fluxo operacional, abra uma issue ou contate o autor do projeto.

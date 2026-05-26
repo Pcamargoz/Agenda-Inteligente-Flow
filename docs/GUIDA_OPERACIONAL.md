@@ -43,15 +43,7 @@ Ações rápidas por papel
 - Consultor: confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS.
 - Cliente: aprovar cronogramas, confirmar horários, assinar OS.
 
-Onde encontrar detalhes
-- Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md#L1)
-- Visual e estilos: [docs/01_visual_e_estilos.md](docs/01_visual_e_estilos.md#L1)
-- Componentes: [docs/02_componentes_utilizados.md](docs/02_componentes_utilizados.md#L1)
-- Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md#L1)
-- Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md#L1)
-- Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md#L1)
- - Estrutura de dados / DB (modelo Postgres sugerido): [docs/09_estrutura_banco_de_dados.md](docs/09_estrutura_banco_de_dados.md#L1)
-- Índice navegável: [INDEX.md](INDEX.md) — sumário por público (Operação / Dev / QA).
+ - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md#L1)
 
 Sugestões de uso
 - Ler este guia antes de abrir o fluxo mestre completo.
@@ -59,4 +51,4 @@ Sugestões de uso
 - Ao documentar alterações, preferir atualizar o arquivo técnico específico em `docs/` e linkar aqui.
 
 Próximos artefatos recomendados
-- `docs/ACCEPTANCE_CHECKLISTS.md` — checklists por tela para QA/aceitação.
+<!-- Acceptance checklists removed -->

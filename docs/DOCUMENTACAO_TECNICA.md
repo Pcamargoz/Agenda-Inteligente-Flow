@@ -522,8 +522,8 @@ Envio de e-mail é assíncrono via serverless. Em falha, há fallback para `mail
 ## Atualizações recentes
 
 - Novo documento mestre de fluxo: `FLUXO_AGENDAMENTO_IMPLANTACAO.md` (fluxo de agendamento e implantação, incluindo endpoints agrupados por fluxo).
- - Documentos de apoio criados em `docs/`: `01_visual_e_estilos.md`, `02_componentes_utilizados.md`, `03_logicas_e_validacoes.md`, `04_fluxo_codigo_geral.md`, `08_estrutura_banco_de_dados.md`, `09_estrutura_banco_de_dados.md`.
+ - Documentos de apoio criados em `docs/`: `01_visual_e_estilos.md`, `02_componentes_utilizados.md`, `03_logicas_e_validacoes.md`, `04_fluxo_codigo_geral.md`, `08_estrutura_banco_de_dados.md`.
 - Arquivos removidos/mesclados: `docs/05_fluxo_criar_empresa_e_card.md`, `docs/06_fluxo_criar_editar_cronograma.md`, `docs/07_tarefas_atendimentos_treinamentos.md` (conteúdo consolidado no fluxo mestre).
-- Próximas recomendações: adicionar `docs/ACCEPTANCE_CHECKLISTS.md` e um `docs/09_endpoints_por_fluxo.md` ou `openapi.yaml` para formalizar contratos de API.
+- Próximas recomendações: adicionar um `docs/09_endpoints_por_fluxo.md` ou `openapi.yaml` para formalizar contratos de API.
 
 

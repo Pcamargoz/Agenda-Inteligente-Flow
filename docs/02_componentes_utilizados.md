@@ -8,7 +8,7 @@ Componentes principais
 - `CardResumo` — mostra totais (itens, treinamentos, tarefas, pendências).
 - `KanbanBoard` e `KanbanColumn` — container e colunas do Kanban por cliente.
 - `ClientCard` — cartão do cliente dentro do Kanban (resumo + ações rápidas).
-- `CronogramaBuilder` — área com seleção de período, templates, preview e configuração de itens.
+- `CronogramaBuilder` — área com seleção de período, templates e preview; edição e organização ficam no builder, porém a criação inicial de cronogramas/itens é iniciada a partir do `ClientCard` (abrir o card correspondente → ação "Criar cronograma").
 - `CronogramaItemEditor` — modal/redrawer para editar data, hora, participantes, recursos.
 - `TemplateCard` — exibição de template com ações `Editar`, `Duplicar`, `Desativar`.
 - `ModalForm` — componente genérico para formulários (cadastro de consultor/empresa/template/OS).
@@ -20,4 +20,4 @@ Componentes principais
 
 Padrões de composição
 - Combinar `CardResumo` com `ClientCard` para navegação rápida.
-- `CronogramaBuilder` usa `TemplateCard` e `CronogramaItemEditor` para criar uma experiência de arrastar/editar.
+- `CronogramaBuilder` usa `TemplateCard` e `CronogramaItemEditor` para editar e organizar itens (arrastar/editar). A criação de novos cronogramas/itens é acionada via `ClientCard`.

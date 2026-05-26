@@ -34,8 +34,8 @@ Documento resumido descrevendo o fluxo de uso para agendamento e implantação.
    - `Atend. / Treino / Tarefas` → `+ Novo cliente` no Kanban (se necessário).
 
 5. Criar cronograma
-   - Em `Cronogramas por empresa` → `Novo cronograma` ou usar `Usar templates`.
-   - Selecionar período, empresa e consultor; aplicar template(s) ou sugerir dias livres.
+   - A criação de cronogramas agora é iniciada a partir do `ClientCard` no Kanban (`Atend. / Treino / Tarefas`) → ação `+ Novo cronograma` no card. A criação direta na tela `Cronogramas por empresa` não inicia mais o processo de criação.
+   - Após iniciar no card, selecionar período, empresa e consultor; aplicar template(s) ou usar `Sugerir dias livres`.
    - Editar data/hora/dia de cada item; validação visual: verde = ok, vermelho = divergência.
 
 6. Envio para aprovação
@@ -105,11 +105,10 @@ Objetivo: descrever passo a passo as ações operacionais que o consultor execut
    - Acesse `Atend. / Treino / Tarefas` → visualização `Kanban por cliente`.
    - Verifique se o cliente já tem um card. Caso não, clique `+ Novo cliente` e selecione a empresa para adicioná‑la ao Kanban.
 
-- 3.2 Criar cronograma para o cliente
-   - Navegue em `Cronogramas → Cronogramas por empresa` e clique `+ Novo cronograma`.
-   - Selecione a empresa e confirme o consultor (geralmente auto‑preenchido pelo `Consultor Padrão`).
-   - Escolha o período (semana, mês, personalizado).
-   - Use `Usar templates` para preencher automaticamente os itens do cronograma ou `Sugerir dias livres` para que o sistema indique datas com base na disponibilidade do consultor.
+-- 3.2 Criar cronograma para o cliente
+   - Abra o `ClientCard` do cliente no Kanban (`Atend. / Treino / Tarefas`) e clique `+ Novo cronograma` no card para iniciar a criação.
+   - O sistema abrirá o builder de cronograma com a empresa/consultor (auto‑preenchido quando aplicável).
+   - Escolha o período (semana, mês, personalizado) e use `Usar templates` ou `Sugerir dias livres` para preencher os itens.
 
 - 3.3 Configurar itens do cronograma
    - No preview, clique em cada item para abrir a tela de configuração.
@@ -189,7 +188,7 @@ Seguem os fluxos operacionais derivados dos documentos auxiliares (criar empresa
 2. Adicionar empresa ao Kanban de Atendimentos
 - Acesse `Atend. / Treino / Tarefas` → `Kanban por cliente`.
 - Clique `+ Novo cliente` → busca por empresa cadastrada → selecione e confirme.
-- Sistema cria `ClientCard` no Kanban com resumo e botão `+ Novo cronograma`.
+ - Sistema cria `ClientCard` no Kanban com resumo; o botão `+ Novo cronograma` fica disponível no card para iniciar a criação do cronograma.
 
 3. Observações práticas
 - Se a empresa ainda não tiver um `Consultor Padrão`, sugerir seleção obrigatória ou exibir aviso.
@@ -198,8 +197,8 @@ Seguem os fluxos operacionais derivados dos documentos auxiliares (criar empresa
 ### Processo detalhado para criar e editar cronograma
 
 1. Iniciar novo cronograma
-- Entrar em `Cronogramas → Cronogramas por empresa` → `+ Novo cronograma`.
-- Selecionar: Empresa, Consultor, Período (start/end).
+- Abrir o `ClientCard` do cliente no Kanban e clicar `+ Novo cronograma` no card para iniciar a criação.
+- Selecionar (se necessário): Empresa, Consultor, Período (start/end).
 
 2. Preencher usando templates ou manualmente
 - `Usar templates`: selecionar template(s) → `Adicionar ao cronograma` → os itens aparecem no preview.

@@ -50,8 +50,7 @@ Objetivo: checklists concisos para validação funcional durante QA e homologaç
 - [ ] Detectar e sinalizar conflitos (`findConflicts`).
 - [ ] Persistir evento e aparecer na vista correta (mês/semana/dia).
 
-3) Cronogramas (criar/enviar)
-- [ ] Selecionar template ou builder.
+- [ ] Selecionar template ou builder (criação iniciada no card).
 - [ ] Sugerir datas com base em disponibilidade do consultor.
 - [ ] Gerar PDF/Excel anexo corretamente.
 - [ ] Enviar e-mail com link de aprovação.
@@ -96,7 +95,7 @@ Sumário rápido
 
 Fluxo principal (resumido)
 1. Cadastrar consultor e empresa.
-2. Criar (ou aplicar) template → montar cronograma.
+2. Criar (ou aplicar) template → montar cronograma (criação de cronogramas iniciada somente dentro do card).
 3. Enviar cronograma para aprovação (PDF/Excel + e-mail).
 4. Cliente aprova → cronograma confirmado e bloqueado.
 5. Sistema gera eventos e registros; execução começa.
@@ -334,7 +333,9 @@ Objetivo: documentar a camada visual do MVP/POC para que a equipe de produto/des
 - Cadastros → Empresas
 - Templates de agendamento (listar, editar, duplicar)
 - Painel do Consultor (visão individual)
-- Modal de Cadastro: Novo consultor, Nova empresa, Novo template, Novo cronograma, Nova OS
+- Modal de Cadastro: Novo consultor, Nova empresa, Novo template, Nova OS
+-
+Observação: a criação de cronogramas agora é feita somente dentro do card (abrir o card correspondente → ação "Criar cronograma").
 
 2. Estrutura visual
 - Layout geral: menu lateral esquerdo com seções `OPERAÇÃO` e `CONFIGURAÇÃO`; área principal com título, ações (botões principais) e conteúdo.
@@ -375,7 +376,7 @@ Componentes principais
 - `CardResumo` — mostra totais (itens, treinamentos, tarefas, pendências).
 - `KanbanBoard` e `KanbanColumn` — container e colunas do Kanban por cliente.
 - `ClientCard` — cartão do cliente dentro do Kanban (resumo + ações rápidas).
-- `CronogramaBuilder` — área com seleção de período, templates, preview e configuração de itens.
+- `CronogramaBuilder` — área com seleção de período, templates e preview; edição e organização ficam no builder, porém a criação inicial de cronogramas/itens é iniciada a partir do `ClientCard` (abrir o card correspondente → ação "Criar cronograma").
 - `CronogramaItemEditor` — modal/redrawer para editar data, hora, participantes, recursos.
 - `TemplateCard` — exibição de template com ações `Editar`, `Duplicar`, `Desativar`.
 - `ModalForm` — componente genérico para formulários (cadastro de consultor/empresa/template/OS).
@@ -387,7 +388,7 @@ Componentes principais
 
 Padrões de composição
 - Combinar `CardResumo` com `ClientCard` para navegação rápida.
-- `CronogramaBuilder` usa `TemplateCard` e `CronogramaItemEditor` para criar uma experiência de arrastar/editar.
+- `CronogramaBuilder` usa `TemplateCard` e `CronogramaItemEditor` para editar e organizar itens (arrastar/editar). A criação de novos cronogramas/itens é acionada via `ClientCard`.
 
 ---
 
@@ -437,7 +438,7 @@ Resumo de erros esperados e manejo
 Objetivo: descrever de forma não técnica o fluxo de execução esperado entre telas e entidades — serve como mapa para arquitetos e desenvolvedores entenderem o comportamento global.
 
 1. Ações do usuário (front) que disparam fluxos
-- Abrir builder de cronograma → preview → salvar rascunho (local/backend) ou enviar para aprovação.
+- Criação/edição de cronograma: iniciar a criação a partir do `ClientCard` (abrir o card → ação "Criar cronograma"); em seguida abrir o builder de cronograma para editar/preview → salvar rascunho (local/backend) ou enviar para aprovação.
 - Enviar para aprovação → backend gera anexos, cria notificação e marca cronograma como `sent`.
 - Cliente aprova → backend recebe confirmação → cria registros de atendimento e atualiza status para `confirmed`.
 - Consultor executa treinamento → marca `Realizado` → pode gerar OS.
@@ -462,7 +463,7 @@ Objetivo: descrever de forma não técnica o fluxo de execução esperado entre 
 Objetivo: documentar todas as etapas do builder de cronograma para que a equipe execute ou refine a interface.
 
 1) Abertura do builder
-- A partir de `Cronogramas → Cronogramas por empresa` ou do card do cliente → `+ Novo cronograma`.
+- A abertura do builder de cronograma é feita a partir do `ClientCard` no Kanban (`Atend. / Treino / Tarefas`) → ação `+ Novo cronograma` no card. A criação diretamente na tela `Cronogramas por empresa` não inicia mais o processo.
 - Selecionar: Empresa, Consultor, Período (de/até).
 
 2) Opções iniciais

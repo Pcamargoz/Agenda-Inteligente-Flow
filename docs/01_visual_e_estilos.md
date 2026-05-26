@@ -10,7 +10,9 @@ Objetivo: documentar a camada visual do MVP/POC para que a equipe de produto/des
 - Cadastros → Empresas
 - Templates de agendamento (listar, editar, duplicar)
 - Painel do Consultor (visão individual)
-- Modal de Cadastro: Novo consultor, Nova empresa, Novo template, Novo cronograma, Nova OS
+-- Modal de Cadastro: Novo consultor, Nova empresa, Novo template, Nova OS
+
+Observação: a criação de cronogramas agora é feita somente dentro do card (abrir o card correspondente → ação "Criar cronograma").
 
 2. Estrutura visual
 - Layout geral: menu lateral esquerdo com seções `OPERAÇÃO` e `CONFIGURAÇÃO`; área principal com título, ações (botões principais) e conteúdo.

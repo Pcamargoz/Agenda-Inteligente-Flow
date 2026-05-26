@@ -3,7 +3,7 @@
 Objetivo: documentar todas as etapas do builder de cronograma para que a equipe execute ou refine a interface.
 
 1) Abertura do builder
-- A partir de `Cronogramas → Cronogramas por empresa` ou do card do cliente → `+ Novo cronograma`.
+- A abertura do builder de cronograma é feita a partir do `ClientCard` no Kanban (`Atend. / Treino / Tarefas`) → ação `+ Novo cronograma` no card. A criação diretamente na tela `Cronogramas por empresa` não inicia mais o processo.
 - Selecionar: Empresa, Consultor, Período (de/até).
 
 2) Opções iniciais

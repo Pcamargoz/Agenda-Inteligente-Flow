@@ -1325,10 +1325,16 @@
   .ic-cal-day.busy{background:var(--burgundy-bg);color:var(--burgundy);border-color:var(--burgundy);cursor:not-allowed}
   .ic-cal-day.busy::after{content:"";position:absolute;left:6px;right:6px;height:1px;background:var(--burgundy);transform:rotate(-12deg)}
   .ic-cal-day.busy-soft{background:var(--paper-3);color:var(--ink-3);border-color:var(--line-2)}
+  /* Dia em que o consultor não trabalha (freeDays do cadastro) ou data bloqueada específica */
+  .ic-cal-day.off-day{
+    background:repeating-linear-gradient(45deg,var(--slate-bg),var(--slate-bg) 3px,rgba(107,124,143,.18) 3px,rgba(107,124,143,.18) 6px);
+    color:var(--slate);border-color:var(--slate);cursor:not-allowed;opacity:.85;
+  }
+  .ic-cal-day.off-day::after{content:"";position:absolute;left:6px;right:6px;height:1px;background:var(--slate);transform:rotate(-12deg)}
   .ic-cal-day.selected{background:var(--ink) !important;color:var(--paper) !important;border-color:var(--ink) !important;font-weight:700}
   .ic-cal-day.selected::after{content:"✓";position:absolute;bottom:1px;right:3px;font-size:10px;color:var(--champagne-2)}
   .ic-cal-day.today{box-shadow:inset 0 0 0 2px var(--champagne)}
-  .ic-cal-day:hover:not(.empty):not(.past):not(.busy){border-color:var(--ink);transform:scale(1.05);z-index:2}
+  .ic-cal-day:hover:not(.empty):not(.past):not(.busy):not(.off-day){border-color:var(--ink);transform:scale(1.05);z-index:2}
 
   /* lista de pendências (dashboard widget) */
   .pendlist-row{
@@ -10337,6 +10343,9 @@ function renderItemConfigCal(it, y, m, consId){
   const selected = it.date;
   const todayIso = fmtDate(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
 
+  /* Consultor associado (para respeitar dias trabalhados / datas bloqueadas do cadastro) */
+  const consultant = consId ? consultantById(consId) : null;
+
   /* Conjunto de dias ocupados (eventos do consultor + outros itens) */
   const busyHard = new Set();
   const busySoft = new Set();
@@ -10357,19 +10366,33 @@ function renderItemConfigCal(it, y, m, consId){
     const dow = new Date(y, m, d).getDay();
     const cls = ['ic-cal-day'];
     const isPast = iso < todayIso;
+    /* Dia em que o consultor NÃO trabalha conforme cadastro
+       (dia-da-semana fora de freeDays ou data em blockedDates) */
+    const isOffDay = consultant && !isConsultantFreeOn(consultant, iso);
     if (dow === 0 || dow === 6) cls.push('weekend');
     if (iso === todayIso) cls.push('today');
     if (isPast){ cls.push('past'); }
     else if (selected === iso){ cls.push('selected'); }
     else if (busyHard.has(iso)){ cls.push('busy'); }
+    else if (isOffDay){ cls.push('off-day'); }
     else if (busySoft.has(iso)){ cls.push('busy-soft'); }
     else { cls.push('free'); }
 
-    const handler = (isPast || busyHard.has(iso)) ? '' : `onclick="icPickDate('${iso}')"`;
-    const title = isPast ? 'Data passada'
-      : busyHard.has(iso) ? 'Evento já agendado neste dia'
-      : busySoft.has(iso) ? 'Outro item deste cronograma já usa esse dia'
-      : 'Disponível';
+    const blocked = isPast || busyHard.has(iso) || isOffDay;
+    const handler = blocked ? '' : `onclick="icPickDate('${iso}')"`;
+    /* Motivo do bloqueio para o tooltip */
+    let title;
+    if (isPast) title = 'Data passada';
+    else if (busyHard.has(iso)) title = 'Evento já agendado neste dia';
+    else if (isOffDay) {
+      const blockedExplicit = consultant.blockedDates && consultant.blockedDates.includes(iso);
+      const dowNamePT = ['domingos','segundas','terças','quartas','quintas','sextas','sábados'][dow];
+      title = blockedExplicit
+        ? `${consultant.name} bloqueou esta data no cadastro`
+        : `${consultant.name} não trabalha ${dowNamePT} (cadastro)`;
+    }
+    else if (busySoft.has(iso)) title = 'Outro item deste cronograma já usa esse dia';
+    else title = 'Disponível';
     cells += `<div class="${cls.join(' ')}" ${handler} title="${title}">${d}</div>`;
   }
 
@@ -10387,6 +10410,7 @@ function renderItemConfigCal(it, y, m, consId){
       <div style="display:flex;gap:10px;font-size:10px;color:var(--ink-3);margin-top:10px;flex-wrap:wrap">
         <span><span style="display:inline-block;width:9px;height:9px;background:var(--forest-bg);border:1px solid var(--forest);margin-right:3px;vertical-align:middle"></span>Livre</span>
         <span><span style="display:inline-block;width:9px;height:9px;background:var(--burgundy-bg);border:1px solid var(--burgundy);margin-right:3px;vertical-align:middle"></span>Evento existente</span>
+        <span><span style="display:inline-block;width:9px;height:9px;background:var(--slate-bg);border:1px solid var(--slate);margin-right:3px;vertical-align:middle"></span>Consultor não trabalha</span>
         <span><span style="display:inline-block;width:9px;height:9px;background:var(--paper-3);border:1px solid var(--line-2);margin-right:3px;vertical-align:middle"></span>Outro item</span>
         <span><span style="display:inline-block;width:9px;height:9px;background:var(--ink);margin-right:3px;vertical-align:middle"></span>Selecionado</span>
       </div>
@@ -10449,6 +10473,22 @@ function validateItemBeforeSave(){
   if (!(it.title||'').trim()){
     toast('error','Título obrigatório','Informe o nome do item.');
     return false;
+  }
+  /* Bloqueio: se a data cai em dia não trabalhado do consultor (cadastro), recusar */
+  if (it.date){
+    const consId = it.responsibleId || document.getElementById('croConsultant')?.value;
+    const consultant = consId ? consultantById(consId) : null;
+    if (consultant && !isConsultantFreeOn(consultant, it.date)){
+      const d = parseISO(it.date);
+      const blockedExplicit = consultant.blockedDates && consultant.blockedDates.includes(it.date);
+      const dowNamePT = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'][d.getDay()];
+      toast('error',
+        blockedExplicit ? 'Data bloqueada no cadastro' : 'Consultor não trabalha neste dia',
+        blockedExplicit
+          ? `${consultant.name} marcou ${pad(d.getDate())}/${pad(d.getMonth()+1)} como bloqueado.`
+          : `${consultant.name} não atende em ${dowNamePT}. Escolha outro dia.`);
+      return false;
+    }
   }
   if (it.kind === 'treinamento'){
     if (!it.date){ toast('error','Data obrigatória','Treinamentos exigem data.'); return false; }

@@ -38,3 +38,31 @@ Contribuindo / editando docs
 
 Contato
 - Para dúvidas sobre o conteúdo técnico ou o fluxo operacional, abra uma issue ou contate o autor do projeto.
+
+---------------------------------------
+
+Processo: como o consultor usa o sistema
+- Abertura: o consultor visualiza seu `Kanban de Clientes` e abre o `ClientCard` do cliente.
+- Criar cronograma: dentro do `ClientCard` selecionar `+ Novo cronograma` → usar `Sugerir dias livres` ou `Usar templates` → ajustar e salvar rascunho ou enviar para aprovação.
+- Execução: ao confirmar, os `EVENTS` e `RECORDS` são criados; o consultor marca `Realizado` e preenche checklist.
+- OS: após execução, gerar OS (PDF) e enviar; o débito de horas ocorre na emissão da OS.
+
+Resumo técnico (resumido)
+- Arquitetura: SPA única (`index.html`) com persistência em `localStorage`; backend serverless mínimo para envio de e-mails.
+- Modelo de dados: entidades principais — `CONSULTANTS`, `COMPANIES`, `EVENTS`, `SCHEDULES`, `RECORDS`, `TEMPLATES`, `ORDERS_SERVICE`.
+- Estado e transições: cronogramas (`rascunho` → `aguardando-cliente` → `confirmado`), eventos e OS com fluxos descritos em `docs/DOCUMENTACAO_TECNICA_COMPLETA.md`.
+
+Documentação técnica (completa, para IA)
+- O arquivo compilado de referência é: [docs/DOCUMENTACAO_TECNICA_COMPLETA.md](docs/DOCUMENTACAO_TECNICA_COMPLETA.md). Ele contém o Blueprint MVP, modelo de dados detalhado, fluxos end-to-end, decisões de arquitetura e guias de replicação.
+
+Guia Operacional (como o sistema funciona)
+- Consulte: [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — resumo prático com passos por papel (Coordenador, Consultor, Cliente) e ações rápidas.
+
+Sobre o código
+- Entrada da aplicação: `index.html` (SPA). Para testes locais abra `index.html` no navegador servindo via servidor estático.
+- API de exemplo: `api/send-os-email.js` — função serverless de referência para envio de OS.
+- Estrutura recomendada: frontend puro para MVP; migrar para Next.js/Prisma/Postgres quando necessário para multiusuário.
+
+Licença / Contato
+- Licença: (preencha conforme apropriado).
+- Autor / contato: consulte o repositório para informações de commit ou abra uma issue.

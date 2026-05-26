@@ -6,20 +6,33 @@ version: "1.0"
 ---
 ## Sumário (clique para abrir)
 
-- [Guia Operacional — Fluxo Resumido](#guia-operacional---fluxo-resumido) — [arquivo](docs/GUIDA_OPERACIONAL.md)
-- [Índice Navegável](#indice-navegavel) — [arquivo](docs/INDEX.md)
-- [Documentação Técnica — principal](#documentação-técnica-—-principal) — [arquivo](docs/DOCUMENTACAO_TECNICA.md)
-- [Parte 1 — Visual e Estilos](#parte-1-—-visual-e-estilos) — [arquivo](docs/01_visual_e_estilos.md)
-- [Parte 2 — Componentes utilizados](#parte-2-—-componentes-utilizados) — [arquivo](docs/02_componentes_utilizados.md)
-- [Parte 3 — Lógicas e Validações](#parte-3-—-lógicas-e-validações) — [arquivo](docs/03_logicas_e_validacoes.md)
-- [Parte 4 — Fluxo de Código (visão geral operacional)](#parte-4-—-fluxo-de-código-visão-geral-operacional) — [arquivo](docs/04_fluxo_codigo_geral.md)
-- [Parte 8 — Estrutura do Banco de Dados](#parte-8-estrutura-do-banco-de-dados) — [arquivo](docs/08_estrutura_banco_de_dados.md)
-- [Acceptance Checklists](#acceptance-checklists) — [arquivo](docs/ACCEPTANCE_CHECKLISTS.md)
-- [Envio de E-mails — Visão Geral](#envio-de-emails---visao-geral) — [arquivo](docs/EMAIL_ENVIO.md)
-- [Blueprint MVP — Documento Completo](#blueprint-mvp---documento-completo) — [arquivo](docs/MVP_BLUEPRINT.md)
-- [DOCS.md — Índice técnico e notas](#docsmd---indice-tecnico-e-notas) — [arquivo](docs/DOCS.md)
+Nota: este arquivo é uma compilação grande. Para evitar erros de preview no GitHub, abra os documentos individuais em `docs/` usando os links abaixo.
+
+- [Guia Operacional — Fluxo Resumido](docs/GUIDA_OPERACIONAL.md)
+- [Índice Navegável](docs/INDEX.md)
+- [Documentação Técnica — principal (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md)
+- [Parte 1 — Visual e Estilos](docs/01_visual_e_estilos.md)
+- [Parte 2 — Componentes utilizados](docs/02_componentes_utilizados.md)
+- [Parte 3 — Lógicas e Validações](docs/03_logicas_e_validacoes.md)
+- [Parte 4 — Fluxo de Código (visão geral operacional)](docs/04_fluxo_codigo_geral.md)
+- [Parte 8 — Estrutura do Banco de Dados](docs/08_estrutura_banco_de_dados.md)
+- [Parte 9 — Estrutura do Banco de Dados (Postgres sugerido)](docs/09_estrutura_banco_de_dados.md)
+- [Acceptance Checklists](docs/ACCEPTANCE_CHECKLISTS.md)
+- [Envio de E-mails — Visão Geral](docs/EMAIL_ENVIO.md)
+- [Blueprint MVP — Documento Completo](docs/MVP_BLUEPRINT.md)
+- [DOCS.md — Índice técnico e notas](docs/DOCS.md)
 
 ---
+
+## Ordem de leitura (IA / Equipe)
+
+- **Para IA (indexação / análise automática):**
+  1. Leia `docs/DOCUMENTACAO_TECNICA_COMPLETA.md` do topo para baixo; use o Sumário (TOC) para saltar para seções relevantes.
+  2. Priorize as seções: `Guia Operacional` → `Índice Navegável` → `Parte 4 — Fluxo de Código` → `Parte 9 — Estrutura do Banco de Dados (Postgres)` → `Envio de E-mails`.
+
+- **Para a equipe (implantação e operação):**
+  1. Comece por `docs/GUIDA_OPERACIONAL.md` (resumo prático).  
+  2. Abra `docs/INDEX.md` para localizar documentos por público e, conforme necessário, leia `docs/09_estrutura_banco_de_dados.md`, `docs/04_fluxo_codigo_geral.md` e `docs/EMAIL_ENVIO.md`.
 
 <a id="acceptance-checklists"></a>
 ## Acceptance Checklists (inserido de `ACCEPTANCE_CHECKLISTS.md`)
@@ -102,6 +115,7 @@ Onde encontrar detalhes
 - Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md)
 - Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md)
 - Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
+ - Estrutura de dados / DB (modelo Postgres sugerido): [docs/09_estrutura_banco_de_dados.md](docs/09_estrutura_banco_de_dados.md)
 - Índice navegável: [docs/INDEX.md](docs/INDEX.md)
 
 Próximos artefatos recomendados
@@ -224,11 +238,11 @@ Sumário
 
 <!-- Include main technical doc -->
 
-Ver original: [docs/DOCUMENTACAO_TECNICA.md](docs/DOCUMENTACAO_TECNICA.md)
+Ver original (resumo): [docs/DOCUMENTACAO_TECNICA.stub.md](docs/DOCUMENTACAO_TECNICA.stub.md)
 
 <!-- START: DOCUMENTACAO_TECNICA.md -->
 
-(Conteúdo completo de [docs/DOCUMENTACAO_TECNICA.md](docs/DOCUMENTACAO_TECNICA.md))
+(Conteúdo completo de [docs/DOCUMENTACAO_TECNICA.stub.md](docs/DOCUMENTACAO_TECNICA.stub.md))
 
 
 *A seguir está o conteúdo principal consolidado.*

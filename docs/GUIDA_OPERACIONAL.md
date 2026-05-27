@@ -1,35 +1,27 @@
 # Guia Operacional — Fluxo Resumido
 
-Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, com links para documentação técnica detalhada.
+**Objetivo:** guia curto e acionável para coordenadores e consultores.
+**Público:** Coordenador de Atendimento, Consultor, Suporte Técnico.
 
-Público: Coordenador de Atendimento, Consultor, Suporte Técnico.
+---
 
-[![Guia](https://img.shields.io/badge/Guia-Operacional-blue)](GUIDA_OPERACIONAL.md) [![Fluxo](https://img.shields.io/badge/Fluxo-Agendamento-green)](FLUXO_AGENDAMENTO_IMPLANTACAO.md) [![Docs](https://img.shields.io/badge/Docs-Index-lightgrey)](INDEX.md)
-
-## Visual rápido
-
-- ✅ Leitura inicial: siga os passos do diagrama abaixo.
-- 🧭 Público: coordenador → consultor → cliente.
+## Fluxo visual
 
 ```mermaid
 flowchart LR
-	A["1. Cadastrar consultor/empresa"] --> B["2. Criar/aplicar template"]
-	B --> C["3. Enviar cronograma (PDF e-mail)"]
-	C --> D["4. Aprovação do cliente"]
-	D --> E["5. Gerar eventos e registros"]
-	E --> F["6. Execução (atend./treino/tarefas)"]
-	F --> G["7. Gerar e enviar OS"]
-	G --> H["8. Assinatura e fechamento"]
+  A["1. Cadastrar consultor/empresa"] --> B["2. Criar/aplicar template"]
+  B --> C["3. Enviar cronograma (PDF + e-mail)"]
+  C --> D["4. Aprovação do cliente"]
+  D --> E["5. Gerar eventos e registros"]
+  E --> F["6. Execução (atend./treino/tarefas)"]
+  F --> G["7. Gerar e enviar OS"]
+  G --> H["8. Assinatura e fechamento"]
 ```
 
+---
 
-Sumário rápido
-- Propósito e papéis
-- Fluxo principal (resumido)
-- Principais ações por papel
-- Links rápidos para documentação detalhada
+## Fluxo principal (resumido)
 
-Fluxo principal (resumido)
 1. Cadastrar consultor e empresa.
 2. Criar (ou aplicar) template → montar cronograma.
 3. Enviar cronograma para aprovação (PDF/Excel + e-mail).
@@ -38,17 +30,20 @@ Fluxo principal (resumido)
 6. Registrar atendimentos/treinamentos/tarefas; gerar OS quando necessário.
 7. Gerar e enviar OS (PDF + e-mail/WhatsApp); marcar como assinada.
 
-Ações rápidas por papel
-- Coordenador: cadastrar consultores/empresas, criar templates, revisar cronogramas, enviar para cliente.
-- Consultor: confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS.
-- Cliente: aprovar cronogramas, confirmar horários, assinar OS.
+---
 
- - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [01_04_manual_unificado.md](01_04_manual_unificado.md)
+## Ações por papel
 
-Sugestões de uso
-- Ler este guia antes de abrir o fluxo mestre completo.
-- Usar os arquivos em `docs/` como referência quando precisar de detalhes técnicos ou tabelas.
-- Ao documentar alterações, preferir atualizar o arquivo técnico específico em `docs/` e linkar aqui.
+| Papel | Ações principais |
+|---|---|
+| **Coordenador** | Cadastrar consultores/empresas, criar templates, revisar cronogramas, enviar para cliente |
+| **Consultor** | Confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS |
+| **Cliente** | Aprovar cronogramas, confirmar horários, assinar OS via link público |
 
-Próximos artefatos recomendados
-<!-- Acceptance checklists removed -->
+---
+
+## Onde encontrar mais detalhes
+
+- **Visão completa do sistema e regras de negócio:** [../DOC_01_VISAO_GERAL.md](../DOC_01_VISAO_GERAL.md)
+- **Arquitetura e referência técnica:** [../DOC_02_ARQUITETURA_E_REFERENCIA_TECNICA.md](../DOC_02_ARQUITETURA_E_REFERENCIA_TECNICA.md)
+- **Fluxo de implantação detalhado (passo a passo):** [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md)

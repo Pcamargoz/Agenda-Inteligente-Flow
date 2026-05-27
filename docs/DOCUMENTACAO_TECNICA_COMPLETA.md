@@ -8,75 +8,24 @@ version: "1.0"
 
 Nota: este arquivo é uma compilação grande. Para evitar erros de preview no GitHub, abra os documentos individuais em `docs/` usando os links abaixo.
 
-- [Guia Operacional — Fluxo Resumido](docs/GUIDA_OPERACIONAL.md)
-- [Índice Navegável](docs/INDEX.md)
-- [Documentação Técnica — principal (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md)
-- [Parte 1 — Visual e Estilos](docs/01_visual_e_estilos.md)
-- [Parte 2 — Componentes utilizados](docs/02_componentes_utilizados.md)
-- [Parte 3 — Lógicas e Validações](docs/03_logicas_e_validacoes.md)
-- [Parte 4 — Fluxo de Código (visão geral operacional)](docs/04_fluxo_codigo_geral.md)
-- [Parte 8 — Estrutura do Banco de Dados](docs/08_estrutura_banco_de_dados.md)
-- [Parte 9 — Estrutura do Banco de Dados (Postgres sugerido)](docs/09_estrutura_banco_de_dados.md)
-- [Acceptance Checklists](docs/ACCEPTANCE_CHECKLISTS.md)
-- [Envio de E-mails — Visão Geral](docs/EMAIL_ENVIO.md)
-- [Blueprint MVP — Documento Completo](docs/MVP_BLUEPRINT.md)
-- [DOCS.md — Índice técnico e notas](docs/DOCS.md)
+ - [Guia Operacional — Fluxo Resumido](GUIDA_OPERACIONAL.md)
+ - [Índice Navegável](INDEX.md)
+ - [Documentação Técnica — principal (resumo)](DOCUMENTACAO_TECNICA.stub.md)
+ - [Manual Unificado — Partes 1–5 (inclui Estrutura do Banco de Dados)](01_04_manual_unificado.md)
 
 ---
 
 ## Ordem de leitura (IA / Equipe)
 
 - **Para IA (indexação / análise automática):**
-  1. Leia `docs/DOCUMENTACAO_TECNICA_COMPLETA.md` do topo para baixo; use o Sumário (TOC) para saltar para seções relevantes.
-  2. Priorize as seções: `Guia Operacional` → `Índice Navegável` → `Parte 4 — Fluxo de Código` → `Parte 9 — Estrutura do Banco de Dados (Postgres)` → `Envio de E-mails`.
+  1. Leia DOCUMENTACAO_TECNICA_COMPLETA.md do topo para baixo; use o Sumário (TOC) para saltar para seções relevantes.
+  2. Priorize as seções: `Guia Operacional` → `Índice Navegável` → `Parte 4 — Fluxo de Código` → `Parte 5 — Estrutura do Banco de Dados (Postgres)` → `Envio de E-mails`.
 
 - **Para a equipe (implantação e operação):**
   1. Comece por `docs/GUIDA_OPERACIONAL.md` (resumo prático).  
-  2. Abra `docs/INDEX.md` para localizar documentos por público e, conforme necessário, leia `docs/09_estrutura_banco_de_dados.md`, `docs/04_fluxo_codigo_geral.md` e `docs/EMAIL_ENVIO.md`.
+  2. Abra [INDEX.md](INDEX.md) para localizar documentos por público e, conforme necessário, leia [08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md).
 
-<a id="acceptance-checklists"></a>
-## Acceptance Checklists (inserido de `ACCEPTANCE_CHECKLISTS.md`)
-
-Objetivo: checklists concisos para validação funcional durante QA e homologação.
-
-1) Dashboard
-- [ ] Carregar filtros salvos (`DASH_VIEWS`).
-- [ ] Exibir métricas de clientes/OS/treinamentos corretamente.
-- [ ] Links funcionais para agenda, cronogramas e registros.
-
-2) Agenda (criar evento)
-- [ ] Selecionar consultor e empresa.
-- [ ] Validar horário inicial < horário final.
-- [ ] Detectar e sinalizar conflitos (`findConflicts`).
-- [ ] Persistir evento e aparecer na vista correta (mês/semana/dia).
-
-3) Cronogramas (criar/enviar)
-- [ ] Selecionar template ou builder.
-- [ ] Sugerir datas com base em disponibilidade do consultor.
-- [ ] Gerar PDF/Excel anexo corretamente.
-- [ ] Enviar e-mail com link de aprovação.
-- [ ] Após aprovação, cronograma bloqueado para edição e eventos gerados.
-
-4) Registro / Atendimento / Treinamento
-- [ ] Checklist salva corretamente (treinamento).
-- [ ] Marcar como realizado atualiza status e contabiliza horas.
-- [ ] Itens pendentes geram tarefas vinculadas.
-
-5) Ordem de Serviço (OS)
-- [ ] Gerar OS a partir de registro/treinamento com itens e horas.
-- [ ] PDF gerado contém horas detalhadas por item.
-- [ ] Envio por e-mail registra entrada no `NOTIFICATIONS_LOG`.
-- [ ] Marcar OS como assinada atualiza status do item de origem.
-
-6) Templates e Hub
-- [ ] Criar/editar itens do template e salvar alterações.
-- [ ] Itens com `suggestedDays` mostram sugestão em builder.
-
-7) Integridade de dados
-- [ ] `validateDataIntegrity()` não encontra órfãos críticos após migração.
-- [ ] `persist()` e `loadPersisted()` conservam versão e dados.
-
-Observação: use estes pontos como base — adaptar conforme fluxo operacional da empresa.
+<!-- Acceptance Checklists removed (moved/obsolete). -->
 
 ---
 
@@ -96,7 +45,7 @@ Sumário rápido
 
 Fluxo principal (resumido)
 1. Cadastrar consultor e empresa.
-2. Criar (ou aplicar) template → montar cronograma.
+2. Criar (ou aplicar) template → montar cronograma (criação de cronogramas iniciada somente dentro do card).
 3. Enviar cronograma para aprovação (PDF/Excel + e-mail).
 4. Cliente aprova → cronograma confirmado e bloqueado.
 5. Sistema gera eventos e registros; execução começa.
@@ -108,49 +57,44 @@ Ações rápidas por papel
 - Consultor: confirmar disponibilidade, executar treinamentos, registrar horas, gerar OS.
 - Cliente: aprovar cronogramas, confirmar horários, assinar OS.
 
-Onde encontrar detalhes
-- Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md)
-- Visual e estilos: [docs/01_visual_e_estilos.md](docs/01_visual_e_estilos.md)
-- Componentes: [docs/02_componentes_utilizados.md](docs/02_componentes_utilizados.md)
-- Lógicas e validações: [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md)
-- Fluxo de código (visão geral): [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md)
-- Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
- - Estrutura de dados / DB (modelo Postgres sugerido): [docs/09_estrutura_banco_de_dados.md](docs/09_estrutura_banco_de_dados.md)
-- Índice navegável: [docs/INDEX.md](docs/INDEX.md)
+ - Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md)
+ - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md)
+ - Estrutura de dados / DB: [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
+ - Índice navegável: [docs/INDEX.md](docs/INDEX.md)
+ Onde encontrar detalhes
+ - Fluxo mestre: [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md)
+ - Manual Unificado (Visual, Componentes, Lógicas e Fluxo): [01_04_manual_unificado.md](01_04_manual_unificado.md)
+ - Estrutura de dados / DB: [08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
+ - Índice navegável: [INDEX.md](INDEX.md)
 
-Próximos artefatos recomendados
-- [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md) — checklists por tela para QA/aceitação.
+ Próximos artefatos recomendados
+<!-- Acceptance checklists removed -->
 
 ---
 
 <a id="indice-navegavel"></a>
 ## Índice Navegável (inserido de `INDEX.md`)
-Ver original: [docs/INDEX.md](docs/INDEX.md)
+Ver original: [INDEX.md](INDEX.md)
 
 Este índice reúne os principais guias e referências do projeto para facilitar a implantação da POC/MVP.
 
 Leitura recomendada (ordem curta)
-- Operacional (obrigatório): [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
-- Visão geral / referência: [docs/DOCS.md](docs/DOCS.md) — índice técnico com links para todos os documentos.
-- QA / Aceitação: [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
+ - Operacional (obrigatório): [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — resumo acionável para coordenadores e consultores.
+ - Visão geral / referência: [DOCS.md](DOCS.md) — índice técnico com links para todos os documentos.
 
 Guias operacionais
-- [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
-- [docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Fluxo mestre detalhado (passo a passo).
+ - [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md) — Quickstart operacional (1 página).
+ - [FLUXO_AGENDAMENTO_IMPLANTACAO.md](FLUXO_AGENDAMENTO_IMPLANTACAO.md) — Fluxo mestre detalhado (passo a passo).
 
 Documentos por público
 Operação / Implantação
-- [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
-- [docs/ACCEPTANCE_CHECKLISTS.md](docs/ACCEPTANCE_CHECKLISTS.md)
+ - [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md)
 
 Desenvolvimento / Referência técnica
-- [docs/DOCS.md](docs/DOCS.md) — índice geral e instruções de deploy.
-- `Documentação Técnica — principal` (já presente neste arquivo)
-- [docs/01_visual_e_estilos.md](docs/01_visual_e_estilos.md)
-- [docs/02_componentes_utilizados.md](docs/02_componentes_utilizados.md)
-- [docs/03_logicas_e_validacoes.md](docs/03_logicas_e_validacoes.md)
-- [docs/04_fluxo_codigo_geral.md](docs/04_fluxo_codigo_geral.md)
-- [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
+ - [DOCS.md](DOCS.md) — índice geral e instruções de deploy.
+ - `Documentação Técnica — principal` (já presente neste arquivo)
+ - [01_04_manual_unificado.md](01_04_manual_unificado.md)
+ - [08_estrutura_banco_de_dados.md](08_estrutura_banco_de_dados.md)
 
 Exportar para PDF (comando sugerido)
 ```bash
@@ -160,7 +104,7 @@ pandoc docs/GUIDA_OPERACIONAL.md docs/*.md -o Faktory-Flow-Docs.pdf
 ---
 
 <a id="envio-de-emails---visao-geral"></a>
-## Envio de E-mails — Visão Geral (inserido de `EMAIL_ENVIO.md`)
+## Envio de E-mails — Visão Geral
 
 Este documento explica, de forma concisa, como funciona o fluxo de envio de e-mails (Ordens de Serviço e notificações) no projeto. Não contém instruções de configuração de provedores ou plataformas de deploy — essas informações foram removidas dos guias principais e centralizadas aqui para referência operacional.
 
@@ -197,7 +141,257 @@ Observação
 <a id="blueprint-mvp---documento-completo"></a>
 ## Blueprint MVP — Documento Completo (inserido de `MVP_BLUEPRINT.md`)
 
-[Conteúdo completo do Blueprint MVP foi incorporado — inclui Resumo executivo, Escopo, Modelo de dados, Fluxo end-to-end, Regras de negócio, Stack recomendado, Arquitetura, Integrações, Variáveis sensíveis e Roteiro de reconstrução.]
+ # Blueprint MVP — Sistema de Agendas de Consultoria
+
+ Documento único para **replicar** este sistema (Faktory Flow Agenda) em outro projeto. Cobre escopo mínimo, modelo de dados, fluxos, integrações e passo-a-passo de reconstrução. Não documenta o código existente — orienta como construí-lo de novo.
+
+ ---
+
+ ## 1. Resumo executivo
+
+ **O que é:** SPA + 1 função serverless para centralizar agenda, cronogramas, registros operacionais (atendimento/treinamento/tarefa), emissão de OS com assinatura digital pública, e controle de saldo de horas por cliente.
+
+ **Para quem:** consultorias com múltiplos consultores atendendo várias empresas, que precisam unificar planejamento, execução e cobrança em um único fluxo rastreável.
+
+ **Princípio arquitetural:** zero backend de dados. Tudo no `localStorage` do navegador. Backend serverless existe **apenas** para tarefas que exigem segredo (SMTP) — credenciais nunca tocam o cliente.
+
+ ---
+
+ ## 2. Escopo MVP — o que é essencial
+
+ | Essencial | Pode ficar para depois |
+ |---|---|
+ | Cadastros (consultor, empresa, tabelas auxiliares) | Filtros salvos por usuário |
+ | Agenda com criação/edição/conflito de eventos | Recorrências customizadas complexas |
+ | Cronograma builder + template | Drag-and-drop em kanban |
+ | Registros (atendimento/treinamento/tarefa) com checklist | Dashboard com múltiplas views |
+ | OS: gerar, enviar (SMTP+WhatsApp+mailto), assinar via link público | Anexos por e-mail |
+ | Saldo de horas debitado **na emissão da OS** (não na assinatura) | PDFs server-side |
+ | Persistência local + migração versionada | Auditoria centralizada |
+ | Integração Microsoft Graph (sync calendar) | Login multi-usuário real |
+
+ ---
+
+ ## 3. Modelo de dados
+
+ Toda entidade tem: `id` (gerado por `uid(prefix)`), `history[]` para auditoria. IDs por convenção: `c_*` consultor, `co_*` empresa, `e_*` evento, `s_*` série/cronograma, `r_*` registro, `os_*` ordem de serviço, `cc_*` card de cliente.
+
+ ### Entidades principais
+
+ **CONSULTANTS** — `name`, `email`, `phone`, `workStart/workEnd` (jornada), `lunchMin`, `freeDays[]`, `blockedDates[]`, `defaultRecurrence`. Calcula capacidade via `workEnd - workStart - lunchMin`.
+
+ **COMPANIES** — `razao`, `fantasia`, `cnpj`, `responsavel`, `contato` (e-mail), `whatsapp`, `consultantId` (consultor padrão), `tipoAgenda`, `projeto`.
+
+ **EVENTS** — `consultantId`, `companyId`, `date` (ISO), `timeStart`/`timeEnd` (HH:MM), `typeId`, `title`, `status`, `recurrence`, `priority`, `seriesId`, `scheduleId`, `itemId`, `reagendadoDe`, `graphEventId` (para sync Microsoft Graph).
+
+ **SCHEDULES** (cronogramas) — `companyId`, `consultantId`, `from`/`to`, `status`, `mode` (`template` ou builder), `items[]` (no template), `eventIds[]` (gerados).
+
+ **RECORDS** — `kind` ∈ {`atendimento`, `treinamento`, `tarefa`}, `consultantId`, `companyId`, `date`, `timeStart/End`, `status`, `priority`, `checklist[]`, `linkedTaskIds[]`, `linkedEventId`.
+
+ **TEMPLATES** — `name`, `items[]`. Cada item: `kind`, `name`, `desc`, `checklist[]`, `suggestedDays`, `timeStart/End`, `priority`, `defaultResponsibleId`.
+
+ **CLIENT_CARDS** (kanban) — `companyId`, `status`, `statusManual`, `hoursContracted`, `hoursLog[]` (movimentações de débito/estorno).
+
+ **ORDERS_SERVICE** — `itemSrc` (`record`|`event`), `itemId`, `title`, `scope`, `clientEmail`, `clientWhatsapp`, `internalPending[]`, `clientPending[]`, `status` ∈ {`rascunho`, `enviada`, `assinada`, `cancelada`}, `sentAt`, `sentVia`, `signedAt`, `hoursDebited`, `hoursDebitedAmount`.
+
+ **Auxiliares** — `EVENT_TYPES`, `STATUSES`, `PERIODS`, `RECURRENCES`, `PRIORITIES`, `USERS` (perfis), `NOTIFICATIONS_LOG`.
+
+ ### Estados possíveis
+
+ | Entidade | Estados |
+ |---|---|
+ | Evento | `criado` → `provisorio` → `confirmado` → `em-atendimento` → `atendido` (terminais: `reagendado`, `cancelado`) |
+ | Cronograma | `rascunho` → `aguardando-cliente` → `confirmado` |
+ | Registro | `em-andamento` → `pendente` → `em-atendimento` → `atendido` → `concluido` |
+ | OS | `rascunho` → `enviada` → `assinada` (terminal: `cancelada`) |
+ | Card cliente | `nao-iniciada` → `aguardando` → `em-andamento` → `concluida` (terminal: `cancelada`) |
+
+ Definir transições em uma tabela `STATUS_TRANSITIONS` e validar com `canTransitionTo(from, to)`. Saltos ilegais bloqueados.
+
+ ---
+
+ ## 4. Fluxo principal end-to-end
+
+ 1. **Cadastro** — admin cria consultores, empresas e cards de cliente.
+ 2. **Cronograma** — consultor monta cronograma (builder simples ou template V2) considerando `freeDays`, `blockedDates` e carga diária.
+ 3. **Envio ao cliente** — cronograma vai pra `aguardando-cliente`; cliente revisa via link público.
+ 4. **Confirmação** — ao confirmar, sistema gera `EVENTS` e `RECORDS` automaticamente, com status inicial conforme presença de data.
+ 5. **Execução** — consultor atualiza registros (status, checklist). Treinamento com checklist incompleto **gera tarefa pendente** automaticamente.
+ 6. **Geração de OS** — quando record vira `atendido`, abre-se modal de OS. Pendências internas vêm de checklists não concluídas; pendências do cliente vêm de tarefas abertas relacionadas à empresa.
+ 7. **Emissão** — OS é enviada via SMTP (com fallback `mailto:`) ou WhatsApp. **No envio**, `os.status='enviada'` E `osDebitHours()` debita o saldo de horas do card do cliente (idempotente por flag `hoursDebited`).
+ 8. **Assinatura** — cliente acessa link público (`publicOSLink(osId)`), revisa OS, desenha assinatura. `os.status='assinada'`, `signedAt=now`. Saldo já estava debitado.
+ 9. **Cancelamento (se houver)** — `osRefundHours()` estorna o saldo se `hoursDebited` estiver `true`. Item de origem (record/event) restaurado ao status anterior.
+ 10. **Sincronização externa (opcional)** — se conectado ao Microsoft Graph, cada criação/edição/exclusão de evento da agenda replica no calendário Outlook/Teams do usuário.
+
+ ---
+
+ ## 5. Regras de negócio críticas
+
+ | Regra | Por quê |
+ |---|---|
+ | Eventos `cancelado`/`reagendado` não aparecem na agenda padrão | Limpeza visual |
+ | Atendimento não pode ser "concluído" diretamente — só via OS | OS é o documento que finaliza |
+ | Treinamento concluído com checklist incompleto cria tarefa | Pendências não somam |
+ | Cronograma `confirmado` bloqueia edição | Garante consistência com o cliente |
+ | Reagendamento exige motivo e cria vínculo `reagendadoDe` | Rastreabilidade |
+ | Capacidade diária = jornada − almoço | Evita sobrecarga |
+ | Recorrências geram no máximo N=5 ocorrências adicionais | Evitar explosão de eventos |
+ | **Débito de horas acontece na emissão da OS, não na assinatura** | Reserva saldo já no compromisso firmado |
+ | Débito é idempotente (flag `hoursDebited`) | Permite chamar de múltiplos pontos sem dobrar |
+ | Cancelamento de OS estorna automaticamente se debitada | Saldo nunca fica "preso" |
+ | OS muda `itemSrc` para `concluido` ao assinar | Formaliza encerramento |
+ | Card do cliente atualiza status macro automaticamente | Visão executiva sem ação manual |
+
+ ---
+
+ ## 6. Stack recomendado
+
+ | Camada | Tecnologia | Por quê |
+ |---|---|---|
+ | Front | HTML/CSS/JS puro em **um arquivo** | Zero build, edição direta, deploy estático |
+ | Persistência | `localStorage` com chave versionada (ex: `app_v2`) | Offline, custo zero, simples |
+ | Persistência (alternativa enterprise) | Substituir por IndexedDB ou backend REST | Quando precisar multi-usuário ou volume |
+ | Serverless | Functions (Node 18+) | 1 só endpoint, deploy automático (ex.: Vercel/Netlify) |
+ | SMTP | `nodemailer` | Padrão de fato no Node |
+ | PDF client | `html2pdf.js` via CDN | Sem backend de documentos |
+ | Auth Microsoft | `@azure/msal-browser` via CDN (PKCE) | Sem servidor OAuth |
+ | Assinatura digital | `<canvas>` nativo + base64 PNG | Sem dependência externa |
+
+ **Alternativas válidas:** Vite + React, Next.js + Prisma + Postgres. Mas o ganho real (modularidade) custa toolchain + build + deploy + hot-reload mais lento na edição direta. Para um sistema interno com ≤ 10 usuários simultâneos, o stack flat é superior.
+
+ ---
+
+ ## 7. Arquitetura
+
+ ```
+ ┌─────────────────────────────────────────────────┐
+ │                  Browser (SPA)                  │
+ │  ┌───────────────────────────────────────────┐  │
+ │  │  index.html                               │  │
+ │  │  ├─ state (objeto global)                 │  │
+ │  │  ├─ arrays: EVENTS, RECORDS, OS, ...      │  │
+ │  │  ├─ render*() (DOM manual)                │  │
+ │  │  └─ persist() → localStorage              │  │
+ │  └───────────────────────────────────────────┘  │
+ │         │                  │              │     │
+ │         ▼                  ▼              ▼     │
+ │   localStorage         MSAL.js        html2pdf  │
+ └─────────│──────────────────│───────────────────┘
+      │                  │
+      ▼                  ▼
+    /api/send-os-email   Microsoft Graph
+      │                  │
+      ▼                  ▼
+    SMTP            Outlook/Teams
+ ```
+
+ **Separação:**
+ - Front concentra **toda** regra de negócio + UI + persistência.
+ - Backend (serverless) é único e existe **só** para envio SMTP (segredo).
+ - Microsoft Graph é cliente-a-cliente — token vive no localStorage do usuário, nunca passa pelo nosso backend.
+ - PDF e assinatura ocorrem totalmente no browser.
+
+ **Padrões:**
+ - Estado global mutável (`state`, `EVENTS`, etc.) — sem Redux/MobX.
+ - Renderização manual com `render*()` funções idempotentes.
+ - Persistência versionada (`persist_v2`, `persist_v3`...) para migração suave entre versões.
+ - Auditoria via array `history` em cada entidade.
+
+ ---
+
+ ## 8. Integrações externas
+
+ ### 8.1 Envio de e-mails (visão geral)
+
+ O envio de Ordens de Serviço (OS) pode ser realizado por um componente de backend que mantém segredos fora do navegador. Este repositório inclui uma função de exemplo (`api/send-os-email.js`). Para configuração de produção, contate o responsável de infraestrutura.
+
+ Durante falhas do serviço de envio, a interface possui fallback para abrir o cliente de e-mail (`mailto:`) como alternativa de menor custo.
+
+ ### 8.2 Microsoft Graph via MSAL.js (browser, PKCE)
+ - **SDK:** `@azure/msal-browser` v2.38+ via CDN jsDelivr.
+ - **Finalidade:** replicar eventos da agenda no calendário Outlook/Teams do usuário logado.
+ - **Config:** `clientId` + `tenantId` (ou `'common'`) hardcoded em `TEAMS_CFG` no `index.html` — público por natureza no SPA, não é segredo.
+ - **Scopes:** `User.Read`, `Calendars.ReadWrite`, `offline_access`. Adicionar `OnlineMeetings.ReadWrite` apenas para tenant M365 corporativo (gera link de reunião Teams automaticamente).
+ - **Pré-requisito:** registrar app no Microsoft Entra ID como **SPA** com redirect URI = URL do deploy.
+ - **Token persistence:** `localStorage` (`cacheLocation: 'localStorage'`).
+ - **Versão do token:** `requestedAccessTokenVersion: 2` no manifest se aceitar contas pessoais.
+ - **Se cair:** agenda local intacta; toast amarelo `"Teams não sincronizou"`.
+
+ ### 8.3 html2pdf.js (CDN)
+ - **Finalidade:** export de OSs/cronogramas em PDF dentro do navegador.
+ - **Sem credenciais.** Se cair: botões de PDF não funcionam, resto intacto.
+
+ ### 8.4 wa.me (deep link)
+ - **Finalidade:** envio de OS via WhatsApp Web.
+ - **Sem credenciais.** Monta URL `https://wa.me/{phone}?text={encoded}` e abre em nova aba.
+
+ ---
+
+ ## 9. Variáveis sensíveis
+
+ As variáveis e segredos relacionados a envio de e-mail e provedores transacionais devem ser gerenciadas via o sistema de infraestrutura adotado (ex.: secrets de projeto, Vault, etc.). Consulte `api/send-os-email.js` como referência de implementação.
+
+ **Microsoft Graph**: o `clientId` e `tenantId` são configurados em `TEAMS_CFG` no front para uso SPA; redirect URIs e políticas devem ser ajustadas conforme o tenant e as regras da organização.
+
+ ---
+
+ ## 10. Como rodar e replicar
+
+ ### 10.1 Pré-requisitos
+ - Node ≥ 18
+ - CLI/ ferramentas de execução conforme a plataforma escolhida (ex.: Vercel CLI, Netlify CLI, etc.).
+ - Conta Microsoft (corporativa ou pessoal) com acesso ao [Microsoft Entra ID](https://entra.microsoft.com) para registrar o app.
+
+ ### 10.2 Setup (visão geral)
+ 1. Instalar dependências: `npm install`.
+ 2. Ajustar variáveis sensíveis via o sistema de segredos da plataforma escolhida.
+ 3. Executar o ambiente de desenvolvimento conforme a plataforma: `npm run dev` (script ajustável).
+ 4. Deploy conforme a infraestrutura adotada (ex.: `npm run deploy` que chama o CLI apropriado).
+
+ ### 10.3 Registro Microsoft Entra (se for usar Teams sync)
+ 1. https://entra.microsoft.com → **Registros de aplicativo** → **+ Novo registro**.
+ 2. Nome livre. Tipos de conta: **Multilocatário + contas pessoais** (mais flexível).
+ 3. Redirect URI: tipo **SPA**, URL = domínio do deploy.
+ 4. Em **Permissões de API** → Microsoft Graph → Delegadas: `Calendars.ReadWrite`, `offline_access`, `User.Read`.
+ 5. Em **Manifesto**: setar `requestedAccessTokenVersion: 2`.
+ 6. Copiar `clientId` e `tenantId` (ou usar `'common'`) → colar em `TEAMS_CFG` no `index.html`.
+ 7. Conceder consentimento de admin se o tenant exigir.
+
+ ### 10.4 Roteiro de reconstrução do zero
+ 1. Modelar entidades + tabela `STATUS_TRANSITIONS`.
+ 2. Implementar `state` global, `persist()`/`loadPersisted()` com chave versionada.
+ 3. UI base: sidebar + workspace + modais (HTML + CSS, sem framework).
+ 4. Módulo **Agenda**: render mensal/semanal/diário, `findConflicts`, mini-calendário.
+ 5. Módulo **Cronograma**: builder simples + template V2.
+ 6. Módulo **Registros**: kinds com regras específicas (atendimento, treinamento, tarefa).
+ 7. Módulo **OS**: modal, geração de PDF (html2pdf), envio SMTP/WhatsApp/mailto, link público de assinatura (canvas).
+ 8. **Saldo de horas**: `hoursDebited` idempotente, débito na emissão, estorno no cancelamento.
+ 9. Endpoint de envio (ex.: `/api/send-os-email`) com validações e healthcheck.
+ 10. **Microsoft Graph**: MSAL via CDN, botão "Conectar", `teamsSync(action, ev)` em `saveEvent`/`deleteEvent`.
+ 11. `validateDataIntegrity()` para detectar/corrigir órfãos.
+ 12. Configurar arquivo de deploy conforme a plataforma adotada (ex.: `vercel.json` como exemplo). 
+
+ ---
+
+ ## 11. Decisões e trade-offs
+
+ **LocalStorage como banco** → simplicidade radical, offline-first, custo zero. Custo: zero multi-usuário, perda de dados ao limpar navegador. Mitigação: botão de export/import JSON.
+
+ **Single-file `index.html`** → edição direta sem toolchain. Custo: arquivo grande (~22k linhas), busca lenta em editores, sem code-splitting. Mitigação: convenções claras de seções por comentários `/* ======== */`.
+
+ **MSAL Public Client (PKCE) no browser** → integração Microsoft sem servidor OAuth. Custo: refresh tokens limitados, token vive no localStorage. Aceitável para uso interno; trocar por Auth Code com backend se for SaaS público.
+
+ **Débito de horas na emissão (não na assinatura)** → cliente vê saldo já reservado quando OS é enviada. Custo: se OS for cancelada antes de assinar, precisa estornar. Mitigação: estorno automático via `osRefundHours()` ao cancelar, idempotente via `hoursDebited`.
+
+ ---
+
+ ## 12. O que **não** replicar literalmente
+
+ - Cores e tipografia da Faktory (Fraunces/Manrope, paleta champagne/forest) — substituir pela identidade visual do novo projeto.
+ - IDs Microsoft (`clientId`, `tenantId` em `TEAMS_CFG`) — registrar novo app, copiar IDs próprios.
+ - Domínio `agenda-inteligente-flow.vercel.app` — usar domínio próprio nos redirect URIs do Entra.
+ - Textos de e-mail (HTML body, mensagens WhatsApp, link público) — adaptar ao tom de voz do novo cliente.
+ - Regras de capacidade do consultor (jornada, almoço) — confirmar se modelo do novo cliente é o mesmo.
 
 ---
 
@@ -217,7 +411,7 @@ Se desejar, posso:
 - Incluir metadados YAML no topo do arquivo para ajudar ferramentas de parsing.
 # Documentação Técnica — Única (compilada)
 
-Este arquivo reúne os documentos técnicos presentes em [docs/](docs/) num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy foram removidas e mantidas separadas; informações sobre o envio de e-mails estão em [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+Este arquivo reúne os documentos técnicos presentes em [docs/](docs/) num único arquivo para leitura sequencial ou para processamento por ferramentas/IA. As seções sensíveis de configuração de provedores e deploy devem ser gerenciadas via infraestrutura interna.
 
 Sumário
 - [Documentação Técnica — principal](#documentação-técnica-—-principal)
@@ -308,7 +502,7 @@ Usuário → SPA (index.html) → localStorage (dados)
 O back-end consiste em pontos mínimos utilizados pelo front-end para operações que dependem de segredos ou de serviços externos (por exemplo, envio de e-mail). Por segurança e separação de responsabilidades a implementação exemplar disponível no repositório é simples — para produção, recomenda‑se migrar a lógica crítica para um serviço backend mais robusto.
 
 - Implementação de referência: existe uma função exemplo que recebe o payload da OS e encaminha para um serviço de envio (SMTP ou transacional).
-- Para a descrição do fluxo de envio de e-mails e recomendações operacionais, veja [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+- Para a implementação de envio de e-mails, consulte `api/send-os-email.js`.
 
 ## 8. Front-end
 
@@ -334,7 +528,9 @@ Objetivo: documentar a camada visual do MVP/POC para que a equipe de produto/des
 - Cadastros → Empresas
 - Templates de agendamento (listar, editar, duplicar)
 - Painel do Consultor (visão individual)
-- Modal de Cadastro: Novo consultor, Nova empresa, Novo template, Novo cronograma, Nova OS
+- Modal de Cadastro: Novo consultor, Nova empresa, Novo template, Nova OS
+-
+Observação: a criação de cronogramas agora é feita somente dentro do card (abrir o card correspondente → ação "Criar cronograma").
 
 2. Estrutura visual
 - Layout geral: menu lateral esquerdo com seções `OPERAÇÃO` e `CONFIGURAÇÃO`; área principal com título, ações (botões principais) e conteúdo.
@@ -375,7 +571,7 @@ Componentes principais
 - `CardResumo` — mostra totais (itens, treinamentos, tarefas, pendências).
 - `KanbanBoard` e `KanbanColumn` — container e colunas do Kanban por cliente.
 - `ClientCard` — cartão do cliente dentro do Kanban (resumo + ações rápidas).
-- `CronogramaBuilder` — área com seleção de período, templates, preview e configuração de itens.
+- `CronogramaBuilder` — área com seleção de período, templates e preview; edição e organização ficam no builder, porém a criação inicial de cronogramas/itens é iniciada a partir do `ClientCard` (abrir o card correspondente → ação "Criar cronograma").
 - `CronogramaItemEditor` — modal/redrawer para editar data, hora, participantes, recursos.
 - `TemplateCard` — exibição de template com ações `Editar`, `Duplicar`, `Desativar`.
 - `ModalForm` — componente genérico para formulários (cadastro de consultor/empresa/template/OS).
@@ -387,7 +583,7 @@ Componentes principais
 
 Padrões de composição
 - Combinar `CardResumo` com `ClientCard` para navegação rápida.
-- `CronogramaBuilder` usa `TemplateCard` e `CronogramaItemEditor` para criar uma experiência de arrastar/editar.
+- `CronogramaBuilder` usa `TemplateCard` e `CronogramaItemEditor` para editar e organizar itens (arrastar/editar). A criação de novos cronogramas/itens é acionada via `ClientCard`.
 
 ---
 
@@ -437,7 +633,7 @@ Resumo de erros esperados e manejo
 Objetivo: descrever de forma não técnica o fluxo de execução esperado entre telas e entidades — serve como mapa para arquitetos e desenvolvedores entenderem o comportamento global.
 
 1. Ações do usuário (front) que disparam fluxos
-- Abrir builder de cronograma → preview → salvar rascunho (local/backend) ou enviar para aprovação.
+- Criação/edição de cronograma: iniciar a criação a partir do `ClientCard` (abrir o card → ação "Criar cronograma"); em seguida abrir o builder de cronograma para editar/preview → salvar rascunho (local/backend) ou enviar para aprovação.
 - Enviar para aprovação → backend gera anexos, cria notificação e marca cronograma como `sent`.
 - Cliente aprova → backend recebe confirmação → cria registros de atendimento e atualiza status para `confirmed`.
 - Consultor executa treinamento → marca `Realizado` → pode gerar OS.
@@ -462,7 +658,7 @@ Objetivo: descrever de forma não técnica o fluxo de execução esperado entre 
 Objetivo: documentar todas as etapas do builder de cronograma para que a equipe execute ou refine a interface.
 
 1) Abertura do builder
-- A partir de `Cronogramas → Cronogramas por empresa` ou do card do cliente → `+ Novo cronograma`.
+- A abertura do builder de cronograma é feita a partir do `ClientCard` no Kanban (`Atend. / Treino / Tarefas`) → ação `+ Novo cronograma` no card. A criação diretamente na tela `Cronogramas por empresa` não inicia mais o processo.
 - Selecionar: Empresa, Consultor, Período (de/até).
 
 2) Opções iniciais
@@ -507,7 +703,7 @@ Objetivo: descrever o modelo de dados sugerido/atual para o MVP/POC e qual tecno
 
 ## Acceptance Checklists — Principais telas
 
-<!-- Paste docs/ACCEPTANCE_CHECKLISTS.md -->
+<!-- Acceptance checklists were removed from the repo -->
 
 # Acceptance Checklists — Principais telas
 
@@ -531,6 +727,6 @@ Objetivo: fornecer um guia curto e acionável para coordenadores e consultores, 
 
 ## Referências e próximos passos
 
-- A versão compacta para leitura rápida é [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md).
+- A versão compacta para leitura rápida é [GUIDA_OPERACIONAL.md](GUIDA_OPERACIONAL.md).
 - Para questões operacionais de deploy e configuração sensível solicite acesso ao responsável pela infraestrutura.
-- Para detalhes do fluxo de envio de e-mails veja [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+- Para implementação de envio de e-mails, consulte `api/send-os-email.js`.

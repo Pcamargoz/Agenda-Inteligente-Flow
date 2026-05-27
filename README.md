@@ -1,26 +1,44 @@
 # Faktory Flow Agenda
 
-[![](https://img.shields.io/badge/Entrada-%C3%8Dndice-blue)](docs/INDEX.md)
+SPA para gestão de agendas, cronogramas, registros operacionais e Ordens de Serviço (OS).
 
-[![Guia Operacional](https://img.shields.io/badge/Guia-Operacional-blue)](docs/GUIDA_OPERACIONAL.md) [![Documentação](https://img.shields.io/badge/Documenta%C3%A7%C3%A3o-tecnica-lightgrey)](docs/DOCUMENTACAO_TECNICA.stub.md) [![Índice](https://img.shields.io/badge/%E2%86%92-Índice-green)](docs/INDEX.md)
+---
 
-Projeto SPA para gestão de agendas, cronogramas, registros operacionais e Ordens de Serviço (OS).
+## Documentação
 
-Visão rápida:
-- Front-end: `index.html` (SPA, persistência via `localStorage`).
-- Docs organizadas em `docs/` para leitura por tópicos.
-- Envio de e-mails: fluxo tratado por um endpoint dedicado — detalhes em [docs/EMAIL_ENVIO.md](docs/EMAIL_ENVIO.md).
+| Documento | Descrição |
+|---|---|
+| [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md) | Guia operacional — fluxo resumido por papel |
+| [docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.md) | Fluxo mestre de implantação (passo a passo) |
+| [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md) | Manual unificado — Visual, Componentes, Lógicas e Fluxo |
+| [docs/01_04_manual_unificado.md](docs/01_04_manual_unificado.md) | Manual Unificado — inclui Estrutura de Dados (Parte 5) |
+| [docs/DOCUMENTACAO_TECNICA_COMPLETA.md](docs/DOCUMENTACAO_TECNICA_COMPLETA.md) | Compilado mestre — referência completa para IA e equipe |
 
-Comece por:
-- 📘 [Guia Operacional](docs/GUIDA_OPERACIONAL.md) — guia prático (coordenador / consultor).
-- 🧭 [Índice Navegável](docs/INDEX.md) — índice navegável com os documentos por público.
-- 📗 [Documentação Técnica (resumo)](docs/DOCUMENTACAO_TECNICA.stub.md) — documentação técnica principal (stub).
- - 🗄️ [Estrutura do Banco de Dados (modelo sugerido - Postgres)](docs/09_estrutura_banco_de_dados.md) — modelo relacional sugerido.
+---
 
-- 📘 [Documentação Técnica — Completa (resumo)](docs/DOCUMENTACAO_TECNICA_COMPLETA.stub.md) — versão compilada (stub).
-- 📘 [Fluxo Mestre — Agendamento (resumo)](docs/FLUXO_AGENDAMENTO_IMPLANTACAO.stub.md) — fluxo mestre (stub).
-- 📘 [MVP Blueprint (resumo)](docs/MVP_BLUEPRINT.stub.md) — blueprint (stub).
+## Como rodar localmente
 
-Entrada recomendada: [docs/INDEX.md](docs/INDEX.md) — use este índice leve como ponto de partida para navegar pela documentação.
+```bash
+python -m http.server 8000
+# ou
+npx serve . -l 8000
+```
 
-Para operações sensíveis (configuração de provedores, deploys e variáveis secretas), consulte a equipe responsável pela infraestrutura; detalhes operacionais foram removidos do README e centralizados nos arquivos de `docs/`.
+Abra `http://localhost:8000` no navegador.
+
+---
+
+## Processo (resumo)
+
+1. Abrir o `ClientCard` do cliente no Kanban.
+2. Dentro do card, criar `+ Novo cronograma` → ajustar e salvar.
+3. Enviar para aprovação do cliente → cronograma confirmado gera eventos e registros.
+4. Executar atendimentos/treinamentos → gerar OS (PDF) → enviar e marcar assinada.
+
+---
+
+## Sobre o código
+
+- `index.html` — SPA único (~22k linhas), estado em `localStorage`.
+- `api/send-os-email.js` — função serverless de exemplo para envio de OS.
+- Entidades principais: `CONSULTANTS`, `COMPANIES`, `EVENTS`, `SCHEDULES`, `RECORDS`, `TEMPLATES`, `ORDERS_SERVICE`.

@@ -7,6 +7,6 @@ Ver o documento completo em: [docs/DOCUMENTACAO_TECNICA_COMPLETA.md](docs/DOCUME
 Sumário rápido:
 - Entrada recomendada: [docs/INDEX.md](docs/INDEX.md)
 - Guia operacional: [docs/GUIDA_OPERACIONAL.md](docs/GUIDA_OPERACIONAL.md)
-- Estrutura do banco (Postgres sugerido): [docs/09_estrutura_banco_de_dados.md](docs/09_estrutura_banco_de_dados.md)
+- Estrutura do banco (modelo unificado): [docs/08_estrutura_banco_de_dados.md](docs/08_estrutura_banco_de_dados.md)
 
 Se você precisa do export completo em PDF, solicite que eu gere `Faktory-Flow-Docs.pdf`.

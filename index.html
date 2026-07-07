@@ -14280,6 +14280,13 @@ document.getElementById('osSendEmailBtn').onclick = async () => {
   osCommit();
   const co = companyById(os.companyId);
 
+  /* Publica a OS no banco (Neon) ANTES de enviar, para o link de assinatura
+     abrir em qualquer dispositivo do cliente. */
+  const _savedRemote = await osRemoteSave(os);
+  if (!_savedRemote && window._OS_REMOTE_ENABLED){
+    toast('warn','Atenção','Não foi possível publicar a OS no servidor — o cliente pode não conseguir abrir o link de assinatura.');
+  }
+
   /* UI: bloqueia botão durante envio */
   const btn = document.getElementById('osSendEmailBtn');
   const original = btn.innerHTML;
@@ -22254,6 +22261,14 @@ window.publicOSLink = (osId) => {
   const o = orderById(osId);
   if (!o) return null;
   if (!o.publicSignToken){ o.publicSignToken = _pubGenToken(); persist(); }
+  /* Rede de segurança: sempre que um link de OS é gerado (por QUALQUER fluxo de
+     envio — e-mail, WhatsApp, copiar link), publica a OS no banco (Neon) para que
+     o cliente consiga abri-la em outro dispositivo. Não roda na visão pública. */
+  try {
+    if (!document.body.classList.contains('public-mode') && typeof osRemoteSave === 'function'){
+      osRemoteSave(o);
+    }
+  } catch(e){}
   return `${location.origin}${location.pathname}#/p/os/${osId}/${o.publicSignToken}`;
 };
 window.publicFeedbackLink = (cardId) => {
@@ -22966,6 +22981,9 @@ function _renderPubReviewsHTML(){
     try {
       const os = state.osDraft;
       if (os && os.id && os.publicSignToken && os.status !== 'assinada' && os.status !== 'cancelada'){
+        /* Republica a OS: garante que ela esteja no banco mesmo que tenha sido enviada
+           antes da integração — assim o link já entregue ao cliente passa a funcionar. */
+        osRemoteSave(orderById(os.id) || os);
         osRemoteGet(os.id, os.publicSignToken).then(remote => {
           if (!remote || remote.status !== 'assinada') return;
           const local = orderById(os.id);

@@ -9,6 +9,7 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
     "nodemailer": "^6.9.16"
   },
   "engines": {

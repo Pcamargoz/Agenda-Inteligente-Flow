@@ -22152,7 +22152,7 @@ window.sendFeedbackRequest = (cardId) => {
   });
 };
 
-window.sendOSSignRequest = (osId) => {
+window.sendOSSignRequest = async (osId) => {
   const o = orderById(osId);
   if (!o){ toast('error','OS não encontrada'); return; }
   if (o.status === 'cancelada' || o.status === 'assinada'){
@@ -22162,6 +22162,11 @@ window.sendOSSignRequest = (osId) => {
   const co = companyById(o.companyId);
   const cs = consultantById(o.consultantId);
   const link = publicOSLink(osId);
+  /* Publica a OS no banco (Neon) para que o link abra no dispositivo do cliente. */
+  const saved = await osRemoteSave(o);
+  if (!saved && window._OS_REMOTE_ENABLED){
+    toast('warn','Atenção', 'Não foi possível publicar a OS no servidor — o cliente pode não conseguir abrir o link. Verifique a conexão/DATABASE_URL.');
+  }
   /* Reutiliza o builder existente buildOSEmailHTML se existir, senão usa um template simples */
   const esc = x => (x||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const html = (typeof buildOSEmailHTML === 'function')
@@ -22259,6 +22264,67 @@ window.publicFeedbackLink = (cardId) => {
 };
 window.publicReviewsLink = () => `${location.origin}${location.pathname}#/p/reviews`;
 
+/* ============================================================
+   SINCRONIZAÇÃO REMOTA DE OS (Neon Postgres via /api/os)
+   Faz a OS "viajar" junto com o link: o admin publica no banco ao
+   gerar/enviar o link, e o navegador do cliente (outro dispositivo)
+   busca a OS do banco para abrir e assinar.
+   Se a API/banco não estiver disponível, desativa-se sozinho e o
+   app continua funcionando em modo local (localStorage).
+   ============================================================ */
+window._OS_REMOTE_ENABLED = true;
+
+/* Snapshot da OS com nomes desnormalizados (o cliente não tem as
+   listas de empresas/consultores no localStorage dele). */
+function _osPublicSnapshot(o){
+  const co = (typeof companyById === 'function') ? companyById(o.companyId) : null;
+  const cs = (typeof consultantById === 'function') ? consultantById(o.consultantId) : null;
+  return Object.assign({}, o, {
+    _companyName: co ? (co.fantasia || co.nome || '') : (o._companyName || ''),
+    _consultantName: cs ? (cs.name || '') : (o._consultantName || ''),
+  });
+}
+
+/* Publica/atualiza a OS no banco. Retorna true se salvou. */
+async function osRemoteSave(o){
+  if (!window._OS_REMOTE_ENABLED || !o || !o.id || !o.publicSignToken) return false;
+  try {
+    const r = await fetch('/api/os', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save', id: o.id, token: o.publicSignToken, os: _osPublicSnapshot(o) }),
+    });
+    if (r.status === 404){ window._OS_REMOTE_ENABLED = false; return false; } // API ausente (modo estático)
+    return r.ok;
+  } catch(e){ return false; }
+}
+
+/* Busca a OS no banco (usado na página pública do cliente). */
+async function osRemoteGet(id, token){
+  try {
+    const r = await fetch(`/api/os?id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`);
+    if (r.status === 404){ /* pode ser OS inexistente OU API ausente */ }
+    if (!r.ok) return null;
+    const j = await r.json();
+    return (j && j.ok) ? j.os : null;
+  } catch(e){ return null; }
+}
+
+/* Registra a assinatura no banco (chamado pelo cliente). */
+async function osRemoteSign(id, token, signature){
+  try {
+    const r = await fetch('/api/os', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'sign', id, token, signature }),
+    });
+    return r.ok;
+  } catch(e){ return false; }
+}
+window.osRemoteSave = osRemoteSave;
+window.osRemoteGet = osRemoteGet;
+window.osRemoteSign = osRemoteSign;
+
 /* Helper para copiar para área de transferência */
 window.copyToClipboard = async (text, label) => {
   try {
@@ -22302,14 +22368,32 @@ function _pubRouter(){
   const mount = document.getElementById('pubMount');
   const [_, kind, id, token] = m;
   let html = '';
+  if (kind === 'os'){
+    /* A OS pode ter sido criada em outro dispositivo → hidrata do banco
+       (Neon) antes de renderizar, para que o link funcione em qualquer lugar. */
+    const localOS = (typeof orderById === 'function') ? orderById(id) : null;
+    if (localOS){
+      mount.innerHTML = _renderPubOSSignHTML(id, token);
+      _wirePubSignCanvas();
+    } else {
+      mount.innerHTML = _pubLoadingHTML('Carregando Ordem de Serviço…');
+      osRemoteGet(id, token).then(remote => {
+        if (remote && remote.id){
+          const idx = ORDERS_SERVICE.findIndex(x => x.id === remote.id);
+          if (idx >= 0) ORDERS_SERVICE[idx] = remote; else ORDERS_SERVICE.push(remote);
+        }
+        mount.innerHTML = _renderPubOSSignHTML(id, token);
+        _wirePubSignCanvas();
+      });
+    }
+    return true;
+  }
   if (kind === 'sch')          html = _renderPubScheduleConfirmHTML(id, token);
-  else if (kind === 'os')      html = _renderPubOSSignHTML(id, token);
   else if (kind === 'fb')      html = _renderPubFeedbackHTML(id, token);
   else if (kind === 'reviews') html = _renderPubReviewsHTML();
   else html = _pubErrorHTML('Endereço desconhecido.');
   mount.innerHTML = html;
   /* Wire de canvas de assinatura, se for o caso */
-  if (kind === 'os') _wirePubSignCanvas();
   if (kind === 'fb') _wirePubStarRating();
   return true;
 }
@@ -22336,6 +22420,14 @@ function _pubErrorHTML(msg){
       <div class="pub-error-ic">⊘</div>
       <p>${msg}</p>
       <p class="pub-small">Verifique se você copiou o link completo ou peça um novo ao consultor responsável.</p>
+    </div>`);
+}
+function _pubLoadingHTML(msg){
+  return _pubShellHTML('Abrindo documento', 'CARREGANDO', `
+    <div class="pub-card" style="text-align:center">
+      <div class="pub-error-ic" style="border-color:#C8839E;color:#C8839E;animation:pulse 1.4s ease-in-out infinite">⋯</div>
+      <p>${msg || 'Buscando as informações mais recentes…'}</p>
+      <p class="pub-small">Isso leva apenas alguns instantes.</p>
     </div>`);
 }
 
@@ -22584,8 +22676,10 @@ function _renderPubOSSignHTML(osId, token){
   if (o.status === 'cancelada'){
     return _pubErrorHTML('Esta OS foi cancelada e não pode mais ser assinada.');
   }
-  const co = companyById(o.companyId);
-  const cs = consultantById(o.consultantId);
+  /* Fallback: no dispositivo do cliente não há listas locais de empresas/consultores,
+     então usa os nomes desnormalizados salvos no snapshot (_companyName/_consultantName). */
+  const co = companyById(o.companyId) || (o._companyName ? { fantasia: o._companyName } : null);
+  const cs = consultantById(o.consultantId) || (o._consultantName ? { name: o._consultantName } : null);
 
   if (o.status === 'assinada'){
     const sigImg = o.signatureDataURL ? `<img class="pub-sig-img" src="${o.signatureDataURL}" alt="assinatura"/>` : '';
@@ -22679,7 +22773,7 @@ window.pubSigClear = () => {
   c._hasDrawing = false;
 };
 
-window.pubSignOS = (osId, token) => {
+window.pubSignOS = async (osId, token) => {
   const o = orderById(osId);
   if (!o || o.publicSignToken !== token) return;
   const c = document.getElementById('pubSigCanvas');
@@ -22712,6 +22806,17 @@ window.pubSignOS = (osId, token) => {
   if (typeof logNotification === 'function'){
     try { logNotification({ kind:'os-signed', to:'', subject:`OS assinada por ${name}`, status:'sucesso', relatedId:osId, relatedType:'os', recipientName:name }); } catch(e){}
   }
+  /* Envia a assinatura ao banco (Neon) para que o admin a receba em qualquer dispositivo. */
+  try {
+    await osRemoteSign(osId, token, {
+      signedAt: o.signedAt,
+      signedByName: o.signedByName,
+      signedByRole: o.signedByRole,
+      signatureDataURL: o.signatureDataURL,
+      signedViaPublic: true,
+      signedUA: o.signedUA,
+    });
+  } catch(e){}
   persist();
   _pubRouter();
 };
@@ -22857,6 +22962,30 @@ function _renderPubReviewsHTML(){
   if (typeof orig !== 'function') return;
   window.renderOSModal = function(){
     orig.apply(this, arguments);
+    /* Sincroniza do banco (Neon) a assinatura feita pelo cliente em outro dispositivo. */
+    try {
+      const os = state.osDraft;
+      if (os && os.id && os.publicSignToken && os.status !== 'assinada' && os.status !== 'cancelada'){
+        osRemoteGet(os.id, os.publicSignToken).then(remote => {
+          if (!remote || remote.status !== 'assinada') return;
+          const local = orderById(os.id);
+          if (!local || local.status === 'assinada') return;
+          Object.assign(local, {
+            status: 'assinada',
+            signedAt: remote.signedAt,
+            signedByName: remote.signedByName,
+            signedByRole: remote.signedByRole,
+            signatureDataURL: remote.signatureDataURL,
+            signedViaPublic: true,
+          });
+          try { if (typeof osDebitHours === 'function') osDebitHours(local); } catch(e){}
+          try { if (typeof pushHistory === 'function') pushHistory(local, 'assinatura sincronizada do cliente', remote.signedByName || ''); } catch(e){}
+          persist();
+          if (typeof toast === 'function') toast('success','OS assinada','Assinatura do cliente recebida.');
+          if (document.getElementById('modalOS')?.classList.contains('show')) renderOSModal();
+        });
+      }
+    } catch(e){}
     /* Injeta botão no footer (sub-painel de envio) */
     try {
       const os = state.osDraft;
@@ -22882,9 +23011,17 @@ window.copyScheduleConfirmLink = (sId) => {
   copyToClipboard(url, 'Cliente abre, revisa e confirma direto no site.');
 };
 /* Botão público no painel de cronogramas (acessível via window) */
-window.copyOSSignLink = (osId) => {
+window.copyOSSignLink = async (osId) => {
+  const o = orderById(osId);
   const url = publicOSLink(osId);
   if (!url){ toast('error','OS não encontrada'); return; }
+  /* Publica a OS no banco antes de copiar, para o link abrir em qualquer dispositivo. */
+  if (o){
+    const saved = await osRemoteSave(o);
+    if (!saved && window._OS_REMOTE_ENABLED){
+      toast('warn','Atenção', 'Não foi possível publicar a OS no servidor — o cliente pode não conseguir abrir o link.');
+    }
+  }
   copyToClipboard(url, 'Cliente desenha a assinatura e finaliza no site.');
 };
 window.copyFeedbackLink = (cardId) => {

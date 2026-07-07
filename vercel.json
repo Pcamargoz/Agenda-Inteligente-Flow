@@ -19,6 +19,9 @@
   "functions": {
     "api/send-os-email.js": {
       "maxDuration": 15
+    },
+    "api/os.js": {
+      "maxDuration": 15
     }
   }
 }

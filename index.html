@@ -12385,6 +12385,17 @@ function openClientCardModal(cardId){
   state.ccTab = 'all';
   renderClientCardModal();
   openModal('modalClientCard');
+  /* Puxa do banco (Neon) as assinaturas que o cliente já fez em outro dispositivo
+     e atualiza o card automaticamente. */
+  try {
+    osSyncPendingSignatures().then(n => {
+      if (n > 0){
+        if (document.getElementById('modalClientCard')?.classList.contains('show')) renderClientCardModal();
+        if (typeof renderClientKanban === 'function') renderClientKanban();
+        if (typeof toast === 'function') toast('success', n === 1 ? 'Assinatura recebida' : 'Assinaturas recebidas', n === 1 ? '1 OS assinada pelo cliente.' : `${n} OS assinadas pelo cliente.`);
+      }
+    });
+  } catch(e){}
   /* Se o card foi criado automaticamente (cronograma confirmado) e ainda não teve saldo definido,
      dispara o modal de saldo inicial após abrir o card. Roda apenas uma vez por card. */
   if (!card.hoursPrompted && (!card.hoursLog || card.hoursLog.length === 0) && (!card.hoursContracted || card.hoursContracted === 0)){
@@ -22340,6 +22351,54 @@ window.osRemoteSave = osRemoteSave;
 window.osRemoteGet = osRemoteGet;
 window.osRemoteSign = osRemoteSign;
 
+/* Aplica no registro LOCAL uma assinatura já registrada no banco (Neon),
+   replicando os efeitos colaterais do fluxo normal de assinatura de OS. */
+function _osApplyRemoteSign(local, remote){
+  if (!local || !remote || remote.status !== 'assinada' || local.status === 'assinada') return false;
+  Object.assign(local, {
+    status: 'assinada',
+    signedAt: remote.signedAt || nowISO(),
+    signedByName: remote.signedByName,
+    signedByRole: remote.signedByRole,
+    signatureDataURL: remote.signatureDataURL,
+    signedViaPublic: true,
+  });
+  try { if (typeof osDebitHours === 'function') osDebitHours(local); } catch(e){}
+  /* Conclui o item de origem (treinamento/atendimento), como na assinatura local */
+  try {
+    if (local.itemSrc === 'record'){
+      const r = RECORDS.find(x => x.id === local.itemId);
+      if (r && r.status !== 'concluido'){ r.status = 'concluido'; if (typeof pushHistory === 'function') pushHistory(r, 'concluído via assinatura de OS', `OS ${local.id}`); }
+    } else if (local.itemSrc === 'event'){
+      const e = EVENTS.find(x => x.id === local.itemId);
+      if (e) e.status = 'concluido';
+    }
+  } catch(e){}
+  try { if (typeof pushHistory === 'function') pushHistory(local, 'assinatura sincronizada do cliente', remote.signedByName || ''); } catch(e){}
+  try { if (typeof logNotification === 'function') logNotification({ kind:'os-signed', to:'', subject:`OS assinada por ${remote.signedByName || 'cliente'}`, status:'sucesso', relatedId:local.id, relatedType:'os', recipientName:remote.signedByName || '' }); } catch(e){}
+  return true;
+}
+
+/* Consulta no banco as OS pendentes de assinatura e aplica as que já foram
+   assinadas pelo cliente. `list` opcional (padrão: todas). Retorna nº atualizadas. */
+async function osSyncPendingSignatures(list){
+  if (!window._OS_REMOTE_ENABLED) return 0;
+  const pend = (list || ORDERS_SERVICE).filter(o =>
+    o && o.id && o.publicSignToken && o.status !== 'assinada' && o.status !== 'cancelada');
+  if (!pend.length) return 0;
+  let changed = 0;
+  await Promise.all(pend.map(async o => {
+    const remote = await osRemoteGet(o.id, o.publicSignToken);
+    if (remote && remote.status === 'assinada'){
+      const local = orderById(o.id) || o;
+      if (_osApplyRemoteSign(local, remote)) changed++;
+    }
+  }));
+  if (changed) persist();
+  return changed;
+}
+window.osSyncPendingSignatures = osSyncPendingSignatures;
+
 /* Helper para copiar para área de transferência */
 window.copyToClipboard = async (text, label) => {
   try {
@@ -22985,22 +23044,13 @@ function _renderPubReviewsHTML(){
            antes da integração — assim o link já entregue ao cliente passa a funcionar. */
         osRemoteSave(orderById(os.id) || os);
         osRemoteGet(os.id, os.publicSignToken).then(remote => {
-          if (!remote || remote.status !== 'assinada') return;
           const local = orderById(os.id);
-          if (!local || local.status === 'assinada') return;
-          Object.assign(local, {
-            status: 'assinada',
-            signedAt: remote.signedAt,
-            signedByName: remote.signedByName,
-            signedByRole: remote.signedByRole,
-            signatureDataURL: remote.signatureDataURL,
-            signedViaPublic: true,
-          });
-          try { if (typeof osDebitHours === 'function') osDebitHours(local); } catch(e){}
-          try { if (typeof pushHistory === 'function') pushHistory(local, 'assinatura sincronizada do cliente', remote.signedByName || ''); } catch(e){}
-          persist();
-          if (typeof toast === 'function') toast('success','OS assinada','Assinatura do cliente recebida.');
-          if (document.getElementById('modalOS')?.classList.contains('show')) renderOSModal();
+          if (_osApplyRemoteSign(local, remote)){
+            persist();
+            if (typeof toast === 'function') toast('success','OS assinada','Assinatura do cliente recebida.');
+            if (document.getElementById('modalOS')?.classList.contains('show')) renderOSModal();
+            if (document.getElementById('modalClientCard')?.classList.contains('show') && typeof renderClientCardModal === 'function') renderClientCardModal();
+          }
         });
       }
     } catch(e){}
@@ -23352,6 +23402,18 @@ if (!_pubRouter()){
   switchView('agenda');
   if (_loaded) toast('success','Dados carregados','Suas alterações anteriores foram restauradas.');
   else toast('info','Bem-vindo','Comece criando consultores em Cadastros.');
+  /* Ao abrir o painel, puxa do banco (Neon) as assinaturas feitas pelos clientes. */
+  try {
+    setTimeout(() => {
+      osSyncPendingSignatures().then(n => {
+        if (n > 0){
+          if (typeof renderAll === 'function') renderAll();
+          if (typeof renderClientKanban === 'function') renderClientKanban();
+          if (typeof toast === 'function') toast('success', n === 1 ? 'Assinatura recebida' : 'Assinaturas recebidas', n === 1 ? '1 OS foi assinada pelo cliente.' : `${n} OS foram assinadas pelo cliente.`);
+        }
+      });
+    }, 800);
+  } catch(e){}
 }
 setInterval(updateSyncTime, 30000);
 </script>
